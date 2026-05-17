@@ -803,9 +803,47 @@ img { display: block; max-width: 100%; }
     max-height: 92vh;
   }
   .detail-modal.open { transform: translateY(0); }
-  .detail-spec-row { grid-template-columns: 110px 1fr; }
+
+  /* Tighter header */
+  .detail-modal__header { padding: 14px 16px; gap: 10px; }
+  .detail-modal__icon {
+    width: 38px; height: 38px; font-size: 1.4rem;
+    border-radius: 10px;
+  }
+  .detail-modal__name { font-size: 1rem; }
+  .detail-modal__fullname { font-size: 0.72rem; }
+
+  /* Tighter body sections */
+  .detail-section { padding: 16px 16px 0; }
+  .detail-section-title { margin-top: 16px; margin-bottom: 12px; padding-bottom: 8px; }
+  .detail-overview { font-size: 0.875rem; }
+
+  /* Spec rows stack on mobile */
+  .detail-spec-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+    padding: 10px 12px;
+  }
+  .detail-spec-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+  }
+  .detail-spec-value {
+    font-size: 0.85rem;
+    color: var(--text);
+    word-break: break-word;
+  }
+
+  .detail-mechanism { padding: 12px 14px; font-size: 0.85rem; }
+  .detail-benefits li { font-size: 0.85rem; }
+  .detail-disclaimer { margin: 16px; padding: 11px 13px; font-size: 0.75rem; }
+  .detail-modal__footer { padding: 12px 16px; }
+
+  /* Product card buttons stack cleanly */
   .product-card__footer { flex-wrap: wrap; gap: 10px; }
-  .product-card__actions { width: 100%; }
+  .product-card__actions { width: 100%; gap: 8px; }
   .view-details-btn, .add-to-cart { flex: 1; justify-content: center; }
 }
 
@@ -952,11 +990,34 @@ img { display: block; max-width: 100%; }
     max-height: 95vh;
   }
   .modal.open { transform: translateY(0); }
-  .modal__form { padding: 16px; }
+  .modal__header { padding: 14px 16px; }
+  .modal__form { padding: 16px; gap: 16px; }
+  .modal__section { gap: 10px; }
+  .modal__section h4 { margin-bottom: 2px; padding-bottom: 8px; font-size: 0.7rem; }
+
+  /* Force form rows to wrap properly — never more than 2 cols on phone */
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  /* Single column variant when needed */
+  .form-row--1 { grid-template-columns: 1fr; }
 
   /* Bigger tap targets on forms */
   .form-group input,
   .form-group textarea { padding: 13px 12px; font-size: 1rem; }
+  .form-group label { font-size: 0.78rem; }
   .btn--full { padding: 14px; font-size: 1rem; }
-  .qty-btn { width: 36px; height: 36px; }
+  .qty-btn { width: 32px; height: 32px; }
+
+  /* Venmo box tighter */
+  .venmo-box { padding: 14px; gap: 10px; }
+  .venmo-handle { font-size: 0.85rem; }
+  .venmo-amount { font-size: 1.1rem; }
+  .venmo-steps li { font-size: 0.78rem; padding-left: 26px; }
+  .checkout-note { font-size: 0.72rem; }
+
+  /* Order summary tighter */
+  .modal__order-summary { padding: 12px; }
+  .order-line { font-size: 0.82rem; padding: 5px 0; }
 }
