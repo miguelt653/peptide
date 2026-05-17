@@ -48,23 +48,79 @@ const DEFAULT_PRODUCTS = [
     price: 49.99,
     unit: "5mg vial",
     purity: "≥99%",
-    desc: "A synthetic peptide with notable research into soft tissue repair, gut health support, and recovery acceleration.",
-    meta: ["5mg / vial", "≥99% Purity", "Lyophilized"],
+    desc: "A synthetic pentadecapeptide studied for soft tissue repair, gut lining support, and recovery acceleration. One of the most researched healing peptides available.",
+    meta: ["5mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
     stock: 25,
   },
   {
     id: 2,
     name: "Retatrutide",
-    fullName: "Retatrutide (GLP-1/GIP/Glucagon)",
+    fullName: "Retatrutide (GLP-1/GIP/Glucagon Triple Agonist)",
     category: "metabolic",
     categoryLabel: "Metabolic",
     icon: "🎯",
     price: 129.99,
     unit: "10mg vial",
     purity: "≥99%",
-    desc: "A triple-agonist peptide (GLP-1, GIP, and glucagon receptors) being researched for metabolic function and body composition.",
-    meta: ["10mg / vial", "≥99% Purity", "Lyophilized"],
+    desc: "A next-generation triple receptor agonist (GLP-1, GIP, and glucagon) being actively studied for metabolic regulation, body composition, and energy balance.",
+    meta: ["10mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
     stock: 15,
+  },
+  {
+    id: 3,
+    name: "TB-500",
+    fullName: "Thymosin Beta-4 (TB-500)",
+    category: "healing",
+    categoryLabel: "Healing & Recovery",
+    icon: "💊",
+    price: 54.99,
+    unit: "5mg vial",
+    purity: "≥98.5%",
+    desc: "A naturally occurring peptide studied for its role in cell migration, proliferation, and differentiation — particularly relevant to muscle, tendon, and wound healing research.",
+    meta: ["5mg / vial", "≥98.5% Purity", "Lyophilized", "COA Included"],
+    stock: 20,
+  },
+  {
+    id: 4,
+    name: "Semaglutide",
+    fullName: "Semaglutide (GLP-1 Agonist)",
+    category: "metabolic",
+    categoryLabel: "Metabolic",
+    icon: "🌿",
+    price: 89.99,
+    unit: "5mg vial",
+    purity: "≥98.5%",
+    desc: "A long-acting GLP-1 receptor agonist extensively studied for glucose metabolism regulation, satiety signaling, and cardiovascular outcomes.",
+    meta: ["5mg / vial", "≥98.5% Purity", "Lyophilized", "COA Included"],
+    stock: 18,
+  },
+  {
+    id: 5,
+    name: "CJC-1295 / Ipamorelin",
+    fullName: "CJC-1295 DAC + Ipamorelin Blend",
+    category: "growth",
+    categoryLabel: "Growth & Performance",
+    icon: "⚡",
+    price: 64.99,
+    unit: "10mg blend vial",
+    purity: "≥99%",
+    desc: "A synergistic blend of a long-acting GHRH analogue (CJC-1295) and a selective GH secretagogue (Ipamorelin), studied for sustained GH release with minimal side-effect profile.",
+    meta: ["5mg CJC + 5mg Ipa", "≥99% Purity", "Lyophilized", "COA Included"],
+    stock: 12,
+  },
+  {
+    id: 6,
+    name: "GHK-Cu",
+    fullName: "Copper Peptide GHK-Cu",
+    category: "healing",
+    categoryLabel: "Healing & Recovery",
+    icon: "🔷",
+    price: 39.99,
+    unit: "50mg powder",
+    purity: "≥99%",
+    desc: "A naturally occurring copper complex found in human plasma, studied for collagen synthesis stimulation, wound healing, antioxidant activity, and tissue remodeling.",
+    meta: ["50mg / jar", "≥99% Purity", "Powder Form", "COA Included"],
+    stock: 30,
   },
 ];
 
@@ -288,6 +344,12 @@ function updateCartUI() {
   });
 
   cartTotal.textContent = `$${total.toFixed(2)}`;
+  const shippingNote = document.getElementById("shippingNote");
+  if (shippingNote) {
+    shippingNote.textContent = total >= 150
+      ? "✓ Free shipping applied"
+      : `Add $${(150 - total).toFixed(2)} more for free shipping`;
+  }
 }
 
 /* ---- Cart Drawer ---- */

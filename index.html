@@ -3,12 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Leanovo — Premium Peptide Shop</title>
+  <title>Leanovo — Research-Grade Peptides</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
+
+  <!-- ANNOUNCEMENT BAR -->
+  <div class="announcement">
+    <strong>Free shipping</strong> on orders over $150 &nbsp;·&nbsp; Every batch independently tested &nbsp;·&nbsp; COA included with all orders
+  </div>
 
   <!-- NAV -->
   <nav class="nav" id="nav">
@@ -16,12 +19,13 @@
       <a href="#" class="nav__logo">Lean<span>ovo</span></a>
       <ul class="nav__links">
         <li><a href="#products">Products</a></li>
-        <li><a href="#about">About</a></li>
+        <li><a href="#why">Why Us</a></li>
+        <li><a href="#how">How It Works</a></li>
         <li><a href="#faq">FAQ</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
       <button class="cart-btn" id="cartBtn" aria-label="Open cart">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         <span class="cart-count" id="cartCount">0</span>
       </button>
     </div>
@@ -29,57 +33,39 @@
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero__content">
-      <span class="hero__badge">Research Grade · 99%+ Purity</span>
-      <h1 class="hero__title">Premium Peptides<br /><em>Delivered to You</em></h1>
-      <p class="hero__sub">Laboratory-tested peptides for research and wellness. Rigorously verified for purity and potency.</p>
-      <a href="#products" class="btn btn--primary">Shop Peptides</a>
-      <a href="#about" class="btn btn--ghost">Learn More</a>
-    </div>
-    <div class="hero__visual">
-      <div class="hero__orb hero__orb--1"></div>
-      <div class="hero__orb hero__orb--2"></div>
-      <div class="hero__orb hero__orb--3"></div>
-      <div class="hero__molecule">
-        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="100" cy="100" r="80" stroke="rgba(99,102,241,0.3)" stroke-width="1.5" stroke-dasharray="6 4"/>
-          <circle cx="100" cy="100" r="50" stroke="rgba(99,102,241,0.5)" stroke-width="1.5"/>
-          <circle cx="100" cy="60"  r="8" fill="rgba(99,102,241,0.8)"/>
-          <circle cx="132" cy="80"  r="6" fill="rgba(139,92,246,0.8)"/>
-          <circle cx="132" cy="120" r="8" fill="rgba(99,102,241,0.8)"/>
-          <circle cx="100" cy="140" r="6" fill="rgba(139,92,246,0.8)"/>
-          <circle cx="68"  cy="120" r="8" fill="rgba(99,102,241,0.8)"/>
-          <circle cx="68"  cy="80"  r="6" fill="rgba(139,92,246,0.8)"/>
-          <circle cx="100" cy="100" r="12" fill="rgba(99,102,241,0.9)"/>
-          <line x1="100" y1="60"  x2="100" y2="88"  stroke="rgba(99,102,241,0.6)" stroke-width="1.5"/>
-          <line x1="132" y1="80"  x2="112" y2="92"  stroke="rgba(99,102,241,0.6)" stroke-width="1.5"/>
-          <line x1="132" y1="120" x2="112" y2="108" stroke="rgba(99,102,241,0.6)" stroke-width="1.5"/>
-          <line x1="100" y1="140" x2="100" y2="112" stroke="rgba(99,102,241,0.6)" stroke-width="1.5"/>
-          <line x1="68"  y1="120" x2="88"  y2="108" stroke="rgba(99,102,241,0.6)" stroke-width="1.5"/>
-          <line x1="68"  y1="80"  x2="88"  y2="92"  stroke="rgba(99,102,241,0.6)" stroke-width="1.5"/>
-        </svg>
+    <div class="hero__inner">
+      <div class="hero__eyebrow">Now available — Retatrutide &amp; BPC-157</div>
+      <h1 class="hero__title">Research-Grade Peptides<br /><span>You Can Trust</span></h1>
+      <p class="hero__sub">Every vial is independently verified for purity and potency. Shipped cold, delivered fast.</p>
+      <div class="hero__ctas">
+        <a href="#products" class="btn btn--primary">Shop Products</a>
+        <a href="#why" class="btn btn--ghost">Our Quality Promise</a>
       </div>
     </div>
   </section>
 
-  <!-- TRUST BAR -->
-  <div class="trust-bar">
-    <div class="trust-bar__inner">
+  <!-- TRUST STRIP -->
+  <div class="trust-strip">
+    <div class="trust-strip__inner">
       <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>Third-Party Tested</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Third-Party COA Verified
       </div>
       <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>Fast Shipping (1–3 Days)</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        ≥99% Avg. Purity
       </div>
       <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-        <span>Satisfaction Guarantee</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8l5 2v4l-5 2"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        Cold-Chain Shipping
       </div>
       <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        <span>Secure Checkout</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        1–3 Day Dispatch
+      </div>
+      <div class="trust-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Discreet Packaging
       </div>
     </div>
   </div>
@@ -87,57 +73,85 @@
   <!-- PRODUCTS -->
   <section class="products" id="products">
     <div class="container">
-      <div class="section-header">
-        <h2>Our Peptides</h2>
-        <p>Every batch independently verified by third-party laboratories.</p>
+      <div class="products__header">
+        <div>
+          <span class="section-label">Current Inventory</span>
+          <h2 class="section-title">Available Products</h2>
+        </div>
+        <p style="color:var(--text-muted);font-size:0.85rem;max-width:320px;text-align:right">All products are sold for research purposes only. A Certificate of Analysis ships with every order.</p>
       </div>
-
-      <div class="product-grid product-grid--small" id="productGrid"></div>
+      <div class="product-grid" id="productGrid"></div>
     </div>
   </section>
 
-  <!-- ABOUT -->
-  <section class="about" id="about">
-    <div class="container about__grid">
-      <div class="about__text">
-        <span class="section-label">Who We Are</span>
-        <h2>Science-backed.<br />Quality-obsessed.</h2>
-        <p>Leanovo was founded with one goal: deliver research-grade peptides that researchers and wellness professionals can trust. We source raw materials exclusively from GMP-certified facilities and perform independent COA testing on every batch.</p>
-        <ul class="about__list">
-          <li>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Certificate of Analysis (COA) with every order
-          </li>
-          <li>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            HPLC &amp; Mass Spectrometry verified purity ≥99%
-          </li>
-          <li>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Cold-chain shipping to preserve peptide integrity
-          </li>
-          <li>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Discreet packaging on every shipment
-          </li>
-        </ul>
+  <!-- WHY US -->
+  <section class="why" id="why">
+    <div class="container">
+      <div style="text-align:center">
+        <span class="section-label">Our Standards</span>
+        <h2 class="section-title">Why Researchers Choose Leanovo</h2>
       </div>
-      <div class="about__stats">
-        <div class="stat-card">
-          <span class="stat-num">99%+</span>
-          <span class="stat-label">Avg. Purity</span>
+      <div class="why__grid">
+        <div class="why-card">
+          <div class="why-card__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+          </div>
+          <div class="why-card__title">Independent Lab Testing</div>
+          <div class="why-card__desc">Every batch is tested by a third-party lab via HPLC and Mass Spectrometry before it ever leaves our warehouse.</div>
         </div>
-        <div class="stat-card">
-          <span class="stat-num">500+</span>
-          <span class="stat-label">Happy Customers</span>
+        <div class="why-card">
+          <div class="why-card__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div class="why-card__title">COA With Every Order</div>
+          <div class="why-card__desc">Your Certificate of Analysis ships with your order — exact purity, sequence confirmation, and endotoxin levels.</div>
         </div>
-        <div class="stat-card">
-          <span class="stat-num">48h</span>
-          <span class="stat-label">Avg. Dispatch</span>
+        <div class="why-card">
+          <div class="why-card__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </div>
+          <div class="why-card__title">Lyophilized for Stability</div>
+          <div class="why-card__desc">All peptides are freeze-dried for maximum shelf life and shipped with cold packs to preserve integrity.</div>
         </div>
-        <div class="stat-card">
-          <span class="stat-num">100%</span>
-          <span class="stat-label">COA Verified</span>
+        <div class="why-card">
+          <div class="why-card__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="why-card__title">Discreet &amp; Secure</div>
+          <div class="why-card__desc">Orders arrive in plain, unmarked packaging. No brand names on the outside. Your privacy is our priority.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <div class="container">
+      <div style="text-align:center">
+        <span class="section-label">Simple Process</span>
+        <h2 class="section-title">How Ordering Works</h2>
+        <p class="section-sub" style="max-width:480px;margin:0 auto">No account needed. No credit card. Add your items, enter your address, and send payment via Venmo.</p>
+      </div>
+      <div class="how__steps">
+        <div class="how-step">
+          <div class="how-step__num">1</div>
+          <div class="how-step__title">Add to Cart</div>
+          <div class="how-step__desc">Browse available products and add what you need to your cart.</div>
+        </div>
+        <div class="how-step">
+          <div class="how-step__num">2</div>
+          <div class="how-step__title">Enter Your Info</div>
+          <div class="how-step__desc">Provide your name, email, and shipping address at checkout.</div>
+        </div>
+        <div class="how-step">
+          <div class="how-step__num">3</div>
+          <div class="how-step__title">Send Venmo Payment</div>
+          <div class="how-step__desc">Send the exact total to our Venmo handle. Include your name in the note.</div>
+        </div>
+        <div class="how-step">
+          <div class="how-step__num">4</div>
+          <div class="how-step__title">We Ship Your Order</div>
+          <div class="how-step__desc">Once payment clears, your order ships within 1–2 business days with tracking.</div>
         </div>
       </div>
     </div>
@@ -146,8 +160,9 @@
   <!-- FAQ -->
   <section class="faq" id="faq">
     <div class="container">
-      <div class="section-header">
-        <h2>Frequently Asked Questions</h2>
+      <div style="text-align:center">
+        <span class="section-label">Got Questions?</span>
+        <h2 class="section-title">Frequently Asked Questions</h2>
       </div>
       <div class="faq__list" id="faqList"></div>
     </div>
@@ -158,34 +173,34 @@
     <div class="container contact__grid">
       <div class="contact__info">
         <span class="section-label">Get in Touch</span>
-        <h2>Questions?<br />We're here.</h2>
-        <p>Reach out for product questions, wholesale inquiries, or order support. We typically respond within a few hours.</p>
+        <h2>Questions?<br />We're here to help.</h2>
+        <p>Reach out for product questions, order status, or anything else. We typically respond within a few hours during business hours.</p>
         <div class="contact__details">
           <div class="contact__detail">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            <span>support@leanovo.com</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            support@leanovo.com
           </div>
           <div class="contact__detail">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
-            <span>+1 (800) 555-0198</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+            +1 (800) 555-0198
           </div>
         </div>
       </div>
       <form class="contact__form" id="contactForm">
         <div class="form-group">
-          <label for="name">Name</label>
-          <input type="text" id="name" name="name" placeholder="Your name" required />
+          <label for="cName">Name</label>
+          <input type="text" id="cName" name="name" placeholder="Your full name" required />
         </div>
         <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="your@email.com" required />
+          <label for="cEmail">Email</label>
+          <input type="email" id="cEmail" name="email" placeholder="your@email.com" required />
         </div>
         <div class="form-group">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" rows="4" placeholder="How can we help?" required></textarea>
+          <label for="cMessage">Message</label>
+          <textarea id="cMessage" name="message" rows="4" placeholder="How can we help?" required></textarea>
         </div>
         <button type="submit" class="btn btn--primary btn--full">Send Message</button>
-        <div class="form-success" id="formSuccess">Thanks! We'll get back to you shortly.</div>
+        <div class="form-success" id="formSuccess">Message sent! We'll get back to you shortly.</div>
       </form>
     </div>
   </section>
@@ -195,29 +210,32 @@
     <div class="container footer__inner">
       <div class="footer__brand">
         <a href="#" class="nav__logo">Lean<span>ovo</span></a>
-        <p>Research-grade peptides.<br />Trusted by professionals.</p>
+        <p>Research-grade peptides.<br />Independently tested. Trusted by professionals.</p>
       </div>
-      <div class="footer__links">
-        <h4>Shop</h4>
-        <a href="#products">All Products</a>
+      <div class="footer__col">
+        <h4>Products</h4>
         <a href="#products">BPC-157</a>
         <a href="#products">Retatrutide</a>
+        <a href="#products">TB-500</a>
+        <a href="#products">Semaglutide</a>
+        <a href="#products">View All</a>
       </div>
-      <div class="footer__links">
+      <div class="footer__col">
         <h4>Company</h4>
-        <a href="#about">About Us</a>
+        <a href="#why">Quality Standards</a>
+        <a href="#how">How It Works</a>
         <a href="#faq">FAQ</a>
         <a href="#contact">Contact</a>
       </div>
-      <div class="footer__links">
+      <div class="footer__col">
         <h4>Legal</h4>
         <a href="#">Terms of Service</a>
         <a href="#">Privacy Policy</a>
-        <a href="#">Disclaimer</a>
+        <a href="#">Research Disclaimer</a>
       </div>
     </div>
-    <div class="footer__bottom">
-      <p>© 2026 Leanovo. For research purposes only. Not for human consumption. Always consult a licensed healthcare professional.</p>
+    <div class="footer__bottom container">
+      <p>© 2026 Leanovo. All products are sold strictly for in vitro research purposes only. Not intended for human or veterinary use, consumption, or injection. Always consult a licensed healthcare professional. These statements have not been evaluated by the FDA.</p>
     </div>
   </footer>
 
@@ -227,19 +245,20 @@
     <div class="cart-drawer__header">
       <h3>Your Cart</h3>
       <button class="cart-close" id="cartClose" aria-label="Close cart">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="cart-drawer__body" id="cartBody">
       <div class="cart-empty" id="cartEmpty">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         <p>Your cart is empty</p>
       </div>
       <div id="cartItems"></div>
     </div>
     <div class="cart-drawer__footer" id="cartFooter" style="display:none">
+      <p class="cart-shipping-note" id="shippingNote"></p>
       <div class="cart-total">
-        <span>Total</span>
+        <span>Subtotal</span>
         <span id="cartTotal">$0.00</span>
       </div>
       <button class="btn btn--primary btn--full" id="checkoutBtn">Proceed to Checkout</button>
@@ -252,7 +271,7 @@
     <div class="modal__header">
       <h3>Complete Your Order</h3>
       <button class="cart-close" id="modalClose">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <form class="modal__form" id="checkoutForm">
@@ -298,15 +317,13 @@
           </div>
         </div>
       </div>
-
       <div class="modal__order-summary" id="orderSummary"></div>
-
       <div class="venmo-box">
         <div class="venmo-box__header">
           <div class="venmo-logo">V</div>
           <div>
             <div class="venmo-box__title">Pay via Venmo</div>
-            <div class="venmo-box__sub">Send the total to the handle below</div>
+            <div class="venmo-box__sub">Send the exact amount shown above to the handle below</div>
           </div>
         </div>
         <div class="venmo-handle-row">
@@ -319,18 +336,17 @@
         </div>
         <ol class="venmo-steps">
           <li>Open Venmo and send the exact amount to <strong>@Frankie-DiLorenzo</strong></li>
-          <li>Include your <strong>name + email</strong> in the Venmo note so we can match the order</li>
-          <li>Click "I've Sent the Payment" below — your order ships once payment clears</li>
+          <li>Add your <strong>name + order email</strong> in the Venmo note</li>
+          <li>Click the button below — we ship once payment is confirmed</li>
         </ol>
       </div>
-
-      <button type="submit" class="btn btn--primary btn--full">I've Sent the Payment</button>
-      <p class="checkout-note">By submitting, you confirm you've sent payment via Venmo. Your order will ship within 1–2 business days of payment confirmation.</p>
+      <button type="submit" class="btn btn--primary btn--full">I've Sent the Payment →</button>
+      <p class="checkout-note">By submitting you confirm payment was sent via Venmo. Orders ship within 1–2 business days of payment confirmation.</p>
     </form>
     <div class="order-success" id="orderSuccess" style="display:none">
-      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 10"/></svg>
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 10"/></svg>
       <h3>Order Received!</h3>
-      <p>Thanks! Once your Venmo payment is confirmed, your order will ship within 1–2 business days. You'll receive a confirmation email.</p>
+      <p>We'll confirm your Venmo and ship within 1–2 business days. Check your email for details.</p>
       <button class="btn btn--primary" id="successClose">Close</button>
     </div>
   </div>
@@ -339,51 +355,38 @@
   <div class="modal-overlay" id="adminOverlay"></div>
   <div class="modal admin-modal" id="adminModal">
     <div class="modal__header">
-      <h3>🔒 Admin Panel</h3>
+      <h3>Admin Panel</h3>
       <button class="cart-close" id="adminClose">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <!-- Login -->
     <div class="admin-login" id="adminLogin">
-      <p>Enter admin password to manage inventory and orders.</p>
+      <p>Enter your admin password to manage inventory and view orders.</p>
       <form id="adminLoginForm">
         <div class="form-group">
           <label>Password</label>
           <input type="password" id="adminPasswordInput" required autocomplete="off" />
         </div>
         <button class="btn btn--primary btn--full" type="submit">Unlock</button>
-        <div class="form-error" id="adminError" style="display:none">Incorrect password.</div>
+        <div class="form-error" id="adminError">Incorrect password. Try again.</div>
       </form>
     </div>
-    <!-- Dashboard -->
     <div class="admin-dashboard" id="adminDashboard" style="display:none">
       <div class="admin-tabs">
         <button class="admin-tab admin-tab--active" data-tab="inventory">Inventory</button>
         <button class="admin-tab" data-tab="orders">Orders</button>
       </div>
       <div class="admin-tab-content" id="tabInventory">
-        <p class="admin-hint">Adjust stock counts. Changes save automatically.</p>
+        <p class="admin-hint">Adjust stock counts below. Changes save immediately.</p>
         <div id="inventoryList"></div>
       </div>
       <div class="admin-tab-content" id="tabOrders" style="display:none">
-        <p class="admin-hint">Recent orders. Mark as shipped once Venmo payment is confirmed.</p>
+        <p class="admin-hint">Pending and recent orders. Mark as shipped once Venmo payment is confirmed.</p>
         <div id="ordersList"></div>
       </div>
     </div>
   </div>
 
-  <!-- EmailJS SDK (only used if USE_EMAILJS = true in app.js) -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script>
-    // Initialize EmailJS if config is set in app.js (loaded below).
-    // This snippet defers init until after app.js loads.
-    window.addEventListener("DOMContentLoaded", () => {
-      if (typeof USE_EMAILJS !== "undefined" && USE_EMAILJS && window.emailjs && typeof EMAILJS_CONFIG !== "undefined") {
-        try { window.emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey }); } catch (e) {}
-      }
-    });
-  </script>
   <script src="app.js"></script>
 </body>
 </html>
