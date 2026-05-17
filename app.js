@@ -51,6 +51,26 @@ const DEFAULT_PRODUCTS = [
     desc: "A synthetic pentadecapeptide studied for soft tissue repair, gut lining support, and recovery acceleration. One of the most researched healing peptides available.",
     meta: ["5mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
     stock: 25,
+    detail: {
+      overview: "BPC-157 (Body Protection Compound 157) is a synthetic peptide derived from a protective protein found naturally in gastric juice. It consists of 15 amino acids and has been the subject of extensive preclinical research for its remarkable regenerative properties across multiple tissue types.",
+      benefits: [
+        "Accelerates healing of tendons, ligaments, and muscle tissue",
+        "Supports gut lining integrity and gastrointestinal health",
+        "Reduces inflammation at injury sites",
+        "Promotes angiogenesis (new blood vessel formation) to injured areas",
+        "Studied for neuroprotective effects and nervous system repair",
+        "May support joint health and cartilage recovery",
+      ],
+      mechanism: "BPC-157 works by upregulating growth hormone receptors and activating the FAK-paxillin pathway, which plays a key role in cell survival and migration. It also promotes the formation of new blood vessels through VEGF signaling, accelerating nutrient delivery to healing tissue.",
+      specs: [
+        { label: "Sequence", value: "Gly-Glu-Pro-Pro-Pro-Gly-Lys-Pro-Ala-Asp-Asp-Ala-Gly-Leu-Val" },
+        { label: "Molecular Weight", value: "1,419.5 Da" },
+        { label: "Form", value: "Lyophilized powder" },
+        { label: "Purity", value: "≥99% (HPLC verified)" },
+        { label: "Storage", value: "Refrigerate at 2–8°C. Stable up to 24 months lyophilized." },
+        { label: "Reconstitution", value: "Bacteriostatic water" },
+      ],
+    },
   },
   {
     id: 2,
@@ -65,6 +85,26 @@ const DEFAULT_PRODUCTS = [
     desc: "A next-generation triple receptor agonist (GLP-1, GIP, and glucagon) being actively studied for metabolic regulation, body composition, and energy balance.",
     meta: ["10mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
     stock: 15,
+    detail: {
+      overview: "Retatrutide is a novel triple receptor agonist that simultaneously targets GLP-1, GIP, and glucagon receptors — making it the first of its kind in peptide research. Early clinical data has positioned it as one of the most potent metabolic peptides studied to date, with research showing significantly greater effects on body composition than single or dual agonists.",
+      benefits: [
+        "Targets three metabolic receptors simultaneously (GLP-1, GIP, glucagon)",
+        "Studied for significant improvements in body composition",
+        "Supports glucose metabolism and insulin sensitivity",
+        "May enhance energy expenditure via glucagon receptor activation",
+        "Research indicates superior metabolic outcomes vs. dual agonists",
+        "Potential cardiovascular benefits under investigation",
+      ],
+      mechanism: "Retatrutide's triple agonism creates a synergistic metabolic effect: GLP-1 activation reduces appetite and slows gastric emptying; GIP activation enhances insulin response and fat metabolism; glucagon receptor activation increases energy expenditure and promotes fat oxidation. Together, these mechanisms produce compounding metabolic benefits.",
+      specs: [
+        { label: "Class", value: "Triple GLP-1/GIP/Glucagon receptor agonist" },
+        { label: "Molecular Weight", value: "~4,900 Da" },
+        { label: "Half-Life", value: "~6 days (subcutaneous)" },
+        { label: "Form", value: "Lyophilized powder" },
+        { label: "Purity", value: "≥99% (HPLC verified)" },
+        { label: "Storage", value: "Refrigerate at 2–8°C. Do not freeze reconstituted solution." },
+      ],
+    },
   },
   {
     id: 3,
@@ -79,6 +119,26 @@ const DEFAULT_PRODUCTS = [
     desc: "A naturally occurring peptide studied for its role in cell migration, proliferation, and differentiation — particularly relevant to muscle, tendon, and wound healing research.",
     meta: ["5mg / vial", "≥98.5% Purity", "Lyophilized", "COA Included"],
     stock: 20,
+    detail: {
+      overview: "TB-500 is a synthetic version of Thymosin Beta-4, a naturally occurring 43-amino acid peptide found in virtually all human and animal cells. It plays a central role in building new blood vessels, muscle fibers, and cell migration. Unlike BPC-157 which is more site-specific, TB-500 has a systemic healing effect throughout the body.",
+      benefits: [
+        "Promotes systemic healing — works throughout the entire body",
+        "Accelerates muscle fiber repair and regeneration",
+        "Reduces inflammation and scar tissue formation",
+        "Improves flexibility and range of motion in damaged tissue",
+        "Studied for cardiac tissue repair and protection",
+        "Supports hair follicle growth in research models",
+      ],
+      mechanism: "TB-500 works primarily by upregulating actin — a protein critical for cell structure and movement. By promoting actin polymerization, it accelerates cell migration to injury sites, speeds up tissue repair, and facilitates the growth of new blood vessels. Its systemic nature means it doesn't require local injection near the injury site.",
+      specs: [
+        { label: "Sequence", value: "Ac-LKKTETQ (17-mer fragment)" },
+        { label: "Molecular Weight", value: "4,963.5 Da" },
+        { label: "Form", value: "Lyophilized powder" },
+        { label: "Purity", value: "≥98.5% (HPLC verified)" },
+        { label: "Storage", value: "Refrigerate at 2–8°C. Stable up to 24 months lyophilized." },
+        { label: "Reconstitution", value: "Bacteriostatic water" },
+      ],
+    },
   },
   {
     id: 4,
@@ -93,6 +153,26 @@ const DEFAULT_PRODUCTS = [
     desc: "A long-acting GLP-1 receptor agonist extensively studied for glucose metabolism regulation, satiety signaling, and cardiovascular outcomes.",
     meta: ["5mg / vial", "≥98.5% Purity", "Lyophilized", "COA Included"],
     stock: 18,
+    detail: {
+      overview: "Semaglutide is a glucagon-like peptide-1 (GLP-1) receptor agonist with a uniquely long half-life of approximately 7 days, achieved through structural modifications that resist enzymatic degradation. It is one of the most clinically studied metabolic peptides in the world, with multiple large-scale trials completed.",
+      benefits: [
+        "Potent regulation of blood glucose and insulin response",
+        "Significant reduction in appetite and caloric intake in research",
+        "Studied for cardiovascular risk reduction (SUSTAIN, PIONEER trials)",
+        "Slows gastric emptying, improving post-meal glucose control",
+        "Demonstrates neuroprotective properties in early research",
+        "Weekly dosing due to ~7-day half-life (research models)",
+      ],
+      mechanism: "Semaglutide mimics the natural GLP-1 hormone released after eating. It binds to GLP-1 receptors in the pancreas (stimulating insulin release), the hypothalamus (reducing appetite signals), and the gastrointestinal tract (slowing food transit). Its fatty acid chain attachment to albumin extends its half-life dramatically compared to native GLP-1.",
+      specs: [
+        { label: "Class", value: "GLP-1 receptor agonist" },
+        { label: "Molecular Weight", value: "4,113.6 Da" },
+        { label: "Half-Life", value: "~7 days" },
+        { label: "Form", value: "Lyophilized powder" },
+        { label: "Purity", value: "≥98.5% (HPLC + MS verified)" },
+        { label: "Storage", value: "Refrigerate at 2–8°C. Stable up to 18 months lyophilized." },
+      ],
+    },
   },
   {
     id: 5,
@@ -107,6 +187,26 @@ const DEFAULT_PRODUCTS = [
     desc: "A synergistic blend of a long-acting GHRH analogue (CJC-1295) and a selective GH secretagogue (Ipamorelin), studied for sustained GH release with minimal side-effect profile.",
     meta: ["5mg CJC + 5mg Ipa", "≥99% Purity", "Lyophilized", "COA Included"],
     stock: 12,
+    detail: {
+      overview: "This blend combines two complementary growth hormone-releasing peptides into a single vial. CJC-1295 DAC extends the natural GHRH signal for days at a time, while Ipamorelin provides a clean, selective GH pulse without affecting cortisol or prolactin. Together they produce a sustained and amplified GH release pattern that mimics the body's natural rhythm.",
+      benefits: [
+        "Sustained growth hormone release over multiple days (CJC-1295)",
+        "Clean GH pulse with no cortisol or prolactin elevation (Ipamorelin)",
+        "Supports lean muscle development and recovery in research",
+        "Studied for improvements in sleep quality and deep sleep duration",
+        "May enhance fat metabolism and body composition",
+        "Synergistic effect — works better together than either alone",
+      ],
+      mechanism: "CJC-1295 binds to GHRH receptors and extends the natural GH-releasing hormone signal for up to 8 days via its Drug Affinity Complex (DAC) technology. Ipamorelin mimics ghrelin to stimulate GH secretion through a separate receptor pathway (GHS-R). Using both simultaneously creates a dual-pathway pulse that produces a larger and more sustained GH response than either compound alone.",
+      specs: [
+        { label: "Contents", value: "5mg CJC-1295 DAC + 5mg Ipamorelin" },
+        { label: "CJC-1295 Half-Life", value: "~8 days" },
+        { label: "Ipamorelin Half-Life", value: "~2 hours" },
+        { label: "Form", value: "Lyophilized blend" },
+        { label: "Purity", value: "≥99% each component (HPLC verified)" },
+        { label: "Storage", value: "Refrigerate at 2–8°C. Keep away from light." },
+      ],
+    },
   },
   {
     id: 6,
@@ -121,6 +221,26 @@ const DEFAULT_PRODUCTS = [
     desc: "A naturally occurring copper complex found in human plasma, studied for collagen synthesis stimulation, wound healing, antioxidant activity, and tissue remodeling.",
     meta: ["50mg / jar", "≥99% Purity", "Powder Form", "COA Included"],
     stock: 30,
+    detail: {
+      overview: "GHK-Cu (Glycyl-L-histidyl-L-lysine copper complex) is a naturally occurring tripeptide found in human plasma, saliva, and urine. Its levels decline significantly with age. Research has shown it plays a wide-ranging role in tissue repair, anti-aging, and antioxidant defense — making it one of the most studied peptides in regenerative and aesthetic research.",
+      benefits: [
+        "Stimulates collagen and elastin synthesis in connective tissue",
+        "Accelerates wound and burn healing in multiple research models",
+        "Potent antioxidant — reduces free radical damage to cells",
+        "Studied extensively for skin regeneration and anti-aging effects",
+        "Promotes nerve regeneration and neuroprotection",
+        "Activates over 30 genes related to tissue repair and remodeling",
+      ],
+      mechanism: "GHK-Cu works by acting as a biological signal that the body interprets as a cue for repair. The copper ion acts as a cofactor for enzymes involved in collagen cross-linking. GHK itself activates the proteasome system (clearing damaged proteins), upregulates antioxidant enzymes, and promotes stem cell recruitment to damaged tissue sites.",
+      specs: [
+        { label: "Sequence", value: "Gly-His-Lys · Cu²⁺" },
+        { label: "Molecular Weight", value: "340.4 Da (peptide), 403.9 Da (Cu complex)" },
+        { label: "Form", value: "Lyophilized powder" },
+        { label: "Purity", value: "≥99% (HPLC verified)" },
+        { label: "Storage", value: "Store at room temperature or refrigerate. Avoid prolonged light exposure." },
+        { label: "Solubility", value: "Highly water soluble" },
+      ],
+    },
   },
 ];
 
@@ -244,11 +364,14 @@ function renderProducts() {
           <div class="product-card__price">$${p.price.toFixed(2)}</div>
           <div class="product-card__price-sub">per ${p.unit}</div>
         </div>
-        <button class="add-to-cart" data-id="${p.id}" ${available === 0 ? "disabled" : ""}>
-          ${available === 0
-            ? "Sold Out"
-            : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart`}
-        </button>
+        <div class="product-card__actions">
+          <button class="view-details-btn" data-id="${p.id}">Details</button>
+          <button class="add-to-cart" data-id="${p.id}" ${available === 0 ? "disabled" : ""}>
+            ${available === 0
+              ? "Sold Out"
+              : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add`}
+          </button>
+        </div>
       </div>
     `;
     productGrid.appendChild(card);
@@ -256,6 +379,9 @@ function renderProducts() {
 
   document.querySelectorAll(".add-to-cart:not([disabled])").forEach(btn => {
     btn.addEventListener("click", () => addToCart(parseInt(btn.dataset.id), btn));
+  });
+  document.querySelectorAll(".view-details-btn").forEach(btn => {
+    btn.addEventListener("click", () => openDetail(parseInt(btn.dataset.id)));
   });
 }
 
@@ -565,6 +691,100 @@ contactForm.addEventListener("submit", e => {
   formSuccess.style.display = "block";
   contactForm.reset();
   setTimeout(() => { formSuccess.style.display = "none"; }, 5000);
+});
+
+/* =========================================================
+   Product Detail Modal
+   ========================================================= */
+const detailOverlay = document.getElementById("detailOverlay");
+const detailModal   = document.getElementById("detailModal");
+const detailClose   = document.getElementById("detailClose");
+const detailBody    = document.getElementById("detailBody");
+const detailAddBtn  = document.getElementById("detailAddBtn");
+
+let detailProduct = null;
+
+function openDetail(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  if (!p) return;
+  detailProduct = p;
+
+  document.getElementById("detailIcon").textContent     = p.icon;
+  document.getElementById("detailName").textContent     = p.name;
+  document.getElementById("detailFullName").textContent = p.fullName;
+  document.getElementById("detailPrice").textContent    = `$${p.price.toFixed(2)}`;
+  document.getElementById("detailUnit").textContent     = `per ${p.unit}`;
+
+  const available = availableStock(p);
+  detailAddBtn.disabled = available === 0;
+  detailAddBtn.innerHTML = available === 0
+    ? "Sold Out"
+    : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart`;
+
+  const d = p.detail;
+  detailBody.innerHTML = `
+    <div class="detail-section">
+      <span class="detail-category-badge detail-category-badge--${p.category}">${p.categoryLabel}</span>
+      <p class="detail-overview">${d.overview}</p>
+    </div>
+
+    <div class="detail-section">
+      <h4 class="detail-section-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Key Benefits
+      </h4>
+      <ul class="detail-benefits">
+        ${d.benefits.map(b => `<li>${b}</li>`).join("")}
+      </ul>
+    </div>
+
+    <div class="detail-section">
+      <h4 class="detail-section-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        How It Works
+      </h4>
+      <p class="detail-mechanism">${d.mechanism}</p>
+    </div>
+
+    <div class="detail-section">
+      <h4 class="detail-section-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+        Specifications
+      </h4>
+      <div class="detail-specs">
+        ${d.specs.map(s => `
+          <div class="detail-spec-row">
+            <span class="detail-spec-label">${s.label}</span>
+            <span class="detail-spec-value">${s.value}</span>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <div class="detail-disclaimer">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      For research purposes only. Not intended for human consumption. Always consult a licensed healthcare professional.
+    </div>
+  `;
+
+  detailModal.classList.add("open");
+  detailOverlay.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function closeDetail() {
+  detailModal.classList.remove("open");
+  detailOverlay.classList.remove("active");
+  document.body.style.overflow = "";
+  detailProduct = null;
+}
+
+detailClose.addEventListener("click", closeDetail);
+detailOverlay.addEventListener("click", closeDetail);
+detailAddBtn.addEventListener("click", () => {
+  if (!detailProduct) return;
+  addToCart(detailProduct.id, detailAddBtn);
+  closeDetail();
 });
 
 /* ---- Hamburger menu ---- */

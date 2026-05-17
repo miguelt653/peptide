@@ -252,6 +252,34 @@
     </div>
   </footer>
 
+  <!-- PRODUCT DETAIL MODAL -->
+  <div class="modal-overlay" id="detailOverlay"></div>
+  <div class="modal detail-modal" id="detailModal">
+    <div class="modal__header detail-modal__header" id="detailHeader">
+      <div class="detail-modal__title-row">
+        <span class="detail-modal__icon" id="detailIcon"></span>
+        <div>
+          <div class="detail-modal__name" id="detailName"></div>
+          <div class="detail-modal__fullname" id="detailFullName"></div>
+        </div>
+      </div>
+      <button class="cart-close" id="detailClose">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="detail-modal__body" id="detailBody"></div>
+    <div class="detail-modal__footer" id="detailFooter">
+      <div>
+        <div class="product-card__price" id="detailPrice"></div>
+        <div class="product-card__price-sub" id="detailUnit"></div>
+      </div>
+      <button class="btn btn--primary" id="detailAddBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add to Cart
+      </button>
+    </div>
+  </div>
+
   <!-- CART DRAWER -->
   <div class="cart-overlay" id="cartOverlay"></div>
   <div class="cart-drawer" id="cartDrawer">
