@@ -267,27 +267,39 @@ const PRODUCTS = loadProducts();
 const FAQS = [
   {
     q: "What does 'research purposes only' mean?",
-    a: "Our peptides are sold strictly for in vitro (laboratory) research. They are not intended for human or veterinary use, consumption, or injection. Always consult a licensed healthcare professional before any personal use.",
+    a: "All Leanova peptides are sold strictly for in vitro (laboratory) research. They are not intended for human or veterinary use, consumption, or injection. Always consult a licensed healthcare professional before any personal use.",
   },
   {
     q: "How do you verify purity?",
-    a: "Every batch undergoes HPLC (High-Performance Liquid Chromatography) and Mass Spectrometry testing at an independent third-party laboratory. A Certificate of Analysis (COA) is available for every product.",
-  },
-  {
-    q: "How are peptides shipped?",
-    a: "Peptides are shipped with cold-pack insulation to maintain stability during transit. All orders are dispatched within 24–48 hours in discreet, unmarked packaging.",
-  },
-  {
-    q: "What's your return / refund policy?",
-    a: "We offer a full refund or replacement within 30 days if the product does not match the COA specifications. Contact our support team with your order number and batch ID.",
-  },
-  {
-    q: "Do you ship internationally?",
-    a: "Yes — we ship to most countries. Please note that import regulations vary. It is the customer's responsibility to confirm that ordering is permitted in their jurisdiction.",
+    a: "Every batch undergoes HPLC (High-Performance Liquid Chromatography) and Mass Spectrometry testing at an independent third-party laboratory. A Certificate of Analysis (COA) ships with every order.",
   },
   {
     q: "What payment methods do you accept?",
-    a: "We accept all major credit/debit cards (Visa, Mastercard, Amex), as well as cryptocurrency (Bitcoin, Ethereum) for privacy-conscious customers.",
+    a: "We currently accept Cash App only. At checkout you'll see our cashtag and the exact amount to send. We ship as soon as the payment clears — typically within a few hours of receipt.",
+  },
+  {
+    q: "How long until my order ships?",
+    a: "Once your Cash App payment is confirmed, orders ship within 1–2 business days. You'll receive a confirmation email with tracking once your package is on its way.",
+  },
+  {
+    q: "How are orders packaged and shipped?",
+    a: "All peptides ship with cold-pack insulation in plain, unmarked packaging to preserve product stability and your privacy. We use USPS Priority or UPS Ground depending on your location.",
+  },
+  {
+    q: "What if my Cash App payment doesn't match an order?",
+    a: "That's why we ask you to include your name and email in the Cash App note. If we can't match a payment to an order, we'll reach out directly using the contact info you submitted at checkout.",
+  },
+  {
+    q: "Do I need an account to order?",
+    a: "No. There are no accounts, no passwords, no logins. Just add what you want to the cart, enter your shipping info and email, and send the Cash App payment.",
+  },
+  {
+    q: "What's your return / refund policy?",
+    a: "If a product doesn't match the COA specifications or arrives damaged, we'll issue a full refund or replacement within 30 days. Reach out via the contact form or email with your order number.",
+  },
+  {
+    q: "Where do you ship to?",
+    a: "We currently ship within the United States only. International orders are not supported at this time due to varying customs regulations.",
   },
 ];
 
