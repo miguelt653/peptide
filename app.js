@@ -1,8 +1,43 @@
 /* =========================================================
-   PurePep — App Logic
-   ========================================================= */
+   Leanovo — App Logic
+   =========================================================
+   OWNER NOTIFICATION SETUP (so you get a text when someone orders):
+   ----------------------------------------------------------
+   Pick ONE option and fill in the URL/ID below.
 
-const PRODUCTS = [
+   OPTION A — Zapier / Make webhook (recommended, sends real SMS):
+     1. Sign up at zapier.com (free) or make.com (free).
+     2. Create a Zap:  Trigger = "Webhook by Zapier → Catch Hook"
+                       Action  = "SMS by Zapier" (or "Twilio → Send SMS")
+     3. Copy the webhook URL Zapier gives you and paste it as
+        OWNER_WEBHOOK_URL below.
+     4. Publish the Zap. Every order will text you the details.
+
+   OPTION B — EmailJS (sends an email, free 200/mo):
+     1. Sign up at emailjs.com.
+     2. Create an Email Service + Template. Note your IDs/Key.
+     3. Set USE_EMAILJS = true and paste your IDs below.
+     4. To turn that email into a TEXT, use your carrier's
+        email-to-SMS gateway as the "To Email" in your EmailJS
+        template (e.g. 5551234567@vtext.com for Verizon,
+        @txt.att.net for AT&T, @tmomail.net for T-Mobile).
+
+   If both are left blank, orders are still saved in the Admin panel
+   — you just won't get a real-time notification.
+   ---------------------------------------------------------- */
+
+/* ---- Config ---- */
+const VENMO_HANDLE      = "@Frankie-DiLorenzo";
+const ADMIN_PASSWORD    = "changeme123"; // change me in production
+const OWNER_WEBHOOK_URL = "";            // e.g. "https://hooks.zapier.com/hooks/catch/123456/abcdef/"
+const USE_EMAILJS       = false;
+const EMAILJS_CONFIG    = {
+  publicKey:  "YOUR_PUBLIC_KEY",
+  serviceId:  "YOUR_SERVICE_ID",
+  templateId: "YOUR_TEMPLATE_ID",
+};
+
+const DEFAULT_PRODUCTS = [
   {
     id: 1,
     name: "BPC-157",
@@ -15,151 +50,43 @@ const PRODUCTS = [
     purity: "≥99%",
     desc: "A synthetic peptide with notable research into soft tissue repair, gut health support, and recovery acceleration.",
     meta: ["5mg / vial", "≥99% Purity", "Lyophilized"],
+    stock: 25,
   },
   {
     id: 2,
-    name: "TB-500",
-    fullName: "Thymosin Beta-4",
-    category: "healing",
-    categoryLabel: "Healing & Recovery",
-    icon: "💊",
-    price: 54.99,
-    unit: "5mg vial",
-    purity: "≥98%",
-    desc: "Researched for its role in cell proliferation, migration, and differentiation — particularly relevant to tissue healing.",
-    meta: ["5mg / vial", "≥98% Purity", "Lyophilized"],
-  },
-  {
-    id: 3,
-    name: "CJC-1295",
-    fullName: "CJC-1295 DAC",
-    category: "growth",
-    categoryLabel: "Growth & Performance",
-    icon: "⚡",
-    price: 39.99,
-    unit: "2mg vial",
-    purity: "≥99%",
-    desc: "A long-acting GHRH analogue studied for sustained growth hormone release, lean mass, and recovery.",
-    meta: ["2mg / vial", "≥99% Purity", "Lyophilized"],
-  },
-  {
-    id: 4,
-    name: "Ipamorelin",
-    fullName: "Ipamorelin Acetate",
-    category: "growth",
-    categoryLabel: "Growth & Performance",
-    icon: "🔬",
-    price: 34.99,
-    unit: "5mg vial",
-    purity: "≥99%",
-    desc: "A selective GH secretagogue studied for growth hormone release with minimal cortisol and prolactin elevation.",
-    meta: ["5mg / vial", "≥99% Purity", "Lyophilized"],
-  },
-  {
-    id: 5,
-    name: "Semaglutide",
-    fullName: "Semaglutide (GLP-1)",
+    name: "Retatrutide",
+    fullName: "Retatrutide (GLP-1/GIP/Glucagon)",
     category: "metabolic",
     categoryLabel: "Metabolic",
     icon: "🎯",
-    price: 89.99,
-    unit: "3mg vial",
-    purity: "≥98.5%",
-    desc: "A GLP-1 receptor agonist extensively studied for glucose metabolism regulation and satiety signaling.",
-    meta: ["3mg / vial", "≥98.5% Purity", "Lyophilized"],
-  },
-  {
-    id: 6,
-    name: "Tirzepatide",
-    fullName: "Tirzepatide (GLP-1/GIP)",
-    category: "metabolic",
-    categoryLabel: "Metabolic",
-    icon: "🌿",
-    price: 99.99,
-    unit: "5mg vial",
-    purity: "≥98%",
-    desc: "A dual GIP/GLP-1 receptor agonist with promising research in metabolic function and energy regulation.",
-    meta: ["5mg / vial", "≥98% Purity", "Lyophilized"],
-  },
-  {
-    id: 7,
-    name: "Selank",
-    fullName: "Selank Peptide",
-    category: "cognitive",
-    categoryLabel: "Cognitive",
-    icon: "🧠",
-    price: 44.99,
-    unit: "5mg vial",
-    purity: "≥99%",
-    desc: "A synthetic analogue of tuftsin studied for anxiolytic effects, mood stabilization, and cognitive function.",
-    meta: ["5mg / vial", "≥99% Purity", "Lyophilized"],
-  },
-  {
-    id: 8,
-    name: "Semax",
-    fullName: "Semax Peptide",
-    category: "cognitive",
-    categoryLabel: "Cognitive",
-    icon: "✨",
-    price: 47.99,
-    unit: "5mg vial",
-    purity: "≥99%",
-    desc: "An ACTH-derived peptide researched for neuroprotection, BDNF upregulation, and attention enhancement.",
-    meta: ["5mg / vial", "≥99% Purity", "Lyophilized"],
-  },
-  {
-    id: 9,
-    name: "PT-141",
-    fullName: "Bremelanotide",
-    category: "healing",
-    categoryLabel: "Healing & Recovery",
-    icon: "💫",
-    price: 42.99,
+    price: 129.99,
     unit: "10mg vial",
-    purity: "≥98%",
-    desc: "A melanocortin receptor agonist studied for its role in various physiological pathways.",
-    meta: ["10mg / vial", "≥98% Purity", "Lyophilized"],
-  },
-  {
-    id: 10,
-    name: "DSIP",
-    fullName: "Delta Sleep-Inducing Peptide",
-    category: "cognitive",
-    categoryLabel: "Cognitive",
-    icon: "🌙",
-    price: 38.99,
-    unit: "5mg vial",
-    purity: "≥98%",
-    desc: "A neuropeptide studied for its effects on sleep architecture, stress response, and circadian rhythm regulation.",
-    meta: ["5mg / vial", "≥98% Purity", "Lyophilized"],
-  },
-  {
-    id: 11,
-    name: "GHK-Cu",
-    fullName: "Copper Peptide GHK-Cu",
-    category: "healing",
-    categoryLabel: "Healing & Recovery",
-    icon: "🔷",
-    price: 36.99,
-    unit: "50mg powder",
     purity: "≥99%",
-    desc: "A naturally occurring copper complex studied for collagen synthesis, wound healing, and antioxidant activity.",
-    meta: ["50mg / jar", "≥99% Purity", "Powder"],
-  },
-  {
-    id: 12,
-    name: "Hexarelin",
-    fullName: "Hexarelin Acetate",
-    category: "growth",
-    categoryLabel: "Growth & Performance",
-    icon: "💪",
-    price: 41.99,
-    unit: "2mg vial",
-    purity: "≥99%",
-    desc: "A potent GH secretagogue studied for growth hormone release, cardiovascular research, and muscle recovery.",
-    meta: ["2mg / vial", "≥99% Purity", "Lyophilized"],
+    desc: "A triple-agonist peptide (GLP-1, GIP, and glucagon receptors) being researched for metabolic function and body composition.",
+    meta: ["10mg / vial", "≥99% Purity", "Lyophilized"],
+    stock: 15,
   },
 ];
+
+/* ---- Load products w/ stock from localStorage ---- */
+function loadProducts() {
+  const saved = localStorage.getItem("leanovo_products");
+  if (saved) {
+    try {
+      const savedProducts = JSON.parse(saved);
+      // Merge: use saved stock counts but fresh product details
+      return DEFAULT_PRODUCTS.map(p => {
+        const s = savedProducts.find(sp => sp.id === p.id);
+        return { ...p, stock: s ? s.stock : p.stock };
+      });
+    } catch (e) { return [...DEFAULT_PRODUCTS]; }
+  }
+  return [...DEFAULT_PRODUCTS];
+}
+function saveProducts() {
+  localStorage.setItem("leanovo_products", JSON.stringify(PRODUCTS.map(p => ({ id: p.id, stock: p.stock }))));
+}
+const PRODUCTS = loadProducts();
 
 const FAQS = [
   {
@@ -194,7 +121,7 @@ let activeCategory = "all";
 
 /* ---- DOM Refs ---- */
 const productGrid = document.getElementById("productGrid");
-const filterBtns  = document.querySelectorAll(".filter-btn");
+const filterBtns  = document.querySelectorAll(".filter-btn"); // may be empty
 const cartBtn     = document.getElementById("cartBtn");
 const cartCount   = document.getElementById("cartCount");
 const cartOverlay = document.getElementById("cartOverlay");
@@ -217,6 +144,15 @@ const faqList       = document.getElementById("faqList");
 const contactForm   = document.getElementById("contactForm");
 const formSuccess   = document.getElementById("formSuccess");
 
+/* ---- Stock helpers ---- */
+function inCart(id) {
+  const item = cart.find(i => i.id === id);
+  return item ? item.qty : 0;
+}
+function availableStock(p) {
+  return Math.max(0, p.stock - inCart(p.id));
+}
+
 /* ---- Render Products ---- */
 function renderProducts() {
   const filtered = activeCategory === "all"
@@ -225,8 +161,11 @@ function renderProducts() {
 
   productGrid.innerHTML = "";
   filtered.forEach((p, i) => {
+    const available = availableStock(p);
+    const soldOut = p.stock === 0;
+    const lowStock = !soldOut && p.stock <= 5;
     const card = document.createElement("div");
-    card.className = "product-card";
+    card.className = "product-card" + (soldOut ? " product-card--soldout" : "");
     card.style.animationDelay = `${i * 0.05}s`;
     card.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between">
@@ -241,18 +180,23 @@ function renderProducts() {
       <div class="product-card__meta">
         ${p.meta.map(m => `<span>${m}</span>`).join("")}
       </div>
+      <div class="stock-indicator ${soldOut ? 'stock-indicator--out' : lowStock ? 'stock-indicator--low' : 'stock-indicator--in'}">
+        <span class="stock-dot"></span>
+        ${soldOut ? "Sold Out" : lowStock ? `Only ${p.stock} left` : `${p.stock} in stock`}
+      </div>
       <div class="product-card__footer">
         <div class="product-card__price">$${p.price.toFixed(2)}<span>/ ${p.unit}</span></div>
-        <button class="add-to-cart" data-id="${p.id}">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add
+        <button class="add-to-cart" data-id="${p.id}" ${available === 0 ? "disabled" : ""}>
+          ${available === 0
+            ? "Sold Out"
+            : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add`}
         </button>
       </div>
     `;
     productGrid.appendChild(card);
   });
 
-  document.querySelectorAll(".add-to-cart").forEach(btn => {
+  document.querySelectorAll(".add-to-cart:not([disabled])").forEach(btn => {
     btn.addEventListener("click", () => addToCart(parseInt(btn.dataset.id), btn));
   });
 }
@@ -271,6 +215,7 @@ filterBtns.forEach(btn => {
 function addToCart(id, btn) {
   const product = PRODUCTS.find(p => p.id === id);
   if (!product) return;
+  if (availableStock(product) <= 0) return;
   const existing = cart.find(i => i.id === id);
   if (existing) {
     existing.qty++;
@@ -278,6 +223,7 @@ function addToCart(id, btn) {
     cart.push({ ...product, qty: 1 });
   }
   updateCartUI();
+  renderProducts();
   btn.classList.add("added");
   btn.textContent = "Added ✓";
   setTimeout(() => {
@@ -289,14 +235,17 @@ function addToCart(id, btn) {
 function removeFromCart(id) {
   cart = cart.filter(i => i.id !== id);
   updateCartUI();
+  renderProducts();
 }
 
 function changeQty(id, delta) {
   const item = cart.find(i => i.id === id);
   if (!item) return;
+  const product = PRODUCTS.find(p => p.id === id);
+  if (delta > 0 && product && item.qty >= product.stock) return; // can't exceed stock
   item.qty += delta;
   if (item.qty <= 0) removeFromCart(id);
-  else updateCartUI();
+  else { updateCartUI(); renderProducts(); }
 }
 
 function updateCartUI() {
@@ -373,8 +322,14 @@ checkoutBtn.addEventListener("click", openCheckout);
 modalClose.addEventListener("click", closeCheckout);
 modalOverlay.addEventListener("click", closeCheckout);
 
+function getOrderTotal() {
+  const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const ship = sub >= 100 ? 0 : 9.99;
+  return { sub, ship, total: sub + ship };
+}
+
 function buildOrderSummary() {
-  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const { sub, ship, total } = getOrderTotal();
   orderSummary.innerHTML = `
     <h4>Order Summary</h4>
     ${cart.map(i => `
@@ -385,36 +340,132 @@ function buildOrderSummary() {
     `).join("")}
     <div class="order-line">
       <span>Shipping</span>
-      <span>${total >= 100 ? "FREE" : "$9.99"}</span>
+      <span>${ship === 0 ? "FREE" : "$" + ship.toFixed(2)}</span>
     </div>
     <div class="order-line">
       <span>Total</span>
-      <span>$${(total + (total >= 100 ? 0 : 9.99)).toFixed(2)}</span>
+      <span>$${total.toFixed(2)}</span>
     </div>
   `;
+  document.getElementById("venmoHandle").textContent = VENMO_HANDLE;
+  document.getElementById("venmoAmount").textContent = `$${total.toFixed(2)}`;
 }
 
-/* ---- Card input formatting ---- */
-document.getElementById("cardNumber").addEventListener("input", function () {
-  let v = this.value.replace(/\D/g, "").slice(0, 16);
-  this.value = v.replace(/(.{4})/g, "$1 ").trim();
+/* ---- Copy Venmo handle ---- */
+document.getElementById("copyVenmo").addEventListener("click", () => {
+  navigator.clipboard.writeText(VENMO_HANDLE).then(() => {
+    const btn = document.getElementById("copyVenmo");
+    const original = btn.textContent;
+    btn.textContent = "Copied ✓";
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  });
 });
-document.getElementById("cardExpiry").addEventListener("input", function () {
-  let v = this.value.replace(/\D/g, "").slice(0, 4);
-  if (v.length >= 3) v = v.slice(0, 2) + " / " + v.slice(2);
-  this.value = v;
-});
-document.getElementById("cardCVV").addEventListener("input", function () {
-  this.value = this.value.replace(/\D/g, "").slice(0, 4);
-});
+
+/* ---- Orders persistence ---- */
+function loadOrders() {
+  try { return JSON.parse(localStorage.getItem("leanovo_orders") || "[]"); }
+  catch { return []; }
+}
+function saveOrders(orders) {
+  localStorage.setItem("leanovo_orders", JSON.stringify(orders));
+}
+
+/* ---- Owner SMS / Email Notification ---- */
+function buildOrderMessage(order) {
+  const itemsLine = order.items.map(i => `${i.name} x${i.qty}`).join(", ");
+  return [
+    `🛒 New Leanovo Order ${order.id}`,
+    `${order.customer.firstName} ${order.customer.lastName}`,
+    `${order.customer.email} · ${order.customer.phone || "no phone"}`,
+    `${order.customer.address}, ${order.customer.city}, ${order.customer.state} ${order.customer.zip}`,
+    `Items: ${itemsLine}`,
+    `Total: $${order.total.toFixed(2)} via Venmo (${VENMO_HANDLE})`,
+  ].join("\n");
+}
+
+async function notifyOwner(order) {
+  const message = buildOrderMessage(order);
+
+  // Option A: Webhook (Zapier / Make → SMS)
+  if (OWNER_WEBHOOK_URL) {
+    try {
+      await fetch(OWNER_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: order.id,
+          message,
+          order,
+        }),
+        mode: "no-cors", // works around CORS for Zapier hooks
+      });
+    } catch (err) {
+      console.warn("Webhook notification failed:", err);
+    }
+  }
+
+  // Option B: EmailJS (email or email-to-SMS gateway)
+  if (USE_EMAILJS && window.emailjs) {
+    try {
+      await window.emailjs.send(
+        EMAILJS_CONFIG.serviceId,
+        EMAILJS_CONFIG.templateId,
+        {
+          order_id: order.id,
+          message,
+          customer_name: `${order.customer.firstName} ${order.customer.lastName}`,
+          customer_email: order.customer.email,
+          customer_phone: order.customer.phone || "",
+          total: `$${order.total.toFixed(2)}`,
+        }
+      );
+    } catch (err) {
+      console.warn("EmailJS notification failed:", err);
+    }
+  }
+}
 
 /* ---- Checkout Submit ---- */
 checkoutForm.addEventListener("submit", e => {
   e.preventDefault();
+  const formData = new FormData(checkoutForm);
+  const { total } = getOrderTotal();
+  const order = {
+    id: "PP-" + Date.now().toString(36).toUpperCase(),
+    date: new Date().toISOString(),
+    status: "awaiting_payment",
+    customer: {
+      firstName: formData.get("firstName"),
+      lastName: formData.get("lastName"),
+      email: formData.get("checkoutEmail"),
+      phone: formData.get("phone"),
+      address: formData.get("address"),
+      city: formData.get("city"),
+      state: formData.get("state"),
+      zip: formData.get("zip"),
+    },
+    items: cart.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
+    total,
+  };
+  // Decrement stock
+  cart.forEach(item => {
+    const p = PRODUCTS.find(x => x.id === item.id);
+    if (p) p.stock = Math.max(0, p.stock - item.qty);
+  });
+  saveProducts();
+  // Save order
+  const orders = loadOrders();
+  orders.unshift(order);
+  saveOrders(orders);
+
+  // Fire SMS / Email notification to owner (best-effort, non-blocking)
+  notifyOwner(order);
+
   checkoutForm.style.display = "none";
   orderSuccess.style.display = "flex";
   cart = [];
   updateCartUI();
+  renderProducts();
 });
 successClose.addEventListener("click", () => {
   closeCheckout();
@@ -459,6 +510,176 @@ window.addEventListener("scroll", () => {
     ? "rgba(255,255,255,0.1)"
     : "rgba(255,255,255,0.05)";
 });
+
+/* =========================================================
+   Admin Panel
+   ========================================================= */
+const adminOverlay   = document.getElementById("adminOverlay");
+const adminModal     = document.getElementById("adminModal");
+const adminClose     = document.getElementById("adminClose");
+const adminLogin     = document.getElementById("adminLogin");
+const adminDashboard = document.getElementById("adminDashboard");
+const adminLoginForm = document.getElementById("adminLoginForm");
+const adminPasswordInput = document.getElementById("adminPasswordInput");
+const adminError     = document.getElementById("adminError");
+const inventoryList  = document.getElementById("inventoryList");
+const ordersList     = document.getElementById("ordersList");
+
+let adminUnlocked = false;
+
+function openAdmin() {
+  adminModal.classList.add("open");
+  adminOverlay.classList.add("active");
+  document.body.style.overflow = "hidden";
+  if (adminUnlocked) {
+    adminLogin.style.display = "none";
+    adminDashboard.style.display = "block";
+    renderInventory();
+    renderOrders();
+  } else {
+    adminLogin.style.display = "block";
+    adminDashboard.style.display = "none";
+    setTimeout(() => adminPasswordInput.focus(), 100);
+  }
+}
+function closeAdmin() {
+  adminModal.classList.remove("open");
+  adminOverlay.classList.remove("active");
+  document.body.style.overflow = "";
+  adminError.style.display = "none";
+  adminLoginForm.reset();
+}
+adminClose.addEventListener("click", closeAdmin);
+adminOverlay.addEventListener("click", closeAdmin);
+
+// Keyboard shortcut: Ctrl/Cmd + Shift + A
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "a") {
+    e.preventDefault();
+    openAdmin();
+  }
+});
+// URL hash trigger
+if (window.location.hash === "#admin") openAdmin();
+window.addEventListener("hashchange", () => {
+  if (window.location.hash === "#admin") openAdmin();
+});
+
+adminLoginForm.addEventListener("submit", e => {
+  e.preventDefault();
+  if (adminPasswordInput.value === ADMIN_PASSWORD) {
+    adminUnlocked = true;
+    adminLogin.style.display = "none";
+    adminDashboard.style.display = "block";
+    renderInventory();
+    renderOrders();
+  } else {
+    adminError.style.display = "block";
+    adminPasswordInput.value = "";
+  }
+});
+
+/* Tabs */
+document.querySelectorAll(".admin-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("admin-tab--active"));
+    tab.classList.add("admin-tab--active");
+    const target = tab.dataset.tab;
+    document.getElementById("tabInventory").style.display = target === "inventory" ? "block" : "none";
+    document.getElementById("tabOrders").style.display    = target === "orders"    ? "block" : "none";
+    if (target === "orders") renderOrders();
+  });
+});
+
+function renderInventory() {
+  inventoryList.innerHTML = "";
+  PRODUCTS.forEach(p => {
+    const row = document.createElement("div");
+    row.className = "inv-row";
+    row.innerHTML = `
+      <div class="inv-row__info">
+        <div class="inv-row__icon">${p.icon}</div>
+        <div>
+          <div class="inv-row__name">${p.name}</div>
+          <div class="inv-row__sub">$${p.price.toFixed(2)} · ${p.unit}</div>
+        </div>
+      </div>
+      <div class="inv-row__controls">
+        <button class="qty-btn" data-id="${p.id}" data-delta="-1">−</button>
+        <input type="number" class="inv-input" data-id="${p.id}" value="${p.stock}" min="0" />
+        <button class="qty-btn" data-id="${p.id}" data-delta="1">+</button>
+      </div>
+    `;
+    inventoryList.appendChild(row);
+  });
+  inventoryList.querySelectorAll(".qty-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const p = PRODUCTS.find(x => x.id === parseInt(btn.dataset.id));
+      if (!p) return;
+      p.stock = Math.max(0, p.stock + parseInt(btn.dataset.delta));
+      saveProducts();
+      renderInventory();
+      renderProducts();
+    });
+  });
+  inventoryList.querySelectorAll(".inv-input").forEach(input => {
+    input.addEventListener("change", () => {
+      const p = PRODUCTS.find(x => x.id === parseInt(input.dataset.id));
+      if (!p) return;
+      p.stock = Math.max(0, parseInt(input.value) || 0);
+      saveProducts();
+      renderProducts();
+    });
+  });
+}
+
+function renderOrders() {
+  const orders = loadOrders();
+  if (orders.length === 0) {
+    ordersList.innerHTML = `<div class="empty-state">No orders yet.</div>`;
+    return;
+  }
+  ordersList.innerHTML = orders.map(o => `
+    <div class="order-card">
+      <div class="order-card__header">
+        <div>
+          <div class="order-card__id">${o.id}</div>
+          <div class="order-card__date">${new Date(o.date).toLocaleString()}</div>
+        </div>
+        <span class="order-status order-status--${o.status}">${o.status === "shipped" ? "Shipped" : o.status === "paid" ? "Paid" : "Awaiting Payment"}</span>
+      </div>
+      <div class="order-card__body">
+        <div><strong>${o.customer.firstName} ${o.customer.lastName}</strong></div>
+        <div>${o.customer.email} · ${o.customer.phone || "—"}</div>
+        <div>${o.customer.address}, ${o.customer.city}, ${o.customer.state} ${o.customer.zip}</div>
+        <div class="order-card__items">
+          ${o.items.map(i => `<span>${i.name} × ${i.qty}</span>`).join(" · ")}
+        </div>
+        <div class="order-card__total">Total: <strong>$${o.total.toFixed(2)}</strong></div>
+      </div>
+      <div class="order-card__actions">
+        ${o.status === "awaiting_payment" ? `<button class="btn-mini btn-mini--success" data-action="paid" data-id="${o.id}">Mark Paid</button>` : ""}
+        ${o.status !== "shipped" ? `<button class="btn-mini btn-mini--primary" data-action="shipped" data-id="${o.id}">Mark Shipped</button>` : ""}
+        <button class="btn-mini btn-mini--danger" data-action="delete" data-id="${o.id}">Delete</button>
+      </div>
+    </div>
+  `).join("");
+  ordersList.querySelectorAll("[data-action]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      let orders = loadOrders();
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      if (action === "delete") {
+        orders = orders.filter(o => o.id !== id);
+      } else {
+        const o = orders.find(x => x.id === id);
+        if (o) o.status = action;
+      }
+      saveOrders(orders);
+      renderOrders();
+    });
+  });
+}
 
 /* ---- Init ---- */
 renderProducts();
