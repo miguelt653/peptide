@@ -19,7 +19,6 @@
       <a href="#" class="nav__logo">Lea<span>nova</span></a>
       <ul class="nav__links" id="navLinks">
         <li><a href="#products" class="nav-link">Products</a></li>
-        <li><a href="#gallery" class="nav-link">Gallery</a></li>
         <li><a href="#why" class="nav-link">Why Us</a></li>
         <li><a href="#how" class="nav-link">How It Works</a></li>
         <li><a href="#faq" class="nav-link">FAQ</a></li>
@@ -38,7 +37,6 @@
     <!-- Mobile menu -->
     <div class="mobile-menu" id="mobileMenu">
       <a href="#products" class="mobile-link">Products</a>
-      <a href="#gallery" class="mobile-link">Gallery</a>
       <a href="#why" class="mobile-link">Why Us</a>
       <a href="#how" class="mobile-link">How It Works</a>
       <a href="#faq" class="mobile-link">FAQ</a>
@@ -48,13 +46,17 @@
 
   <!-- HERO -->
   <section class="hero">
+    <div class="hero__bg">
+      <img src="assets/hero-bg.jpg" alt="" loading="eager"
+           onerror="this.style.display='none'" />
+    </div>
     <div class="hero__inner">
       <div class="hero__eyebrow">Now available — Retatrutide &amp; BPC-157</div>
       <h1 class="hero__title">Research-Grade Peptides<br /><span>You Can Trust</span></h1>
       <p class="hero__sub">Every vial is independently verified for purity and potency. Shipped cold, delivered fast.</p>
       <div class="hero__ctas">
         <a href="#products" class="btn btn--primary">Shop Products</a>
-        <a href="#why" class="btn btn--ghost">Our Quality Promise</a>
+        <a href="#how" class="btn btn--ghost">How It Works</a>
       </div>
     </div>
   </section>
@@ -96,34 +98,6 @@
         <p style="color:var(--text-muted);font-size:0.85rem;max-width:320px;text-align:right">All products are sold for research purposes only. A Certificate of Analysis ships with every order.</p>
       </div>
       <div class="product-grid" id="productGrid"></div>
-    </div>
-  </section>
-
-  <!-- LIFESTYLE GALLERY -->
-  <section class="gallery" id="gallery">
-    <div class="container">
-      <div style="text-align:center">
-        <span class="section-label">Real Results</span>
-        <h2 class="section-title">Trusted by Real People</h2>
-        <p class="section-sub" style="max-width:520px;margin:0 auto">Researchers and wellness professionals use our peptides every day. Here's a look at what that looks like in real life.</p>
-      </div>
-      <div class="gallery__grid">
-        <figure class="gallery__item gallery__item--tall">
-          <img src="assets/lifestyle-1.jpg" alt="Customer with peptide pen" loading="lazy"
-               onerror="this.parentElement.classList.add('gallery__item--placeholder');this.style.display='none'" />
-          <figcaption>Backed by Real Customers</figcaption>
-        </figure>
-        <figure class="gallery__item">
-          <img src="assets/lifestyle-2.jpg" alt="Peptide injection pen close-up" loading="lazy"
-               onerror="this.parentElement.classList.add('gallery__item--placeholder');this.style.display='none'" />
-          <figcaption>Ready-to-Use Pens</figcaption>
-        </figure>
-        <figure class="gallery__item">
-          <img src="assets/lifestyle-3.jpg" alt="Peptide product in hand" loading="lazy"
-               onerror="this.parentElement.classList.add('gallery__item--placeholder');this.style.display='none'" />
-          <figcaption>Discreet Daily Use</figcaption>
-        </figure>
-      </div>
     </div>
   </section>
 
@@ -169,32 +143,48 @@
 
   <!-- HOW IT WORKS -->
   <section class="how" id="how">
-    <div class="container">
-      <div style="text-align:center">
-        <span class="section-label">Simple Process</span>
-        <h2 class="section-title">How Ordering Works</h2>
-        <p class="section-sub" style="max-width:480px;margin:0 auto">No account needed. No credit card. Add your items, enter your address, and send payment via Venmo.</p>
+    <div class="container how__container">
+      <div class="how__media">
+        <img src="assets/pen.jpg" alt="Peptide pen close-up" loading="lazy"
+             onerror="this.parentElement.classList.add('how__media--placeholder');this.style.display='none'" />
+        <div class="how__media-caption">
+          <div class="how__media-caption-eyebrow">What You'll Receive</div>
+          <div class="how__media-caption-title">Pre-filled, Ready to Use</div>
+        </div>
       </div>
-      <div class="how__steps">
-        <div class="how-step">
-          <div class="how-step__num">1</div>
-          <div class="how-step__title">Add to Cart</div>
-          <div class="how-step__desc">Browse available products and add what you need to your cart.</div>
-        </div>
-        <div class="how-step">
-          <div class="how-step__num">2</div>
-          <div class="how-step__title">Enter Your Info</div>
-          <div class="how-step__desc">Provide your name, email, and shipping address at checkout.</div>
-        </div>
-        <div class="how-step">
-          <div class="how-step__num">3</div>
-          <div class="how-step__title">Send Venmo Payment</div>
-          <div class="how-step__desc">Send the exact total to our Venmo handle. Include your name in the note.</div>
-        </div>
-        <div class="how-step">
-          <div class="how-step__num">4</div>
-          <div class="how-step__title">We Ship Your Order</div>
-          <div class="how-step__desc">Once payment clears, your order ships within 1–2 business days with tracking.</div>
+      <div class="how__content">
+        <span class="section-label">Simple Process</span>
+        <h2 class="section-title">From Order to Your Door</h2>
+        <p class="section-sub" style="margin-bottom:32px">No account, no credit card, no fuss. Four steps from cart to cold-shipped delivery.</p>
+        <div class="how__steps">
+          <div class="how-step">
+            <div class="how-step__num">1</div>
+            <div>
+              <div class="how-step__title">Add to Cart</div>
+              <div class="how-step__desc">Browse available products and add what you need.</div>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-step__num">2</div>
+            <div>
+              <div class="how-step__title">Enter Your Info</div>
+              <div class="how-step__desc">Name, email, and shipping address at checkout — no account required.</div>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-step__num">3</div>
+            <div>
+              <div class="how-step__title">Send Venmo Payment</div>
+              <div class="how-step__desc">Send the exact total to our Venmo handle with your name in the note.</div>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-step__num">4</div>
+            <div>
+              <div class="how-step__title">We Ship Your Order</div>
+              <div class="how-step__desc">Once payment clears, your order ships within 1–2 business days with tracking.</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

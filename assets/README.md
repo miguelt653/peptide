@@ -1,28 +1,36 @@
 # Leanova — Image Assets
 
-Drop your lifestyle/product photos in this folder with these exact filenames:
+Drop your photos in this folder with these exact filenames:
 
-- `lifestyle-1.jpg` — Tall hero image (left, 1.2fr width)
-- `lifestyle-2.jpg` — Standard image (middle)
-- `lifestyle-3.jpg` — Standard image (right)
+## 1. `hero-bg.jpg` — Hero Background
 
-## Image specs
+The portrait-style photo (person holding pen/syringe) used as a subtle background behind the hero headline.
 
-- **Format**: JPG or WebP (smaller file size = faster site)
-- **Dimensions**: at least 1200px on the longest side
-- **Aspect ratios**:
-  - `lifestyle-1.jpg`: portrait/tall (3:4 or 2:3)
-  - `lifestyle-2.jpg` / `lifestyle-3.jpg`: any (gets cropped to fit)
-- **File size**: under 400KB each if possible (use tinypng.com to compress)
+- **Best photo**: the tall portrait shot of the customer holding the syringe
+- **Format**: JPG (or WebP)
+- **Dimensions**: minimum 1600×1000px, ideally 2000×1200px
+- **Aspect**: any (it will be cropped to fit, focused on upper third)
+- The site automatically darkens it with an overlay so the white text stays readable
+
+## 2. `pen.jpg` — "How It Works" Pen Photo
+
+The close-up shot of the peptide pen, shown alongside the 4 ordering steps.
+
+- **Best photo**: the vertical close-up of the pen being held
+- **Format**: JPG (or WebP)
+- **Dimensions**: minimum 800×1000px (4:5 portrait works best)
+- **Aspect**: portrait (vertical) is ideal — landscape will still work
+
+## Compression
+
+Compress all images at [tinypng.com](https://tinypng.com) — aim for under 400KB each. The site loads faster and ranks better.
 
 ## Once added
 
-After dropping the files in this folder, commit and push — they'll show up automatically. No code changes needed.
-
 ```bash
 git add assets/
-git commit -m "Add lifestyle photos"
+git commit -m "Add product photos"
 git push
 ```
 
-Until images are added, the slots show a clean dark placeholder with a camera icon — so the page never looks broken if files are missing.
+Until images are added, both spots show a clean fallback (dark navy + subtle gradient on the hero, a 💉 icon on the How section) so the site never looks broken.
