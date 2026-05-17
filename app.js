@@ -294,8 +294,8 @@ const FAQS = [
     a: "No. There are no accounts, no passwords, no logins. Just add what you want to the cart, enter your shipping info and email, and send the Cash App payment.",
   },
   {
-    q: "What's your return / refund policy?",
-    a: "If a product doesn't match the COA specifications or arrives damaged, we'll issue a full refund or replacement within 30 days. Reach out via the contact form or email with your order number.",
+    q: "Do you accept returns or refunds?",
+    a: "All sales are final. We do not accept returns or issue refunds. Because peptides are sensitive to temperature and handling, we cannot resell returned product. If your order arrives damaged or doesn't match the COA, contact us right away and we'll make it right.",
   },
   {
     q: "Where do you ship to?",
