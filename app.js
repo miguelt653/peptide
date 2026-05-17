@@ -224,28 +224,30 @@ function renderProducts() {
     card.className = "product-card" + (soldOut ? " product-card--soldout" : "");
     card.style.animationDelay = `${i * 0.05}s`;
     card.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div class="product-card__icon">${p.icon}</div>
-        <span class="product-card__tag">${p.categoryLabel}</span>
+      <div class="product-card__img">
+        <span class="product-card__img-icon">${p.icon}</span>
+        <span class="product-card__img-badge">${p.categoryLabel}</span>
       </div>
-      <div>
+      <div class="product-card__body">
         <div class="product-card__name">${p.name}</div>
-        <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px">${p.fullName}</div>
-      </div>
-      <p class="product-card__desc">${p.desc}</p>
-      <div class="product-card__meta">
-        ${p.meta.map(m => `<span>${m}</span>`).join("")}
-      </div>
-      <div class="stock-indicator ${soldOut ? 'stock-indicator--out' : lowStock ? 'stock-indicator--low' : 'stock-indicator--in'}">
-        <span class="stock-dot"></span>
-        ${soldOut ? "Sold Out" : lowStock ? `Only ${p.stock} left` : `${p.stock} in stock`}
+        <p class="product-card__desc">${p.desc}</p>
+        <div class="product-card__specs">
+          ${p.meta.map(m => `<span class="spec-tag">${m}</span>`).join("")}
+        </div>
+        <div class="stock-indicator ${soldOut ? 'stock-indicator--out' : lowStock ? 'stock-indicator--low' : 'stock-indicator--in'}">
+          <span class="stock-dot"></span>
+          ${soldOut ? "Sold Out" : lowStock ? `Only ${p.stock} left` : `${p.stock} in stock`}
+        </div>
       </div>
       <div class="product-card__footer">
-        <div class="product-card__price">$${p.price.toFixed(2)}<span>/ ${p.unit}</span></div>
+        <div>
+          <div class="product-card__price">$${p.price.toFixed(2)}</div>
+          <div class="product-card__price-sub">per ${p.unit}</div>
+        </div>
         <button class="add-to-cart" data-id="${p.id}" ${available === 0 ? "disabled" : ""}>
           ${available === 0
             ? "Sold Out"
-            : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add`}
+            : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart`}
         </button>
       </div>
     `;
