@@ -7,7 +7,8 @@
 | Filename | Photo | Where it shows |
 |---|---|---|
 | `hero-bg.jpg` | Molecule render (dark blue, 3D structure) | Behind hero headline |
-| `pen.jpg` | Girl holding the peptide pen close-up | "How It Works" section |
+| `pen.jpg` | Girl holding the peptide pen close-up | "How It Works" — top image |
+| `usage.jpg` | Woman injecting at the abdomen (window/plants in background) | "How It Works" — second image below pen |
 | `science-bg.jpg` | Light/transparent molecule render | "Why Us" section background |
 
 ## How to add photos (2 minutes)
