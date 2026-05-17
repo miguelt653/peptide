@@ -314,6 +314,66 @@ img { display: block; max-width: 100%; }
 .stock-indicator--low { background: var(--amber-pale);  color: var(--amber); }
 .stock-indicator--out { background: var(--red-pale);    color: var(--red); }
 
+/* ---- Lifestyle Gallery ---- */
+.gallery { padding: 64px 0; background: #fff; border-top: 1px solid var(--border); }
+.gallery .section-sub { margin-bottom: 40px; }
+.gallery__grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  grid-template-rows: 480px;
+  gap: 16px;
+  margin-top: 40px;
+}
+.gallery__item {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+  border: 1px solid var(--border);
+  margin: 0;
+}
+.gallery__item img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.gallery__item:hover img { transform: scale(1.04); }
+.gallery__item figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to top, rgba(15,28,46,0.92) 0%, rgba(15,28,46,0.5) 60%, transparent 100%);
+  color: #fff;
+  padding: 36px 20px 16px;
+  font-size: 0.92rem; font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* Placeholder state when image fails to load */
+.gallery__item--placeholder {
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+  color: rgba(255,255,255,0.5);
+  text-align: center; padding: 24px;
+}
+.gallery__item--placeholder::before {
+  content: '📷';
+  font-size: 2.4rem; margin-bottom: 12px;
+  filter: grayscale(1) opacity(0.7);
+}
+.gallery__item--placeholder figcaption {
+  position: static; background: none;
+  padding: 0; color: rgba(255,255,255,0.85);
+  font-size: 0.85rem;
+}
+.gallery__item--placeholder figcaption::after {
+  content: ' — drop image at /assets/';
+  display: block;
+  font-size: 0.7rem; font-weight: 400;
+  color: rgba(255,255,255,0.4);
+  margin-top: 4px;
+  font-family: monospace;
+}
+
 /* ---- Why Us ---- */
 .why { padding: 64px 0; background: var(--gray-50); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .why__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; margin-top: 40px; }
@@ -897,6 +957,8 @@ img { display: block; max-width: 100%; }
   .footer__inner { grid-template-columns: 1fr 1fr; gap: 28px; }
   .why__grid { grid-template-columns: 1fr 1fr; }
   .how__steps { grid-template-columns: 1fr 1fr; }
+  .gallery__grid { grid-template-columns: 1fr 1fr; grid-template-rows: 400px 240px; }
+  .gallery__item--tall { grid-row: span 2; }
 }
 
 /* Mobile */
@@ -948,6 +1010,15 @@ img { display: block; max-width: 100%; }
   /* Product card — make add button full touch area */
   .product-card__footer { padding: 12px 16px; }
   .add-to-cart { padding: 11px 18px; font-size: 0.85rem; }
+
+  /* Gallery — single column stack on mobile */
+  .gallery { padding: 40px 0; }
+  .gallery__grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, 280px);
+    gap: 12px;
+  }
+  .gallery__item figcaption { font-size: 0.85rem; padding: 30px 16px 14px; }
 
   /* Why / How */
   .why { padding: 40px 0; }
