@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Leanovo — Research-Grade Peptides</title>
+  <title>Leanova — Research-Grade Peptides</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -16,18 +16,31 @@
   <!-- NAV -->
   <nav class="nav" id="nav">
     <div class="nav__inner">
-      <a href="#" class="nav__logo">Lean<span>ovo</span></a>
-      <ul class="nav__links">
-        <li><a href="#products">Products</a></li>
-        <li><a href="#why">Why Us</a></li>
-        <li><a href="#how">How It Works</a></li>
-        <li><a href="#faq">FAQ</a></li>
-        <li><a href="#contact">Contact</a></li>
+      <a href="#" class="nav__logo">Lea<span>nova</span></a>
+      <ul class="nav__links" id="navLinks">
+        <li><a href="#products" class="nav-link">Products</a></li>
+        <li><a href="#why" class="nav-link">Why Us</a></li>
+        <li><a href="#how" class="nav-link">How It Works</a></li>
+        <li><a href="#faq" class="nav-link">FAQ</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
       </ul>
-      <button class="cart-btn" id="cartBtn" aria-label="Open cart">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        <span class="cart-count" id="cartCount">0</span>
-      </button>
+      <div class="nav__actions">
+        <button class="cart-btn" id="cartBtn" aria-label="Open cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#products" class="mobile-link">Products</a>
+      <a href="#why" class="mobile-link">Why Us</a>
+      <a href="#how" class="mobile-link">How It Works</a>
+      <a href="#faq" class="mobile-link">FAQ</a>
+      <a href="#contact" class="mobile-link">Contact</a>
     </div>
   </nav>
 
@@ -89,7 +102,7 @@
     <div class="container">
       <div style="text-align:center">
         <span class="section-label">Our Standards</span>
-        <h2 class="section-title">Why Researchers Choose Leanovo</h2>
+        <h2 class="section-title">Why Researchers Choose Leanova</h2>
       </div>
       <div class="why__grid">
         <div class="why-card">
@@ -178,7 +191,7 @@
         <div class="contact__details">
           <div class="contact__detail">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            support@leanovo.com
+            support@leanova.com
           </div>
           <div class="contact__detail">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
@@ -209,7 +222,7 @@
   <footer class="footer">
     <div class="container footer__inner">
       <div class="footer__brand">
-        <a href="#" class="nav__logo">Lean<span>ovo</span></a>
+        <a href="#" class="nav__logo">Lea<span>nova</span></a>
         <p>Research-grade peptides.<br />Independently tested. Trusted by professionals.</p>
       </div>
       <div class="footer__col">
@@ -235,7 +248,7 @@
       </div>
     </div>
     <div class="footer__bottom container">
-      <p>© 2026 Leanovo. All products are sold strictly for in vitro research purposes only. Not intended for human or veterinary use, consumption, or injection. Always consult a licensed healthcare professional. These statements have not been evaluated by the FDA.</p>
+      <p>© 2026 Leanova. All products are sold strictly for in vitro research purposes only. Not intended for human or veterinary use, consumption, or injection. Always consult a licensed healthcare professional. These statements have not been evaluated by the FDA.</p>
     </div>
   </footer>
 

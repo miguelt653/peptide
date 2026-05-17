@@ -1,5 +1,5 @@
 /* =========================================================
-   Leanovo — App Logic
+   Leanova — App Logic
    =========================================================
    OWNER NOTIFICATION SETUP (so you get a text when someone orders):
    ----------------------------------------------------------
@@ -126,7 +126,7 @@ const DEFAULT_PRODUCTS = [
 
 /* ---- Load products w/ stock from localStorage ---- */
 function loadProducts() {
-  const saved = localStorage.getItem("leanovo_products");
+  const saved = localStorage.getItem("leanova_products");
   if (saved) {
     try {
       const savedProducts = JSON.parse(saved);
@@ -140,7 +140,7 @@ function loadProducts() {
   return [...DEFAULT_PRODUCTS];
 }
 function saveProducts() {
-  localStorage.setItem("leanovo_products", JSON.stringify(PRODUCTS.map(p => ({ id: p.id, stock: p.stock }))));
+  localStorage.setItem("leanova_products", JSON.stringify(PRODUCTS.map(p => ({ id: p.id, stock: p.stock }))));
 }
 const PRODUCTS = loadProducts();
 
@@ -427,18 +427,18 @@ document.getElementById("copyVenmo").addEventListener("click", () => {
 
 /* ---- Orders persistence ---- */
 function loadOrders() {
-  try { return JSON.parse(localStorage.getItem("leanovo_orders") || "[]"); }
+  try { return JSON.parse(localStorage.getItem("leanova_orders") || "[]"); }
   catch { return []; }
 }
 function saveOrders(orders) {
-  localStorage.setItem("leanovo_orders", JSON.stringify(orders));
+  localStorage.setItem("leanova_orders", JSON.stringify(orders));
 }
 
 /* ---- Owner SMS / Email Notification ---- */
 function buildOrderMessage(order) {
   const itemsLine = order.items.map(i => `${i.name} x${i.qty}`).join(", ");
   return [
-    `🛒 New Leanovo Order ${order.id}`,
+    `🛒 New Leanova Order ${order.id}`,
     `${order.customer.firstName} ${order.customer.lastName}`,
     `${order.customer.email} · ${order.customer.phone || "no phone"}`,
     `${order.customer.address}, ${order.customer.city}, ${order.customer.state} ${order.customer.zip}`,
@@ -567,12 +567,25 @@ contactForm.addEventListener("submit", e => {
   setTimeout(() => { formSuccess.style.display = "none"; }, 5000);
 });
 
-/* ---- Nav scroll effect ---- */
-window.addEventListener("scroll", () => {
-  const nav = document.getElementById("nav");
-  nav.style.borderBottomColor = window.scrollY > 10
-    ? "rgba(255,255,255,0.1)"
-    : "rgba(255,255,255,0.05)";
+/* ---- Hamburger menu ---- */
+const hamburger   = document.getElementById("hamburger");
+const mobileMenu  = document.getElementById("mobileMenu");
+
+hamburger.addEventListener("click", () => {
+  const open = mobileMenu.classList.toggle("open");
+  hamburger.classList.toggle("open", open);
+  hamburger.setAttribute("aria-expanded", open);
+  document.body.style.overflow = open ? "hidden" : "";
+});
+
+// Close mobile menu when a link is tapped
+document.querySelectorAll(".mobile-link").forEach(link => {
+  link.addEventListener("click", () => {
+    mobileMenu.classList.remove("open");
+    hamburger.classList.remove("open");
+    hamburger.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+  });
 });
 
 /* =========================================================
