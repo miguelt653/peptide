@@ -188,8 +188,8 @@
           <div class="how-step">
             <div class="how-step__num">3</div>
             <div>
-              <div class="how-step__title">Send Venmo Payment</div>
-              <div class="how-step__desc">Send the exact total to our Venmo handle with your name in the note.</div>
+              <div class="how-step__title">Send Cash App Payment</div>
+              <div class="how-step__desc">Send the exact total to our Cash App cashtag with your name in the note.</div>
             </div>
           </div>
           <div class="how-step">
@@ -264,7 +264,7 @@
         <a href="#products">BPC-157</a>
         <a href="#products">Retatrutide</a>
         <a href="#products">TB-500</a>
-        <a href="#products">Semaglutide</a>
+        <a href="#products">NAD+</a>
         <a href="#products">View All</a>
       </div>
       <div class="footer__col">
@@ -393,35 +393,35 @@
         </div>
       </div>
       <div class="modal__order-summary" id="orderSummary"></div>
-      <div class="venmo-box">
-        <div class="venmo-box__header">
-          <div class="venmo-logo">V</div>
+      <div class="cashapp-box">
+        <div class="cashapp-box__header">
+          <div class="cashapp-logo">$</div>
           <div>
-            <div class="venmo-box__title">Pay via Venmo</div>
-            <div class="venmo-box__sub">Send the exact amount shown above to the handle below</div>
+            <div class="cashapp-box__title">Pay via Cash App</div>
+            <div class="cashapp-box__sub">Send the exact amount shown above to the cashtag below</div>
           </div>
         </div>
-        <div class="venmo-handle-row">
-          <span class="venmo-handle" id="venmoHandle">@Frankie-DiLorenzo</span>
+        <div class="cashapp-handle-row">
+          <span class="cashapp-handle" id="venmoHandle">$Frankie-DiLorenzo</span>
           <button type="button" class="copy-btn" id="copyVenmo">Copy</button>
         </div>
-        <div class="venmo-amount-row">
+        <div class="cashapp-amount-row">
           <span>Amount to send</span>
-          <span class="venmo-amount" id="venmoAmount">$0.00</span>
+          <span class="cashapp-amount" id="venmoAmount">$0.00</span>
         </div>
-        <ol class="venmo-steps">
-          <li>Open Venmo and send the exact amount to <strong>@Frankie-DiLorenzo</strong></li>
-          <li>Add your <strong>name + order email</strong> in the Venmo note</li>
+        <ol class="cashapp-steps">
+          <li>Open Cash App and send the exact amount to <strong id="cashtagInline">$Frankie-DiLorenzo</strong></li>
+          <li>Add your <strong>name + order email</strong> in the payment note</li>
           <li>Click the button below — we ship once payment is confirmed</li>
         </ol>
       </div>
       <button type="submit" class="btn btn--primary btn--full">I've Sent the Payment →</button>
-      <p class="checkout-note">By submitting you confirm payment was sent via Venmo. Orders ship within 1–2 business days of payment confirmation.</p>
+      <p class="checkout-note">By submitting you confirm payment was sent via Cash App. Orders ship within 1–2 business days of payment confirmation.</p>
     </form>
     <div class="order-success" id="orderSuccess" style="display:none">
       <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 10"/></svg>
       <h3>Order Received!</h3>
-      <p>We'll confirm your Venmo and ship within 1–2 business days. Check your email for details.</p>
+      <p>We'll confirm your Cash App payment and ship within 1–2 business days. Check your email for details.</p>
       <button class="btn btn--primary" id="successClose">Close</button>
     </div>
   </div>
@@ -456,7 +456,7 @@
         <div id="inventoryList"></div>
       </div>
       <div class="admin-tab-content" id="tabOrders" style="display:none">
-        <p class="admin-hint">Pending and recent orders. Mark as shipped once Venmo payment is confirmed.</p>
+        <p class="admin-hint">Pending and recent orders. Mark as shipped once Cash App payment is confirmed.</p>
         <div id="ordersList"></div>
       </div>
     </div>

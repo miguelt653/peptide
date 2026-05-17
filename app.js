@@ -27,7 +27,7 @@
    ---------------------------------------------------------- */
 
 /* ---- Config ---- */
-const VENMO_HANDLE      = "@Frankie-DiLorenzo";
+const CASHAPP_HANDLE    = "$Frankie-DiLorenzo"; // change to actual cashtag
 const ADMIN_PASSWORD    = "changeme123"; // change me in production
 const OWNER_WEBHOOK_URL = "";            // e.g. "https://hooks.zapier.com/hooks/catch/123456/abcdef/"
 const USE_EMAILJS       = false;
@@ -142,35 +142,35 @@ const DEFAULT_PRODUCTS = [
   },
   {
     id: 4,
-    name: "Semaglutide",
-    fullName: "Semaglutide (GLP-1 Agonist)",
+    name: "NAD+",
+    fullName: "Nicotinamide Adenine Dinucleotide",
     category: "metabolic",
     categoryLabel: "Metabolic",
-    icon: "🌿",
-    price: 89.99,
-    unit: "5mg vial",
-    purity: "≥98.5%",
-    desc: "A long-acting GLP-1 receptor agonist extensively studied for glucose metabolism regulation, satiety signaling, and cardiovascular outcomes.",
-    meta: ["5mg / vial", "≥98.5% Purity", "Lyophilized", "COA Included"],
-    stock: 18,
+    icon: "✨",
+    price: 79.99,
+    unit: "100mg vial",
+    purity: "≥99%",
+    desc: "A critical coenzyme present in every living cell, studied extensively for cellular energy production, mitochondrial function, DNA repair, and longevity pathways.",
+    meta: ["100mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
+    stock: 22,
     detail: {
-      overview: "Semaglutide is a glucagon-like peptide-1 (GLP-1) receptor agonist with a uniquely long half-life of approximately 7 days, achieved through structural modifications that resist enzymatic degradation. It is one of the most clinically studied metabolic peptides in the world, with multiple large-scale trials completed.",
+      overview: "NAD+ (Nicotinamide Adenine Dinucleotide) is a coenzyme found in every cell of the body, essential for converting nutrients into ATP — the body's energy currency. NAD+ levels decline significantly with age, and a growing body of research connects NAD+ restoration to mitochondrial health, cellular repair, and longevity pathways. It's one of the most actively studied molecules in aging research today.",
       benefits: [
-        "Potent regulation of blood glucose and insulin response",
-        "Significant reduction in appetite and caloric intake in research",
-        "Studied for cardiovascular risk reduction (SUSTAIN, PIONEER trials)",
-        "Slows gastric emptying, improving post-meal glucose control",
-        "Demonstrates neuroprotective properties in early research",
-        "Weekly dosing due to ~7-day half-life (research models)",
+        "Supports cellular energy production via the mitochondrial electron transport chain",
+        "Activates sirtuins — proteins involved in DNA repair and longevity",
+        "Studied for improvements in mental clarity, focus, and cognitive function",
+        "Supports healthy aging and may slow markers of cellular senescence",
+        "Plays a key role in DNA damage repair via PARP enzymes",
+        "Research suggests benefits for energy, metabolism, and recovery",
       ],
-      mechanism: "Semaglutide mimics the natural GLP-1 hormone released after eating. It binds to GLP-1 receptors in the pancreas (stimulating insulin release), the hypothalamus (reducing appetite signals), and the gastrointestinal tract (slowing food transit). Its fatty acid chain attachment to albumin extends its half-life dramatically compared to native GLP-1.",
+      mechanism: "NAD+ functions as an electron carrier in cellular metabolism, shuttling electrons during the conversion of nutrients to ATP. It's also a required substrate for sirtuins (longevity-associated proteins) and PARP enzymes (DNA repair). Supplementation replenishes the natural decline of NAD+ that occurs with age, restoring cellular energy capacity and supporting key repair mechanisms.",
       specs: [
-        { label: "Class", value: "GLP-1 receptor agonist" },
-        { label: "Molecular Weight", value: "4,113.6 Da" },
-        { label: "Half-Life", value: "~7 days" },
+        { label: "Class", value: "Coenzyme / Cellular cofactor" },
+        { label: "Molecular Weight", value: "663.43 Da" },
         { label: "Form", value: "Lyophilized powder" },
-        { label: "Purity", value: "≥98.5% (HPLC + MS verified)" },
-        { label: "Storage", value: "Refrigerate at 2–8°C. Stable up to 18 months lyophilized." },
+        { label: "Purity", value: "≥99% (HPLC verified)" },
+        { label: "Storage", value: "Refrigerate at 2–8°C. Protect from light." },
+        { label: "Reconstitution", value: "Bacteriostatic water or sterile saline" },
       ],
     },
   },
@@ -345,7 +345,6 @@ function renderProducts() {
     card.style.animationDelay = `${i * 0.05}s`;
     card.innerHTML = `
       <div class="product-card__img">
-        <span class="product-card__img-icon">${p.icon}</span>
         <span class="product-card__img-badge">${p.categoryLabel}</span>
       </div>
       <div class="product-card__body">
@@ -537,13 +536,13 @@ function buildOrderSummary() {
       <span>$${total.toFixed(2)}</span>
     </div>
   `;
-  document.getElementById("venmoHandle").textContent = VENMO_HANDLE;
+  document.getElementById("venmoHandle").textContent = CASHAPP_HANDLE;
   document.getElementById("venmoAmount").textContent = `$${total.toFixed(2)}`;
 }
 
-/* ---- Copy Venmo handle ---- */
+/* ---- Copy Cash App handle ---- */
 document.getElementById("copyVenmo").addEventListener("click", () => {
-  navigator.clipboard.writeText(VENMO_HANDLE).then(() => {
+  navigator.clipboard.writeText(CASHAPP_HANDLE).then(() => {
     const btn = document.getElementById("copyVenmo");
     const original = btn.textContent;
     btn.textContent = "Copied ✓";
@@ -569,7 +568,7 @@ function buildOrderMessage(order) {
     `${order.customer.email} · ${order.customer.phone || "no phone"}`,
     `${order.customer.address}, ${order.customer.city}, ${order.customer.state} ${order.customer.zip}`,
     `Items: ${itemsLine}`,
-    `Total: $${order.total.toFixed(2)} via Venmo (${VENMO_HANDLE})`,
+    `Total: $${order.total.toFixed(2)} via Cash App (${CASHAPP_HANDLE})`,
   ].join("\n");
 }
 
@@ -892,17 +891,20 @@ function renderInventory() {
   inventoryList.innerHTML = "";
   PRODUCTS.forEach(p => {
     const row = document.createElement("div");
-    row.className = "inv-row";
+    row.className = "inv-row" + (p.stock === 0 ? " inv-row--out" : "");
     row.innerHTML = `
       <div class="inv-row__info">
         <div class="inv-row__icon">${p.icon}</div>
         <div>
-          <div class="inv-row__name">${p.name}</div>
+          <div class="inv-row__name">
+            ${p.name}
+            ${p.stock === 0 ? '<span class="inv-out-tag">Out of Stock</span>' : ''}
+          </div>
           <div class="inv-row__sub">$${p.price.toFixed(2)} · ${p.unit}</div>
         </div>
       </div>
       <div class="inv-row__controls">
-        <button class="qty-btn" data-id="${p.id}" data-delta="-1">−</button>
+        <button class="qty-btn" data-id="${p.id}" data-delta="-1" ${p.stock === 0 ? 'disabled' : ''}>−</button>
         <input type="number" class="inv-input" data-id="${p.id}" value="${p.stock}" min="0" />
         <button class="qty-btn" data-id="${p.id}" data-delta="1">+</button>
       </div>
