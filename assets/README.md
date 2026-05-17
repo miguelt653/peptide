@@ -4,36 +4,35 @@ Drop your photos in this folder with these exact filenames:
 
 ## 1. `hero-bg.jpg` — Hero Background
 
-Sits behind the headline at the very top of the page. Auto-darkened so white text stays readable.
+Sits behind the headline at the very top. Auto-darkened so white text stays readable.
 
-- **Best photo**: the woman in dark coat holding the vials with black gloves
+- **Photo to use**: woman in dark coat holding two vials with black gloves
 - **Format**: JPG (or WebP)
 - **Dimensions**: minimum 1600×1000px
-- **Crops to**: landscape, focuses on upper third
-- **File size**: under 400KB after compression
+- **File size**: under 400KB compressed
 
-## 2. `science-bg.jpg` — "Why Us" Section Background
+## 2. `pen.jpg` — "How It Works" Featured Image
 
-Sits behind the four feature cards. Heavily darkened with a navy overlay so cards stay legible.
+Vertical product shot shown alongside the 4 ordering steps. Caption reads "What You'll Receive — Pre-filled, Ready to Use".
 
-- **Best photo**: the dark molecule render (3D balls/structures on dark blue)
-- **Format**: JPG (or WebP)
-- **Dimensions**: minimum 1600×900px
-- **File size**: under 400KB after compression
-
-## 3. `pen.jpg` — "How It Works" Featured Image
-
-Shown alongside the 4 ordering steps. Caption overlay reads "What You'll Receive — Pre-filled, Ready to Use".
-
-- **Best photo**: the light/transparent molecule render (works for now), or a real pen/vial photo when you have one
+- **Photo to use**: the close-up vertical shot of the girl holding the peptide pen (the one with the blue pen and white cap)
 - **Format**: JPG (or WebP)
 - **Dimensions**: minimum 800×1000px (portrait works best)
-- **File size**: under 400KB after compression
+- **File size**: under 400KB compressed
+
+## 3. `science-bg.jpg` — "Why Us" Section Background
+
+Sits behind the four feature cards. Heavily darkened so cards stay legible.
+
+- **Photo to use**: the dark molecule render (3D balls/structures on dark blue background)
+- **Format**: JPG (or WebP)
+- **Dimensions**: minimum 1600×900px
+- **File size**: under 400KB compressed
 
 ## Compression workflow
 
 1. Save each photo from chat
-2. Run through [tinypng.com](https://tinypng.com) (free, drag & drop, no signup)
+2. Run through [tinypng.com](https://tinypng.com) (free, no signup)
 3. Rename to the exact filenames above
 4. Drop into this folder
 
@@ -46,3 +45,7 @@ git push
 ```
 
 Until images are added, every spot shows a clean fallback (navy gradient + emoji), so the page never looks broken.
+
+---
+
+> Have a 4th photo (the light/transparent molecule render)? Save it — we can drop it in as a section divider or product detail backdrop later when we add a "Science" section.
