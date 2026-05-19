@@ -1052,6 +1052,7 @@ img { display: block; max-width: 100%; }
   }
   .trust-item { font-size: 0.76rem; gap: 6px; }
   .trust-item svg { width: 14px; height: 14px; }
+  .trust-item:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; }
 
   /* Section headers — consistent on mobile */
   .section-title { font-size: 1.5rem; letter-spacing: -0.3px; }

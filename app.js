@@ -525,7 +525,7 @@ modalOverlay.addEventListener("click", closeCheckout);
 
 function getOrderTotal() {
   const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const ship = sub >= 100 ? 0 : 9.99;
+  const ship = sub >= 150 ? 0 : 9.99;
   return { sub, ship, total: sub + ship };
 }
 
