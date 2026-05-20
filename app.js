@@ -939,6 +939,7 @@ function renderInventory() {
       if (!p) return;
       p.stock = Math.max(0, parseInt(input.value) || 0);
       saveProducts();
+      renderInventory();
       renderProducts();
     });
   });
