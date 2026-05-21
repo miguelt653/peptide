@@ -17,6 +17,7 @@ Prerequisites:
     For Google Sheets: set GOOGLE_CREDS_PATH env var or pass --creds flag
     pointing to your service account JSON key file.
 """
+from __future__ import annotations
 
 import argparse
 import json
