@@ -529,14 +529,18 @@ def sheets_retry(fn, *args, **kwargs):
             time.sleep(wait)
 
 
-def open_or_create_sheet(gc, sheet_name: str):
-    """Open existing sheet or create a new one."""
+def open_or_create_sheet(gc, sheet_name: str, share_email: str = ""):
+    """Open existing sheet or create a new one, optionally sharing with a user."""
     import gspread
     try:
-        return gc.open(sheet_name)
+        sh = gc.open(sheet_name)
     except gspread.exceptions.SpreadsheetNotFound:
         log(f"Creating new Google Sheet: '{sheet_name}'")
-        return gc.create(sheet_name)
+        sh = gc.create(sheet_name)
+        if share_email:
+            sh.share(share_email, perm_type="user", role="writer")
+            log(f"Shared sheet with {share_email}")
+    return sh
 
 
 def write_brand_tab(spreadsheet, brand_name: str, records: list[dict], year: str):
@@ -596,9 +600,10 @@ def write_to_sheets(
     extracted: dict[str, list[dict]],
     failed_downloads: list[str],
     creds_path: str,
+    share_email: str = "",
 ):
     gc = get_gspread_client(creds_path)
-    spreadsheet = open_or_create_sheet(gc, GOOGLE_SHEET_NAME)
+    spreadsheet = open_or_create_sheet(gc, GOOGLE_SHEET_NAME, share_email=share_email)
     log(f"Opened sheet: {spreadsheet.url}")
 
     completed = load_completed()
@@ -677,6 +682,11 @@ def main():
         default="",
         help="Override path to brands.json (skip scraping)",
     )
+    parser.add_argument(
+        "--share-email",
+        default="",
+        help="Google account email to share the sheet with (so you can view it)",
+    )
     args = parser.parse_args()
 
     setup_dirs()
@@ -753,7 +763,7 @@ No Google credentials file found.  To set up access:
             sys.exit(0)
 
         log("\n--- STEP 4-5: Writing to Google Sheets ---")
-        total_records = write_to_sheets(brands, extracted, failed_downloads, args.creds)
+        total_records = write_to_sheets(brands, extracted, failed_downloads, args.creds, share_email=args.share_email)
 
     # ── Final summary ──
     elapsed = time.time() - start_time
