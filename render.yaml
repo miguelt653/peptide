@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: loop-ai-landing
+    runtime: node
+    rootDir: loop-ai-landing
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22
