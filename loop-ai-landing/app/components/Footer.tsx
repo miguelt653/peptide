@@ -6,7 +6,7 @@ export default function Footer() {
       style={{
         background: "#fff",
         borderTop: "1px solid #E2E8F0",
-        padding: "28px 24px",
+        padding: "28px clamp(20px, 5vw, 48px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -14,13 +14,12 @@ export default function Footer() {
         gap: 12,
       }}
     >
-      <Logo size={28} />
+      <Logo height={30} />
       <p
         style={{
           fontFamily: "var(--font-inter), Inter, sans-serif",
           fontSize: 13,
           color: "#8A9BB0",
-          margin: 0,
         }}
       >
         tryloop.ai · Automated Reconciliation &amp; AI Reporting

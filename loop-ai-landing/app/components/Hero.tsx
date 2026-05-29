@@ -1,56 +1,71 @@
 "use client";
+
 export default function Hero() {
   return (
     <section
       style={{
-        background: "#0F1E30",
+        background: "#0C2D3F",
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
         overflow: "hidden",
-        padding: "120px 24px 80px",
+        padding: "128px clamp(20px, 5vw, 48px) 96px",
       }}
     >
-      {/* Grid texture */}
+      {/* Subtle grid */}
       <div
+        aria-hidden
         style={{
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
+            "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px)," +
+            "linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+          pointerEvents: "none",
         }}
       />
-      {/* Orange radial glow */}
+      {/* Glow */}
       <div
+        aria-hidden
         style={{
           position: "absolute",
-          bottom: "-80px",
+          bottom: -120,
           left: "50%",
           transform: "translateX(-50%)",
-          width: 700,
-          height: 400,
-          background: "radial-gradient(ellipse at center, rgba(224,85,32,0.18) 0%, transparent 70%)",
+          width: "min(800px, 100vw)",
+          height: 480,
+          background:
+            "radial-gradient(ellipse at 50% 100%, rgba(224,85,32,0.22) 0%, transparent 65%)",
           pointerEvents: "none",
         }}
       />
 
-      <div style={{ position: "relative", textAlign: "center", maxWidth: 760 }}>
+      <div
+        style={{
+          position: "relative",
+          textAlign: "center",
+          maxWidth: 780,
+          width: "100%",
+          margin: "0 auto",
+        }}
+      >
         {/* Badge */}
-        <div className="fade-up" style={{ display: "inline-block", marginBottom: 24 }}>
+        <div className="fade-up" style={{ marginBottom: 28 }}>
           <span
             style={{
-              background: "rgba(224,85,32,0.15)",
-              border: "1px solid rgba(224,85,32,0.35)",
+              display: "inline-block",
+              background: "rgba(224,85,32,0.12)",
+              border: "1px solid rgba(224,85,32,0.3)",
               color: "#E05520",
               fontFamily: "var(--font-inter), Inter, sans-serif",
-              fontWeight: 500,
-              fontSize: 13,
-              padding: "6px 16px",
+              fontWeight: 600,
+              fontSize: 12,
+              padding: "6px 18px",
               borderRadius: 100,
-              letterSpacing: "0.05em",
+              letterSpacing: "0.1em",
               textTransform: "uppercase",
             }}
           >
@@ -60,41 +75,48 @@ export default function Hero() {
 
         {/* H1 */}
         <h1
-          className="fade-up fade-up-1"
+          className="fade-up delay-1"
           style={{
             fontFamily: "var(--font-syne), Syne, sans-serif",
             fontWeight: 800,
-            fontSize: "clamp(40px, 6vw, 72px)",
-            lineHeight: 1.1,
+            fontSize: "clamp(38px, 6.5vw, 76px)",
+            lineHeight: 1.08,
             color: "#fff",
-            margin: "0 0 24px",
+            marginBottom: 24,
           }}
         >
           Stop Reconciling.{" "}
+          <br />
           <span style={{ color: "#E05520" }}>Start Deciding.</span>
         </h1>
 
         {/* Subtext */}
         <p
-          className="fade-up fade-up-2"
+          className="fade-up delay-2"
           style={{
             fontFamily: "var(--font-inter), Inter, sans-serif",
-            fontSize: "clamp(16px, 2vw, 19px)",
-            fontWeight: 300,
-            color: "#8A9BB0",
-            lineHeight: 1.65,
-            maxWidth: 580,
-            margin: "0 auto 40px",
+            fontSize: "clamp(16px, 2.2vw, 20px)",
+            fontWeight: 400,
+            color: "rgba(255,255,255,0.6)",
+            lineHeight: 1.7,
+            maxWidth: 560,
+            margin: "0 auto 44px",
           }}
         >
-          Loop AI automates your entire reconciliation process and gives your team
-          instant access to the data they need — without combing through spreadsheets.
+          Loop AI automates your entire reconciliation process and gives your
+          team instant access to the data they need — without combing through
+          spreadsheets.
         </p>
 
         {/* CTAs */}
         <div
-          className="fade-up fade-up-3"
-          style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}
+          className="fade-up delay-3"
+          style={{
+            display: "flex",
+            gap: 14,
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
         >
           <a
             href="https://tryloop.ai"
@@ -109,13 +131,14 @@ export default function Hero() {
               padding: "14px 32px",
               borderRadius: 8,
               textDecoration: "none",
-              transition: "background 0.2s, transform 0.2s",
+              transition: "background 0.18s, transform 0.18s",
+              letterSpacing: "0.01em",
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#c44a1a";
+            onMouseEnter={e => {
+              e.currentTarget.style.background = "#c84c1c";
               e.currentTarget.style.transform = "translateY(-1px)";
             }}
-            onMouseLeave={(e) => {
+            onMouseLeave={e => {
               e.currentTarget.style.background = "#E05520";
               e.currentTarget.style.transform = "translateY(0)";
             }}
@@ -126,22 +149,23 @@ export default function Hero() {
             href="#products"
             style={{
               background: "transparent",
-              color: "#fff",
+              color: "rgba(255,255,255,0.85)",
               fontFamily: "var(--font-inter), Inter, sans-serif",
               fontWeight: 500,
               fontSize: 15,
               padding: "14px 32px",
               borderRadius: 8,
               textDecoration: "none",
-              border: "1px solid rgba(255,255,255,0.25)",
-              transition: "border-color 0.2s, background 0.2s",
+              border: "1px solid rgba(255,255,255,0.2)",
+              transition: "border-color 0.18s, background 0.18s",
+              letterSpacing: "0.01em",
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.5)";
-              e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.45)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.06)";
             }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)";
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
               e.currentTarget.style.background = "transparent";
             }}
           >

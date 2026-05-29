@@ -6,8 +6,8 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -18,23 +18,24 @@ export default function Nav() {
         top: 0,
         left: 0,
         right: 0,
-        zIndex: 50,
-        padding: "0 24px",
-        height: 64,
+        zIndex: 100,
+        height: 68,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        transition: "background 0.3s, backdrop-filter 0.3s, border-color 0.3s",
-        background: scrolled ? "rgba(255,255,255,0.92)" : "transparent",
-        backdropFilter: scrolled ? "blur(12px)" : "none",
-        borderBottom: scrolled ? "1px solid #E2E8F0" : "1px solid transparent",
+        padding: "0 clamp(20px, 5vw, 48px)",
+        transition: "background 0.25s, box-shadow 0.25s",
+        background: scrolled ? "rgba(255,255,255,0.96)" : "transparent",
+        backdropFilter: scrolled ? "blur(16px)" : "none",
+        boxShadow: scrolled ? "0 1px 0 rgba(0,0,0,0.08)" : "none",
       }}
     >
-      <Logo size={32} />
+      <Logo height={36} dark={!scrolled} />
       <a
         href="https://tryloop.ai"
         target="_blank"
         rel="noopener noreferrer"
+        className="btn-primary"
         style={{
           background: "#E05520",
           color: "#fff",
@@ -42,12 +43,20 @@ export default function Nav() {
           fontWeight: 600,
           fontSize: 14,
           padding: "10px 22px",
-          borderRadius: 8,
+          borderRadius: 7,
           textDecoration: "none",
-          transition: "background 0.2s",
+          letterSpacing: "0.01em",
+          transition: "background 0.18s, transform 0.18s",
+          display: "inline-block",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.background = "#c44a1a")}
-        onMouseLeave={(e) => (e.currentTarget.style.background = "#E05520")}
+        onMouseEnter={e => {
+          e.currentTarget.style.background = "#c84c1c";
+          e.currentTarget.style.transform = "translateY(-1px)";
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.background = "#E05520";
+          e.currentTarget.style.transform = "translateY(0)";
+        }}
       >
         Book a Demo
       </a>
