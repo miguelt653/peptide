@@ -1,60 +1,59 @@
 export default function Logo({ height = 40, dark = false }: { height?: number; dark?: boolean }) {
-  // Flat-top hexagon icon matching Loop AI branding
-  // ViewBox 60x56, flat-top hex
   const iconH = height;
-  const iconW = (iconH * 60) / 56;
-
+  const iconW = (iconH * 56) / 56;
   const textColor = dark ? "#fff" : "#0C2D3F";
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: height * 0.28 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: height * 0.3 }}>
       <svg
         width={iconW}
         height={iconH}
-        viewBox="0 0 60 56"
+        viewBox="0 0 56 56"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
           <clipPath id="hexclip">
             {/* Flat-top hexagon */}
-            <polygon points="45,3 57,28 45,53 15,53 3,28 15,3" />
+            <polygon points="42,4 54,28 42,52 14,52 2,28 14,4" />
           </clipPath>
         </defs>
 
-        {/* Hex background — dark teal */}
-        <polygon points="45,3 57,28 45,53 15,53 3,28 15,3" fill="#0C2D3F" />
+        {/* Hex fill — slightly lighter than page so it's always visible */}
+        <polygon points="42,4 54,28 42,52 14,52 2,28 14,4" fill="#1A4560" />
 
-        {/* All inner artwork clipped to hex */}
         <g clipPath="url(#hexclip)">
-          {/* Left half — 3 white diagonal lines (left face of cube, receding) */}
-          {/* Lines angle follows left face edge direction: roughly -30deg */}
-          {[16, 22, 28].map((x, i) => (
+          {/* Left half — 3 white lines angled like left face of isometric cube */}
+          {/* Lines go from upper-right to lower-left (\\\) */}
+          {[20, 27, 34].map((x, i) => (
             <line
               key={i}
-              x1={x - 12}
+              x1={x + 8}
               y1={2}
-              x2={x + 12}
+              x2={x - 8}
               y2={54}
               stroke="white"
-              strokeWidth="5"
-              strokeLinecap="round"
-              opacity="0.92"
+              strokeWidth="5.5"
+              strokeLinecap="butt"
+              opacity="0.95"
             />
           ))}
 
+          {/* Divider — subtle vertical center line */}
+          <line x1="30" y1="4" x2="30" y2="52" stroke="#0C2D3F" strokeWidth="1.5" opacity="0.4" />
+
           {/* Right half — 3 orange vertical bars */}
-          <rect x="33" y="10" width="7" height="43" rx="1" fill="#E05520" />
-          <rect x="43" y="14" width="7" height="39" rx="1" fill="#E05520" />
-          <rect x="53" y="18" width="7" height="35" rx="1" fill="#E05520" />
+          <rect x="31" y="12" width="6.5" height="40" rx="1" fill="#E05520" />
+          <rect x="40" y="17" width="6.5" height="35" rx="1" fill="#E05520" />
+          <rect x="49" y="22" width="6.5" height="30" rx="1" fill="#E05520" />
         </g>
 
-        {/* Subtle hex border */}
+        {/* Hex border */}
         <polygon
-          points="45,3 57,28 45,53 15,53 3,28 15,3"
+          points="42,4 54,28 42,52 14,52 2,28 14,4"
           fill="none"
-          stroke="rgba(255,255,255,0.1)"
-          strokeWidth="1"
+          stroke={dark ? "rgba(255,255,255,0.15)" : "rgba(12,45,63,0.2)"}
+          strokeWidth="1.5"
         />
       </svg>
 
@@ -62,8 +61,8 @@ export default function Logo({ height = 40, dark = false }: { height?: number; d
         style={{
           fontFamily: "var(--font-syne), Syne, sans-serif",
           fontWeight: 800,
-          fontSize: height * 0.52,
-          letterSpacing: "0.04em",
+          fontSize: height * 0.5,
+          letterSpacing: "0.05em",
           lineHeight: 1,
           color: textColor,
         }}
