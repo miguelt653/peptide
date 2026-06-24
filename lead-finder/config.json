@@ -1,0 +1,47 @@
+{
+  "_comment": "Edit these to match what Loop AI sells and who you want to reach. Keep queries specific.",
+
+  "topics": [
+    "weight loss plateau",
+    "can't lose weight",
+    "GLP-1 alternative",
+    "low energy fatigue",
+    "NAD supplement",
+    "peptides for recovery",
+    "anti aging supplement",
+    "biohacking longevity",
+    "muscle recovery supplement",
+    "metabolism slow"
+  ],
+
+  "pain_signals": [
+    "struggling", "struggle", "can't", "cant", "help", "advice",
+    "recommend", "recommendation", "anyone tried", "anyone else",
+    "looking for", "desperate", "exhausted", "tired all the time",
+    "frustrated", "tried everything", "what worked", "suggestions",
+    "fed up", "at a loss", "no idea", "where do i", "should i"
+  ],
+
+  "reddit": {
+    "enabled": true,
+    "subreddits": [
+      "loseit", "Biohackers", "Supplements", "PeptideTherapy",
+      "Semaglutide", "longevity", "Fitness", "xxfitness", "GettingShredded"
+    ],
+    "time_filter": "month",
+    "limit_per_query": 50
+  },
+
+  "hackernews": {
+    "enabled": true,
+    "limit_per_query": 30
+  },
+
+  "lemmy": {
+    "enabled": false,
+    "instance": "https://lemmy.world",
+    "limit_per_query": 20
+  },
+
+  "min_score": 1
+}
