@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+
+# Secrets — never commit real credentials
+.env
+
+# Generated lead output
+output/
+*.csv
+
+# Logs
+errors.csv
