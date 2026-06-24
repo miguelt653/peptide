@@ -101,7 +101,14 @@ def main():
                     help="Run only this source (default: all)")
     ap.add_argument("--dry-run", action="store_true",
                     help="Print matches without writing CSV")
+    ap.add_argument("--self-test", action="store_true",
+                    help="Validate scoring/CSV logic offline (no internet needed)")
     args = ap.parse_args()
+
+    if args.self_test:
+        import self_test
+        self_test.run()
+        return
 
     if args.source:
         sources_to_run = [args.source]
