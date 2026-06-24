@@ -1,1 +1,1 @@
-"""Free, no-API-key lead sources. Each exposes search(topic, cfg) -> list[dict]."""
+"""Lead scraper source modules for Loop AI pain signal detection."""

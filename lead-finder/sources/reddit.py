@@ -1,63 +1,72 @@
-"""Reddit source — uses the public .json endpoints. No API key required.
+"""Reddit source via PRAW (official free API)."""
+import os
+import praw
+from datetime import datetime, timezone
+from utils import make_lead
+from config import REDDIT_SUBREDDITS, ALL_KEYWORDS
 
-Reddit allows unauthenticated JSON access at low volume. We send a descriptive
-User-Agent and throttle between requests to stay within their fair-use limits.
-For higher volume, switch to PRAW with a registered app (free).
-"""
-import time
-import requests
-
-USER_AGENT = "loopai-lead-finder/0.1 (research; contact: leads@loopai.example)"
-HEADERS = {"User-Agent": USER_AGENT}
+_reddit = None
 
 
-def _get(url, params):
-    for attempt in range(4):
-        try:
-            r = requests.get(url, params=params, headers=HEADERS, timeout=15)
-            if r.status_code == 200:
-                return r.json()
-            if r.status_code == 429:
-                time.sleep(2 ** attempt)
-                continue
-            return None
-        except requests.RequestException:
-            time.sleep(2 ** attempt)
-    return None
+def _client():
+    global _reddit
+    if _reddit is None:
+        _reddit = praw.Reddit(
+            client_id=os.environ["REDDIT_CLIENT_ID"],
+            client_secret=os.environ["REDDIT_CLIENT_SECRET"],
+            user_agent=os.environ.get("REDDIT_USER_AGENT", "loopai-lead-finder/1.0"),
+        )
+        _reddit.read_only = True
+    return _reddit
 
 
-def search(topic, cfg):
-    """Search configured subreddits for a topic. Returns raw lead dicts."""
-    results = []
-    subs = cfg.get("subreddits") or [None]
-    time_filter = cfg.get("time_filter", "month")
-    limit = cfg.get("limit_per_query", 50)
+def scrape(dry_run=False):
+    r = _client()
+    leads = []
+    seen = set()
 
-    for sub in subs:
-        if sub:
-            url = f"https://www.reddit.com/r/{sub}/search.json"
-            params = {"q": topic, "restrict_sr": 1, "sort": "relevance",
-                      "t": time_filter, "limit": limit}
-        else:
-            url = "https://www.reddit.com/search.json"
-            params = {"q": topic, "sort": "relevance", "t": time_filter, "limit": limit}
+    for sub_name in REDDIT_SUBREDDITS:
+        sub = r.subreddit(sub_name)
+        for kw in ALL_KEYWORDS:
+            try:
+                for post in sub.search(kw, sort="new", time_filter="month", limit=50):
+                    if post.id in seen:
+                        continue
+                    seen.add(post.id)
+                    date = datetime.fromtimestamp(post.created_utc, tz=timezone.utc).date().isoformat()
+                    lead = make_lead(
+                        platform=f"Reddit r/{sub_name}",
+                        url=f"https://www.reddit.com{post.permalink}",
+                        text=post.selftext or "",
+                        title=post.title,
+                        author_username=str(post.author) if post.author else "",
+                        date_posted=date,
+                    )
+                    if lead:
+                        leads.append(lead)
+                        if dry_run:
+                            print(f"  [reddit][{lead['relevance_score']}] {post.title[:70]}")
 
-        data = _get(url, params)
-        time.sleep(1.5)  # be polite
-        if not data:
-            continue
+                # Also scan comments in matching posts
+                for post in sub.search(kw, sort="relevance", time_filter="month", limit=20):
+                    post.comments.replace_more(limit=0)
+                    for comment in post.comments.list()[:30]:
+                        cid = f"c_{comment.id}"
+                        if cid in seen:
+                            continue
+                        seen.add(cid)
+                        date = datetime.fromtimestamp(comment.created_utc, tz=timezone.utc).date().isoformat()
+                        lead = make_lead(
+                            platform=f"Reddit r/{sub_name}",
+                            url=f"https://www.reddit.com{post.permalink}",
+                            text=comment.body or "",
+                            title=post.title,
+                            author_username=str(comment.author) if comment.author else "",
+                            date_posted=date,
+                        )
+                        if lead:
+                            leads.append(lead)
+            except Exception as e:
+                print(f"  ! reddit r/{sub_name} '{kw}': {e}")
 
-        for child in data.get("data", {}).get("children", []):
-            d = child.get("data", {})
-            results.append({
-                "source": "reddit",
-                "external_id": d.get("id", ""),
-                "author": d.get("author", ""),
-                "title": d.get("title", ""),
-                "body": d.get("selftext", "") or "",
-                "url": "https://www.reddit.com" + d.get("permalink", ""),
-                "community": "r/" + d.get("subreddit", ""),
-                "upvotes": d.get("score", 0),
-                "created_utc": int(d.get("created_utc", 0)),
-            })
-    return results
+    return leads

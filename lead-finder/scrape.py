@@ -1,84 +1,123 @@
 #!/usr/bin/env python3
-"""Lead finder — searches free public sources for people expressing pain points
-that Loop AI's products address, scores them, and stores them for the portal.
+"""
+Loop AI Pain Signal Scraper
+============================
+Scans free public platforms for restaurant operators, franchise owners, and
+finance/ops leaders expressing pain around delivery reconciliation, chargebacks,
+marketing ROI, and reporting — the exact problems Loop AI solves.
 
 Usage:
-    python scrape.py            # run all enabled sources against config topics
-    python scrape.py --dry-run  # show what would be found, don't write to db
+    python scrape.py                        # run all sources
+    python scrape.py --source reddit        # single source
+    python scrape.py --dry-run              # print matches, no CSV
+    python scrape.py --source hackernews --dry-run
 """
 import argparse
-import json
-import re
+import os
+import sys
+from datetime import date
 from pathlib import Path
 
-import db
-from sources import reddit, hackernews, lemmy
+import pandas as pd
+from dotenv import load_dotenv
 
-CONFIG = Path(__file__).parent / "config.json"
-SOURCE_MODULES = {"reddit": reddit, "hackernews": hackernews, "lemmy": lemmy}
+load_dotenv()
 
+from utils import CSV_COLUMNS
 
-def load_config():
-    with open(CONFIG) as f:
-        return json.load(f)
-
-
-def score_pain(text, signals):
-    """Count distinct intent phrases present. Higher = more likely a real lead."""
-    if not text:
-        return 0
-    low = text.lower()
-    hits = set()
-    for sig in signals:
-        # word-ish boundary match so 'cant' doesn't fire inside 'cantaloupe'
-        if re.search(r"(?<![a-z])" + re.escape(sig.lower()) + r"(?![a-z])", low):
-            hits.add(sig.lower())
-    return len(hits)
+SOURCES = {
+    "reddit": "sources.reddit",
+    "hackernews": "sources.hackernews",
+    "g2": "sources.g2",
+    "capterra": "sources.capterra",
+    "trustpilot": "sources.trustpilot",
+    "google": "sources.google_search",
+    "quora": "sources.quora",
+    "press": "sources.industry_press",
+}
 
 
-def run(dry_run=False):
-    cfg = load_config()
-    signals = cfg.get("pain_signals", [])
-    min_score = cfg.get("min_score", 1)
-    topics = cfg.get("topics", [])
+def import_source(name):
+    import importlib
+    return importlib.import_module(SOURCES[name])
 
-    found, new, skipped = 0, 0, 0
 
-    for name, mod in SOURCE_MODULES.items():
-        scfg = cfg.get(name, {})
-        if not scfg.get("enabled"):
-            continue
-        print(f"\n=== {name} ===")
-        for topic in topics:
-            try:
-                raw = mod.search(topic, scfg)
-            except Exception as e:  # one bad source shouldn't kill the run
-                print(f"  ! {topic}: {e}")
-                continue
-            for item in raw:
-                found += 1
-                score = score_pain(item["title"] + " " + item["body"], signals)
-                if score < min_score:
-                    skipped += 1
-                    continue
-                item["matched_topic"] = topic
-                item["pain_score"] = score
-                if dry_run:
-                    print(f"  [{score}] {item['community']}: {item['title'][:70]}")
-                    new += 1
-                elif db.upsert_lead(item):
-                    new += 1
-                    print(f"  + [{score}] {item['community']}: {item['title'][:70]}")
-            print(f"  · topic '{topic}' done")
+def run(sources_to_run, dry_run):
+    all_leads = []
 
-    print(f"\nDone. scanned={found}  qualified+new={new}  below-threshold={skipped}")
-    if not dry_run:
-        s = db.stats()
-        print(f"Portal now holds {s['total']} leads. Run: python app.py")
+    for name in sources_to_run:
+        print(f"\n{'='*50}")
+        print(f"  Source: {name.upper()}")
+        print(f"{'='*50}")
+        try:
+            mod = import_source(name)
+            leads = mod.scrape(dry_run=dry_run)
+            all_leads.extend(leads)
+            print(f"  => {len(leads)} qualified leads from {name}")
+        except Exception as e:
+            print(f"  ! {name} failed: {e}")
+            if os.environ.get("DEBUG"):
+                import traceback; traceback.print_exc()
+
+    if not all_leads:
+        print("\nNo leads found. Try --dry-run or check your credentials.")
+        return
+
+    df = pd.DataFrame(all_leads, columns=CSV_COLUMNS)
+
+    # Deduplicate by URL + author
+    df = df.drop_duplicates(subset=["post_url", "author_username"], keep="first")
+
+    # Sort by relevance descending
+    df = df.sort_values("relevance_score", ascending=False).reset_index(drop=True)
+
+    if dry_run:
+        print(f"\n[dry-run] Would write {len(df)} leads.")
+        print(df[["platform", "relevance_score", "product_signal", "keyword_matched",
+                   "post_text"]].head(20).to_string(index=False))
+        return
+
+    out_dir = Path(__file__).parent / "output"
+    out_dir.mkdir(exist_ok=True)
+    filename = out_dir / f"loop_pain_signals_{date.today().isoformat()}.csv"
+    df.to_csv(filename, index=False)
+
+    print(f"\n{'='*50}")
+    print(f"  DONE")
+    print(f"  Total leads:     {len(df)}")
+    print(f"  Output:          {filename}")
+    print(f"  By product:")
+    for product, count in df["product_signal"].value_counts().items():
+        print(f"    {product}: {count}")
+    print(f"  By score:")
+    for score, count in df["relevance_score"].value_counts().sort_index(ascending=False).items():
+        print(f"    Score {score}: {count}")
+    print(f"{'='*50}")
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Loop AI Pain Signal Scraper")
+    ap.add_argument("--source", choices=list(SOURCES.keys()),
+                    help="Run only this source (default: all)")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="Print matches without writing CSV")
+    args = ap.parse_args()
+
+    if args.source:
+        sources_to_run = [args.source]
+    else:
+        # Skip reddit if no credentials are set
+        sources_to_run = list(SOURCES.keys())
+        if not os.environ.get("REDDIT_CLIENT_ID"):
+            print("⚠  REDDIT_CLIENT_ID not set — skipping Reddit. Add to .env to enable.")
+            sources_to_run = [s for s in sources_to_run if s != "reddit"]
+        # Skip quora unless explicitly requested (slow)
+        if not args.source:
+            sources_to_run = [s for s in sources_to_run if s != "quora"]
+            print("ℹ  Quora skipped by default (slow). Run: python scrape.py --source quora")
+
+    run(sources_to_run, dry_run=args.dry_run)
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--dry-run", action="store_true", help="don't write to db")
-    args = ap.parse_args()
-    run(dry_run=args.dry_run)
+    main()
