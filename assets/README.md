@@ -11,6 +11,21 @@
 | `usage.jpg` | Woman injecting at the abdomen (window/plants in background) | "How It Works" — second image below pen |
 | `science-bg.jpg` | Light/transparent molecule render | "Why Us" section background |
 
+## Certificate of Analysis (COA) images
+
+Each product's "View Certificate of Analysis" button opens the matching image below.
+Save each COA (JPG or PNG, but keep the `.jpg` filename) into this `assets/` folder:
+
+| Filename | Product | COA # |
+|---|---|---|
+| `coa-retatrutide.jpg` | Retatrutide 20mg | 33877 |
+| `coa-nad.jpg` | NAD+ 500mg | 22727 |
+| `coa-ghk-cu.jpg` | GHK-Cu 50mg | 31317 |
+| `coa-wolverine.jpg` | Wolverine Stack (BPC-157 + TB-500) | 34197 |
+
+Until a file is uploaded, the button shows a friendly "coming soon" message instead of breaking.
+To add a COA for Melanotan II later, drop `coa-melanotan.jpg` here and let me know so I can link it.
+
 ## How to add photos (2 minutes)
 
 ### Option A — through GitHub web (easiest, no terminal):

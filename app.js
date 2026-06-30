@@ -46,6 +46,7 @@ const DEFAULT_PRODUCTS = [
     category: "metabolic",
     categoryLabel: "Metabolic",
     icon: "🎯",
+    coa: "assets/coa-retatrutide.jpg",
     price: 195,
     penPrice: 265,
     unit: "20mg vial",
@@ -81,6 +82,7 @@ const DEFAULT_PRODUCTS = [
     category: "metabolic",
     categoryLabel: "Metabolic",
     icon: "✨",
+    coa: "assets/coa-nad.jpg",
     price: 115,
     penPrice: 155,
     unit: "500mg vial",
@@ -116,6 +118,7 @@ const DEFAULT_PRODUCTS = [
     category: "healing",
     categoryLabel: "Healing & Recovery",
     icon: "🔷",
+    coa: "assets/coa-ghk-cu.jpg",
     price: 115,
     penPrice: 155,
     unit: "50mg powder",
@@ -151,6 +154,7 @@ const DEFAULT_PRODUCTS = [
     category: "healing",
     categoryLabel: "Healing & Recovery",
     icon: "🛡️",
+    coa: "assets/coa-wolverine.jpg",
     price: 100,
     penPrice: 140,
     unit: "10mg blend vial",
@@ -353,6 +357,11 @@ function renderProducts() {
           <span class="stock-dot"></span>
           ${soldOut ? "Sold Out" : lowStock ? `Only ${p.stock} left` : `${p.stock} in stock`}
         </div>
+        ${p.coa ? `
+        <button class="view-coa" data-coa="${p.coa}" data-name="${p.name}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          View Certificate of Analysis
+        </button>` : ''}
         ${hasPen(p) ? `
         <div class="variant-select">
           <button class="variant-opt ${variant === 'vial' ? 'variant-opt--active' : ''}" data-id="${p.id}" data-variant="vial">
@@ -825,6 +834,14 @@ function openDetail(id) {
       </div>
     </div>
 
+    ${p.coa ? `
+    <div class="detail-section">
+      <button class="btn btn--ghost btn--full view-coa" data-coa="${p.coa}" data-name="${p.name}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        View Certificate of Analysis
+      </button>
+    </div>` : ''}
+
     <div class="detail-disclaimer">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       For research purposes only. Not intended for human consumption. Always consult a licensed healthcare professional.
@@ -1056,6 +1073,50 @@ function renderOrders() {
     });
   });
 }
+
+/* =========================================================
+   COA Lightbox
+   ========================================================= */
+const coaOverlay  = document.getElementById("coaOverlay");
+const coaLightbox = document.getElementById("coaLightbox");
+const coaImg      = document.getElementById("coaImg");
+const coaFallback = document.getElementById("coaFallback");
+const coaTitle    = document.getElementById("coaTitle");
+const coaOpen     = document.getElementById("coaOpen");
+const coaClose    = document.getElementById("coaClose");
+
+function openCoa(src, name) {
+  coaTitle.textContent = `Certificate of Analysis${name ? " — " + name : ""}`;
+  coaFallback.style.display = "none";
+  coaImg.style.display = "block";
+  coaImg.src = src;
+  coaOpen.href = src;
+  coaLightbox.classList.add("open");
+  coaOverlay.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+function closeCoa() {
+  coaLightbox.classList.remove("open");
+  coaOverlay.classList.remove("active");
+  // keep scroll locked if a product detail modal is still open behind it
+  document.body.style.overflow = detailModal.classList.contains("open") ? "hidden" : "";
+}
+if (coaImg) {
+  coaImg.addEventListener("error", () => {
+    coaImg.style.display = "none";
+    coaFallback.style.display = "block";
+  });
+}
+if (coaClose)   coaClose.addEventListener("click", closeCoa);
+if (coaOverlay) coaOverlay.addEventListener("click", closeCoa);
+
+// Delegated: any "View COA" button (cards + detail modal)
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".view-coa");
+  if (!btn) return;
+  e.preventDefault();
+  openCoa(btn.dataset.coa, btn.dataset.name);
+});
 
 /* =========================================================
    Age Gate (18+)
