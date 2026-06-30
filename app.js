@@ -1,5 +1,5 @@
 /* =========================================================
-   Leanova — App Logic
+   Bella Vita Labs — App Logic
    =========================================================
    OWNER NOTIFICATION SETUP (so you get a text when someone orders):
    ----------------------------------------------------------
@@ -246,7 +246,7 @@ const DEFAULT_PRODUCTS = [
 
 /* ---- Load products w/ stock from localStorage ---- */
 function loadProducts() {
-  const saved = localStorage.getItem("leanova_products");
+  const saved = localStorage.getItem("bellavita_products") || localStorage.getItem("leanova_products");
   if (saved) {
     try {
       const savedProducts = JSON.parse(saved);
@@ -260,14 +260,14 @@ function loadProducts() {
   return [...DEFAULT_PRODUCTS];
 }
 function saveProducts() {
-  localStorage.setItem("leanova_products", JSON.stringify(PRODUCTS.map(p => ({ id: p.id, stock: p.stock }))));
+  localStorage.setItem("bellavita_products", JSON.stringify(PRODUCTS.map(p => ({ id: p.id, stock: p.stock }))));
 }
 const PRODUCTS = loadProducts();
 
 const FAQS = [
   {
     q: "What does 'research purposes only' mean?",
-    a: "All Leanova peptides are sold strictly for in vitro (laboratory) research. They are not intended for human or veterinary use, consumption, or injection. Always consult a licensed healthcare professional before any personal use.",
+    a: "All Bella Vita Labs peptides are sold strictly for in vitro (laboratory) research. They are not intended for human or veterinary use, consumption, or injection. Always consult a licensed healthcare professional before any personal use.",
   },
   {
     q: "How do you verify purity?",
@@ -564,18 +564,18 @@ document.getElementById("copyVenmo").addEventListener("click", () => {
 
 /* ---- Orders persistence ---- */
 function loadOrders() {
-  try { return JSON.parse(localStorage.getItem("leanova_orders") || "[]"); }
+  try { return JSON.parse(localStorage.getItem("bellavita_orders") || localStorage.getItem("leanova_orders") || "[]"); }
   catch { return []; }
 }
 function saveOrders(orders) {
-  localStorage.setItem("leanova_orders", JSON.stringify(orders));
+  localStorage.setItem("bellavita_orders", JSON.stringify(orders));
 }
 
 /* ---- Owner SMS / Email Notification ---- */
 function buildOrderMessage(order) {
   const itemsLine = order.items.map(i => `${i.name} x${i.qty}`).join(", ");
   return [
-    `🛒 New Leanova Order ${order.id}`,
+    `🛒 New Bella Vita Labs Order ${order.id}`,
     `${order.customer.firstName} ${order.customer.lastName}`,
     `${order.customer.email} · ${order.customer.phone || "no phone"}`,
     `${order.customer.address}, ${order.customer.city}, ${order.customer.state} ${order.customer.zip}`,
@@ -632,7 +632,7 @@ checkoutForm.addEventListener("submit", e => {
   const formData = new FormData(checkoutForm);
   const { total } = getOrderTotal();
   const order = {
-    id: "PP-" + Date.now().toString(36).toUpperCase(),
+    id: "BV-" + Date.now().toString(36).toUpperCase(),
     date: new Date().toISOString(),
     status: "awaiting_payment",
     customer: {

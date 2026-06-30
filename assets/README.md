@@ -1,4 +1,4 @@
-# Leanova — Image Assets
+# Bella Vita Labs — Image Assets
 
 ⚠️ **The site won't show photos until you save files into this folder.** The code references these filenames — when files matching them exist here, they'll appear automatically.
 
