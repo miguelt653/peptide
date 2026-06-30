@@ -40,47 +40,14 @@ const EMAILJS_CONFIG    = {
 
 const DEFAULT_PRODUCTS = [
   {
-    id: 1,
-    name: "BPC-157",
-    fullName: "Body Protection Compound 157",
-    category: "healing",
-    categoryLabel: "Healing & Recovery",
-    icon: "🧬",
-    price: 49.99,
-    unit: "5mg vial",
-    purity: "≥99%",
-    desc: "A synthetic pentadecapeptide studied for soft tissue repair, gut lining support, and recovery acceleration. One of the most researched healing peptides available.",
-    meta: ["5mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
-    stock: 25,
-    detail: {
-      overview: "BPC-157 (Body Protection Compound 157) is a synthetic peptide derived from a protective protein found naturally in gastric juice. It consists of 15 amino acids and has been the subject of extensive preclinical research for its remarkable regenerative properties across multiple tissue types.",
-      benefits: [
-        "Accelerates healing of tendons, ligaments, and muscle tissue",
-        "Supports gut lining integrity and gastrointestinal health",
-        "Reduces inflammation at injury sites",
-        "Promotes angiogenesis (new blood vessel formation) to injured areas",
-        "Studied for neuroprotective effects and nervous system repair",
-        "May support joint health and cartilage recovery",
-      ],
-      mechanism: "BPC-157 works by upregulating growth hormone receptors and activating the FAK-paxillin pathway, which plays a key role in cell survival and migration. It also promotes the formation of new blood vessels through VEGF signaling, accelerating nutrient delivery to healing tissue.",
-      specs: [
-        { label: "Sequence", value: "Gly-Glu-Pro-Pro-Pro-Gly-Lys-Pro-Ala-Asp-Asp-Ala-Gly-Leu-Val" },
-        { label: "Molecular Weight", value: "1,419.5 Da" },
-        { label: "Form", value: "Lyophilized powder" },
-        { label: "Purity", value: "≥99% (HPLC verified)" },
-        { label: "Storage", value: "Refrigerate at 2–8°C. Stable up to 24 months lyophilized." },
-        { label: "Reconstitution", value: "Bacteriostatic water" },
-      ],
-    },
-  },
-  {
     id: 2,
     name: "Retatrutide",
     fullName: "Retatrutide (GLP-1/GIP/Glucagon Triple Agonist)",
     category: "metabolic",
     categoryLabel: "Metabolic",
     icon: "🎯",
-    price: 129.99,
+    price: 195,
+    penPrice: 265,
     unit: "20mg vial",
     purity: "≥99%",
     desc: "A next-generation triple receptor agonist (GLP-1, GIP, and glucagon) being actively studied for metabolic regulation, body composition, and energy balance.",
@@ -108,47 +75,14 @@ const DEFAULT_PRODUCTS = [
     },
   },
   {
-    id: 3,
-    name: "TB-500",
-    fullName: "Thymosin Beta-4 (TB-500)",
-    category: "healing",
-    categoryLabel: "Healing & Recovery",
-    icon: "💊",
-    price: 54.99,
-    unit: "5mg vial",
-    purity: "≥98.5%",
-    desc: "A naturally occurring peptide studied for its role in cell migration, proliferation, and differentiation — particularly relevant to muscle, tendon, and wound healing research.",
-    meta: ["5mg / vial", "≥98.5% Purity", "Lyophilized", "COA Included"],
-    stock: 20,
-    detail: {
-      overview: "TB-500 is a synthetic version of Thymosin Beta-4, a naturally occurring 43-amino acid peptide found in virtually all human and animal cells. It plays a central role in building new blood vessels, muscle fibers, and cell migration. Unlike BPC-157 which is more site-specific, TB-500 has a systemic healing effect throughout the body.",
-      benefits: [
-        "Promotes systemic healing — works throughout the entire body",
-        "Accelerates muscle fiber repair and regeneration",
-        "Reduces inflammation and scar tissue formation",
-        "Improves flexibility and range of motion in damaged tissue",
-        "Studied for cardiac tissue repair and protection",
-        "Supports hair follicle growth in research models",
-      ],
-      mechanism: "TB-500 works primarily by upregulating actin — a protein critical for cell structure and movement. By promoting actin polymerization, it accelerates cell migration to injury sites, speeds up tissue repair, and facilitates the growth of new blood vessels. Its systemic nature means it doesn't require local injection near the injury site.",
-      specs: [
-        { label: "Sequence", value: "Ac-LKKTETQ (17-mer fragment)" },
-        { label: "Molecular Weight", value: "4,963.5 Da" },
-        { label: "Form", value: "Lyophilized powder" },
-        { label: "Purity", value: "≥98.5% (HPLC verified)" },
-        { label: "Storage", value: "Refrigerate at 2–8°C. Stable up to 24 months lyophilized." },
-        { label: "Reconstitution", value: "Bacteriostatic water" },
-      ],
-    },
-  },
-  {
     id: 4,
     name: "NAD+",
     fullName: "Nicotinamide Adenine Dinucleotide",
     category: "metabolic",
     categoryLabel: "Metabolic",
     icon: "✨",
-    price: 79.99,
+    price: 115,
+    penPrice: 155,
     unit: "500mg vial",
     purity: "≥99%",
     desc: "A critical coenzyme present in every living cell, studied extensively for cellular energy production, mitochondrial function, DNA repair, and longevity pathways.",
@@ -182,7 +116,8 @@ const DEFAULT_PRODUCTS = [
     category: "healing",
     categoryLabel: "Healing & Recovery",
     icon: "🔷",
-    price: 39.99,
+    price: 115,
+    penPrice: 155,
     unit: "50mg powder",
     purity: "≥99%",
     desc: "A naturally occurring copper complex found in human plasma, studied for collagen synthesis stimulation, wound healing, antioxidant activity, and tissue remodeling.",
@@ -216,11 +151,12 @@ const DEFAULT_PRODUCTS = [
     category: "healing",
     categoryLabel: "Healing & Recovery",
     icon: "🛡️",
-    price: 99.99, // PLACEHOLDER — confirm price
-    unit: "2-vial stack",
+    price: 100,
+    penPrice: 140,
+    unit: "10mg blend vial",
     purity: "≥99%",
-    desc: "A complete recovery stack pairing BPC-157 (10mg) with TB-500 (10mg) — two of the most studied healing peptides — for comprehensive soft-tissue, tendon, and ligament recovery research.",
-    meta: ["BPC-157 10mg", "TB-500 10mg", "≥99% Purity", "COA Included"],
+    desc: "A complete recovery blend pairing BPC-157 (5mg) with TB-500 (5mg) — two of the most studied healing peptides — for comprehensive soft-tissue, tendon, and ligament recovery research.",
+    meta: ["BPC-157 5mg", "TB-500 5mg", "≥99% Purity", "COA Included"],
     stock: 15,
     detail: {
       overview: "The Wolverine Stack combines BPC-157 and TB-500 into a single recovery protocol. BPC-157 acts locally and site-specifically to accelerate healing, while TB-500 works systemically throughout the body. Together they are studied as complementary peptides that address tissue repair from two distinct angles — making this one of the most popular combinations in regenerative research.",
@@ -234,9 +170,9 @@ const DEFAULT_PRODUCTS = [
       ],
       mechanism: "BPC-157 upregulates growth hormone receptors and the FAK-paxillin pathway while promoting VEGF-driven angiogenesis at the injury site. TB-500 upregulates actin to accelerate cell migration and tissue repair systemically. Used together, they target both localized and body-wide repair processes simultaneously, which is why they are commonly researched as a stack.",
       specs: [
-        { label: "Contents", value: "10mg BPC-157 + 10mg TB-500 (2 vials)" },
+        { label: "Contents", value: "5mg BPC-157 + 5mg TB-500 (blend vial)" },
         { label: "Form", value: "Lyophilized powder" },
-        { label: "Purity", value: "≥99% each component (HPLC verified)" },
+        { label: "Purity", value: "≥99% blend (HPLC verified)" },
         { label: "Storage", value: "Refrigerate at 2–8°C. Stable up to 24 months lyophilized." },
         { label: "Reconstitution", value: "Bacteriostatic water" },
       ],
@@ -249,7 +185,8 @@ const DEFAULT_PRODUCTS = [
     category: "aesthetic",
     categoryLabel: "Aesthetic",
     icon: "☀️",
-    price: 49.99, // PLACEHOLDER — confirm price
+    price: 100,
+    penPrice: 140,
     unit: "10mg vial",
     purity: "≥99%",
     desc: "A synthetic analogue of alpha-melanocyte-stimulating hormone (α-MSH), studied for its effect on melanogenesis (skin pigmentation) and the tanning response with reduced UV exposure.",
@@ -339,6 +276,7 @@ const FAQS = [
 /* ---- State ---- */
 let cart = [];
 let activeCategory = "all";
+let selectedVariant = {}; // { [productId]: "vial" | "pen" }
 
 /* ---- DOM Refs ---- */
 const productGrid = document.getElementById("productGrid");
@@ -367,11 +305,22 @@ const formSuccess   = document.getElementById("formSuccess");
 
 /* ---- Stock helpers ---- */
 function inCart(id) {
-  const item = cart.find(i => i.id === id);
-  return item ? item.qty : 0;
+  // total quantity across all variants of this product
+  return cart.filter(i => i.id === id).reduce((s, i) => s + i.qty, 0);
 }
 function availableStock(p) {
   return Math.max(0, p.stock - inCart(p.id));
+}
+
+/* ---- Variant ("with Pen") helpers ---- */
+function hasPen(p) {
+  return typeof p.penPrice === "number";
+}
+function variantOf(id) {
+  return selectedVariant[id] || "vial";
+}
+function priceFor(p, variant) {
+  return variant === "pen" && hasPen(p) ? p.penPrice : p.price;
 }
 
 /* ---- Render Products ---- */
@@ -385,6 +334,8 @@ function renderProducts() {
     const available = availableStock(p);
     const soldOut = p.stock === 0;
     const lowStock = !soldOut && p.stock <= 5;
+    const variant = variantOf(p.id);
+    const curPrice = priceFor(p, variant);
     const card = document.createElement("div");
     card.className = "product-card" + (soldOut ? " product-card--soldout" : "");
     card.style.animationDelay = `${i * 0.05}s`;
@@ -402,11 +353,20 @@ function renderProducts() {
           <span class="stock-dot"></span>
           ${soldOut ? "Sold Out" : lowStock ? `Only ${p.stock} left` : `${p.stock} in stock`}
         </div>
+        ${hasPen(p) ? `
+        <div class="variant-select">
+          <button class="variant-opt ${variant === 'vial' ? 'variant-opt--active' : ''}" data-id="${p.id}" data-variant="vial">
+            Vial Only<span>$${p.price.toFixed(2)}</span>
+          </button>
+          <button class="variant-opt ${variant === 'pen' ? 'variant-opt--active' : ''}" data-id="${p.id}" data-variant="pen">
+            With Pen<span>$${p.penPrice.toFixed(2)}</span>
+          </button>
+        </div>` : ''}
       </div>
       <div class="product-card__footer">
         <div>
-          <div class="product-card__price">$${p.price.toFixed(2)}</div>
-          <div class="product-card__price-sub">per ${p.unit}</div>
+          <div class="product-card__price">$${curPrice.toFixed(2)}</div>
+          <div class="product-card__price-sub">${variant === 'pen' ? 'vial + injection pen' : `per ${p.unit}`}</div>
         </div>
         <div class="product-card__actions">
           <button class="view-details-btn" data-id="${p.id}">Details</button>
@@ -421,8 +381,14 @@ function renderProducts() {
     productGrid.appendChild(card);
   });
 
+  document.querySelectorAll(".variant-opt").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedVariant[parseInt(btn.dataset.id)] = btn.dataset.variant;
+      renderProducts();
+    });
+  });
   document.querySelectorAll(".add-to-cart:not([disabled])").forEach(btn => {
-    btn.addEventListener("click", () => addToCart(parseInt(btn.dataset.id), btn));
+    btn.addEventListener("click", () => addToCart(parseInt(btn.dataset.id), variantOf(parseInt(btn.dataset.id)), btn));
   });
   document.querySelectorAll(".view-details-btn").forEach(btn => {
     btn.addEventListener("click", () => openDetail(parseInt(btn.dataset.id)));
@@ -440,39 +406,50 @@ filterBtns.forEach(btn => {
 });
 
 /* ---- Cart Logic ---- */
-function addToCart(id, btn) {
+function addToCart(id, variant, btn) {
   const product = PRODUCTS.find(p => p.id === id);
   if (!product) return;
   if (availableStock(product) <= 0) return;
-  const existing = cart.find(i => i.id === id);
+  variant = variant === "pen" && hasPen(product) ? "pen" : "vial";
+  const existing = cart.find(i => i.id === id && i.variant === variant);
   if (existing) {
     existing.qty++;
   } else {
-    cart.push({ ...product, qty: 1 });
+    cart.push({
+      id: product.id,
+      variant,
+      name: product.name,
+      icon: product.icon,
+      unit: product.unit,
+      price: priceFor(product, variant),
+      qty: 1,
+    });
   }
   updateCartUI();
   renderProducts();
-  btn.classList.add("added");
-  btn.textContent = "Added ✓";
-  setTimeout(() => {
-    btn.classList.remove("added");
-    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add`;
-  }, 1500);
+  if (btn) {
+    btn.classList.add("added");
+    btn.textContent = "Added ✓";
+    setTimeout(() => {
+      btn.classList.remove("added");
+      btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add`;
+    }, 1500);
+  }
 }
 
-function removeFromCart(id) {
-  cart = cart.filter(i => i.id !== id);
+function removeFromCart(id, variant) {
+  cart = cart.filter(i => !(i.id === id && i.variant === variant));
   updateCartUI();
   renderProducts();
 }
 
-function changeQty(id, delta) {
-  const item = cart.find(i => i.id === id);
+function changeQty(id, variant, delta) {
+  const item = cart.find(i => i.id === id && i.variant === variant);
   if (!item) return;
   const product = PRODUCTS.find(p => p.id === id);
-  if (delta > 0 && product && item.qty >= product.stock) return; // can't exceed stock
+  if (delta > 0 && product && inCart(id) >= product.stock) return; // can't exceed stock (all variants share stock)
   item.qty += delta;
-  if (item.qty <= 0) removeFromCart(id);
+  if (item.qty <= 0) removeFromCart(id, variant);
   else { updateCartUI(); renderProducts(); }
 }
 
@@ -492,16 +469,16 @@ function updateCartUI() {
     el.className = "cart-item";
     el.innerHTML = `
       <div>
-        <div class="cart-item__name">${item.icon} ${item.name}</div>
-        <div class="cart-item__price">$${item.price.toFixed(2)} / ${item.unit}</div>
+        <div class="cart-item__name">${item.icon} ${item.name}${item.variant === 'pen' ? ' <span class="cart-item__variant">+ Pen</span>' : ''}</div>
+        <div class="cart-item__price">$${item.price.toFixed(2)} / ${item.variant === 'pen' ? 'vial + pen' : item.unit}</div>
         <div class="cart-item__controls">
-          <button class="qty-btn" data-id="${item.id}" data-delta="-1">−</button>
+          <button class="qty-btn" data-id="${item.id}" data-variant="${item.variant}" data-delta="-1">−</button>
           <span class="qty-display">${item.qty}</span>
-          <button class="qty-btn" data-id="${item.id}" data-delta="1">+</button>
+          <button class="qty-btn" data-id="${item.id}" data-variant="${item.variant}" data-delta="1">+</button>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-        <button class="cart-item__remove" data-id="${item.id}" title="Remove">×</button>
+        <button class="cart-item__remove" data-id="${item.id}" data-variant="${item.variant}" title="Remove">×</button>
         <span class="cart-item__total">$${(item.price * item.qty).toFixed(2)}</span>
       </div>
     `;
@@ -509,10 +486,10 @@ function updateCartUI() {
   });
 
   cartItems.querySelectorAll(".qty-btn").forEach(btn => {
-    btn.addEventListener("click", () => changeQty(parseInt(btn.dataset.id), parseInt(btn.dataset.delta)));
+    btn.addEventListener("click", () => changeQty(parseInt(btn.dataset.id), btn.dataset.variant, parseInt(btn.dataset.delta)));
   });
   cartItems.querySelectorAll(".cart-item__remove").forEach(btn => {
-    btn.addEventListener("click", () => removeFromCart(parseInt(btn.dataset.id)));
+    btn.addEventListener("click", () => removeFromCart(parseInt(btn.dataset.id), btn.dataset.variant));
   });
 
   cartTotal.textContent = `$${total.toFixed(2)}`;
@@ -568,7 +545,7 @@ function buildOrderSummary() {
     <h4>Order Summary</h4>
     ${cart.map(i => `
       <div class="order-line">
-        <span>${i.icon} ${i.name} × ${i.qty}</span>
+        <span>${i.icon} ${i.name}${i.variant === 'pen' ? ' (+ Pen)' : ''} × ${i.qty}</span>
         <span>$${(i.price * i.qty).toFixed(2)}</span>
       </div>
     `).join("")}
@@ -633,7 +610,7 @@ function saveOrders(orders) {
 
 /* ---- Owner SMS / Email Notification ---- */
 function buildOrderMessage(order) {
-  const itemsLine = order.items.map(i => `${i.name} x${i.qty}`).join(", ");
+  const itemsLine = order.items.map(i => `${i.name}${i.variant === 'pen' ? ' (+Pen)' : ''} x${i.qty}`).join(", ");
   return [
     `🛒 New Bella Vita Labs Order ${order.id}`,
     `${order.customer.firstName} ${order.customer.lastName}`,
@@ -706,7 +683,7 @@ checkoutForm.addEventListener("submit", e => {
       state: formData.get("state"),
       zip: formData.get("zip"),
     },
-    items: cart.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
+    items: cart.map(i => ({ id: i.id, name: i.name, variant: i.variant, qty: i.qty, price: i.price })),
     total,
     referral: normalizeReferral(formData.get("referral")) || null,
     referralValid: isValidReferral(formData.get("referral")),
@@ -779,6 +756,15 @@ const detailAddBtn  = document.getElementById("detailAddBtn");
 
 let detailProduct = null;
 
+function refreshDetailPrice(p) {
+  const variant = variantOf(p.id);
+  document.getElementById("detailPrice").textContent = `$${priceFor(p, variant).toFixed(2)}`;
+  document.getElementById("detailUnit").textContent  = variant === "pen" ? "vial + injection pen" : `per ${p.unit}`;
+  detailBody.querySelectorAll(".variant-opt").forEach(b => {
+    b.classList.toggle("variant-opt--active", b.dataset.variant === variant);
+  });
+}
+
 function openDetail(id) {
   const p = PRODUCTS.find(x => x.id === id);
   if (!p) return;
@@ -787,8 +773,6 @@ function openDetail(id) {
   document.getElementById("detailIcon").textContent     = p.icon;
   document.getElementById("detailName").textContent     = p.name;
   document.getElementById("detailFullName").textContent = p.fullName;
-  document.getElementById("detailPrice").textContent    = `$${p.price.toFixed(2)}`;
-  document.getElementById("detailUnit").textContent     = `per ${p.unit}`;
 
   const available = availableStock(p);
   detailAddBtn.disabled = available === 0;
@@ -798,6 +782,11 @@ function openDetail(id) {
 
   const d = p.detail;
   detailBody.innerHTML = `
+    ${hasPen(p) ? `
+    <div class="variant-select variant-select--modal">
+      <button class="variant-opt" data-variant="vial">Vial Only<span>$${p.price.toFixed(2)}</span></button>
+      <button class="variant-opt" data-variant="pen">With Pen<span>$${p.penPrice.toFixed(2)}</span></button>
+    </div>` : ''}
     <div class="detail-section">
       <span class="detail-category-badge detail-category-badge--${p.category}">${p.categoryLabel}</span>
       <p class="detail-overview">${d.overview}</p>
@@ -842,6 +831,14 @@ function openDetail(id) {
     </div>
   `;
 
+  detailBody.querySelectorAll(".variant-opt").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedVariant[p.id] = btn.dataset.variant;
+      refreshDetailPrice(p);
+    });
+  });
+  refreshDetailPrice(p);
+
   detailModal.classList.add("open");
   detailOverlay.classList.add("active");
   document.body.style.overflow = "hidden";
@@ -858,7 +855,7 @@ detailClose.addEventListener("click", closeDetail);
 detailOverlay.addEventListener("click", closeDetail);
 detailAddBtn.addEventListener("click", () => {
   if (!detailProduct) return;
-  addToCart(detailProduct.id, detailAddBtn);
+  addToCart(detailProduct.id, variantOf(detailProduct.id), detailAddBtn);
   closeDetail();
 });
 
@@ -1029,7 +1026,7 @@ function renderOrders() {
         <div>${o.customer.email} · ${o.customer.phone || "—"}</div>
         <div>${o.customer.address}, ${o.customer.city}, ${o.customer.state} ${o.customer.zip}</div>
         <div class="order-card__items">
-          ${o.items.map(i => `<span>${i.name} × ${i.qty}</span>`).join(" · ")}
+          ${o.items.map(i => `<span>${i.name}${i.variant === 'pen' ? ' (+Pen)' : ''} × ${i.qty}</span>`).join(" · ")}
         </div>
         <div class="order-card__total">Total: <strong>$${o.total.toFixed(2)}</strong></div>
         ${o.referral
@@ -1057,6 +1054,26 @@ function renderOrders() {
       saveOrders(orders);
       renderOrders();
     });
+  });
+}
+
+/* =========================================================
+   Age Gate (18+)
+   ========================================================= */
+const ageGate = document.getElementById("ageGate");
+if (ageGate) {
+  if (localStorage.getItem("bellavita_age_ok") === "yes") {
+    ageGate.classList.add("age-gate--hidden");
+  } else {
+    document.body.style.overflow = "hidden";
+  }
+  document.getElementById("ageYes").addEventListener("click", () => {
+    localStorage.setItem("bellavita_age_ok", "yes");
+    ageGate.classList.add("age-gate--hidden");
+    document.body.style.overflow = "";
+  });
+  document.getElementById("ageNo").addEventListener("click", () => {
+    window.location.href = "https://www.google.com";
   });
 }
 
