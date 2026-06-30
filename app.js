@@ -29,6 +29,7 @@
 /* ---- Config ---- */
 const CASHAPP_HANDLE    = "$Frankie-DiLorenzo"; // change to actual cashtag
 const ADMIN_PASSWORD    = "changeme123"; // change me in production
+const VALID_REFERRAL_CODES = ["VAL"];    // accepted referral codes (case-insensitive)
 const OWNER_WEBHOOK_URL = "";            // e.g. "https://hooks.zapier.com/hooks/catch/123456/abcdef/"
 const USE_EMAILJS       = false;
 const EMAILJS_CONFIG    = {
@@ -562,6 +563,33 @@ document.getElementById("copyVenmo").addEventListener("click", () => {
   });
 });
 
+/* ---- Referral Code ---- */
+function normalizeReferral(code) {
+  return (code || "").trim().toUpperCase();
+}
+function isValidReferral(code) {
+  return VALID_REFERRAL_CODES.includes(normalizeReferral(code));
+}
+
+const referralInput    = document.getElementById("referralInput");
+const referralFeedback = document.getElementById("referralFeedback");
+
+function updateReferralFeedback() {
+  if (!referralInput || !referralFeedback) return;
+  const code = normalizeReferral(referralInput.value);
+  if (!code) {
+    referralFeedback.textContent = "";
+    referralFeedback.className = "referral-feedback";
+  } else if (isValidReferral(code)) {
+    referralFeedback.textContent = `✓ Code ${code} applied`;
+    referralFeedback.className = "referral-feedback referral-feedback--ok";
+  } else {
+    referralFeedback.textContent = "Code not recognized";
+    referralFeedback.className = "referral-feedback referral-feedback--err";
+  }
+}
+if (referralInput) referralInput.addEventListener("input", updateReferralFeedback);
+
 /* ---- Orders persistence ---- */
 function loadOrders() {
   try { return JSON.parse(localStorage.getItem("bellavita_orders") || localStorage.getItem("leanova_orders") || "[]"); }
@@ -581,6 +609,7 @@ function buildOrderMessage(order) {
     `${order.customer.address}, ${order.customer.city}, ${order.customer.state} ${order.customer.zip}`,
     `Items: ${itemsLine}`,
     `Total: $${order.total.toFixed(2)} via Cash App (${CASHAPP_HANDLE})`,
+    order.referral ? `Referral: ${order.referral}${order.referralValid ? " ✓" : " (unrecognized)"}` : "Referral: none",
   ].join("\n");
 }
 
@@ -647,6 +676,8 @@ checkoutForm.addEventListener("submit", e => {
     },
     items: cart.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
     total,
+    referral: normalizeReferral(formData.get("referral")) || null,
+    referralValid: isValidReferral(formData.get("referral")),
   };
   // Decrement stock
   cart.forEach(item => {
@@ -673,6 +704,7 @@ successClose.addEventListener("click", () => {
   checkoutForm.style.display = "flex";
   orderSuccess.style.display = "none";
   checkoutForm.reset();
+  updateReferralFeedback();
 });
 
 /* ---- FAQ ---- */
@@ -968,6 +1000,9 @@ function renderOrders() {
           ${o.items.map(i => `<span>${i.name} × ${i.qty}</span>`).join(" · ")}
         </div>
         <div class="order-card__total">Total: <strong>$${o.total.toFixed(2)}</strong></div>
+        ${o.referral
+          ? `<div class="order-card__referral">Referral: <strong>${o.referral}</strong> ${o.referralValid ? '<span class="ref-badge ref-badge--ok">valid</span>' : '<span class="ref-badge ref-badge--bad">unrecognized</span>'}</div>`
+          : ""}
       </div>
       <div class="order-card__actions">
         ${o.status === "awaiting_payment" ? `<button class="btn-mini btn-mini--success" data-action="paid" data-id="${o.id}">Mark Paid</button>` : ""}
