@@ -38,6 +38,12 @@ const EMAILJS_CONFIG    = {
   templateId: "YOUR_TEMPLATE_ID",
 };
 
+// Initialize EmailJS once, if enabled and the SDK loaded
+if (USE_EMAILJS && window.emailjs && EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.publicKey !== "YOUR_PUBLIC_KEY") {
+  try { window.emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey }); }
+  catch (e) { console.warn("EmailJS init failed:", e); }
+}
+
 const DEFAULT_PRODUCTS = [
   {
     id: 2,
