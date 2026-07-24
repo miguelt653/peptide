@@ -671,6 +671,9 @@ async function notifyOwner(order) {
           customer_email: order.customer.email,
           customer_phone: order.customer.phone || "",
           total: `$${order.total.toFixed(2)}`,
+          referral: order.referral
+            ? `${order.referral}${order.referralValid ? " (valid)" : " (unrecognized)"}`
+            : "none",
         }
       );
     } catch (err) {
