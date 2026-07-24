@@ -131,7 +131,10 @@ img { display: block; max-width: 100%; }
   text-align: center;
   position: relative;
   overflow: hidden;
-  min-height: 480px;
+  min-height: 680px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .hero__bg {
   position: absolute; inset: 0;
