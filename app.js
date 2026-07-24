@@ -27,7 +27,7 @@
    ---------------------------------------------------------- */
 
 /* ---- Config ---- */
-const CASHAPP_HANDLE    = "$Frankie-DiLorenzo"; // change to actual cashtag
+const CASHAPP_HANDLE    = "$BellaVitaLabs"; // change to actual cashtag
 const ADMIN_PASSWORD    = "changeme123"; // change me in production
 const VALID_REFERRAL_CODES = ["VAL"];    // accepted referral codes (case-insensitive)
 const OWNER_WEBHOOK_URL = "";            // e.g. "https://hooks.zapier.com/hooks/catch/123456/abcdef/"
