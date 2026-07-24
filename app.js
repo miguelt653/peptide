@@ -1119,6 +1119,151 @@ document.addEventListener("click", e => {
 });
 
 /* =========================================================
+   Legal Modal (Terms / Privacy / Research Disclaimer)
+   ========================================================= */
+const LEGAL_DOCS = {
+  terms: {
+    title: "Terms &amp; Conditions",
+    html: `
+      <p class="legal-updated">Last updated: July 2026</p>
+      <p>These Terms &amp; Conditions ("Terms") govern your access to and use of the Bella Vita Labs LLC website and your purchase of products offered on it. By accessing this site or placing an order, you agree to be bound by these Terms. If you do not agree, do not use this site.</p>
+
+      <h4>1. Research Use Only</h4>
+      <p>All products sold by Bella Vita Labs LLC are intended <strong>strictly for in-vitro laboratory and research purposes only</strong>. They are <strong>not</strong> intended for human or veterinary use, consumption, ingestion, injection, or any form of clinical, diagnostic, therapeutic, or cosmetic application. Products are not drugs, foods, dietary supplements, or medical devices, and no statements on this site have been evaluated by the U.S. Food and Drug Administration (FDA).</p>
+
+      <h4>2. Eligibility</h4>
+      <p>You must be at least 18 years of age (or the age of majority in your jurisdiction, whichever is greater) to use this site or place an order. By ordering, you represent that you are of legal age and are a qualified professional or researcher acquiring products for lawful research use.</p>
+
+      <h4>3. Products &amp; Availability</h4>
+      <p>We make reasonable efforts to describe products accurately, including purity, quantity, and specifications shown in each product's Certificate of Analysis (COA). Product descriptions are provided for informational purposes and may be updated at any time. All products are subject to availability, and we reserve the right to limit quantities or discontinue any product without notice.</p>
+
+      <h4>4. Pricing &amp; Payment</h4>
+      <p>All prices are listed in U.S. dollars. We currently accept payment via Cash App only. At checkout you will be shown a cashtag and the exact amount to send. Your order is not confirmed until we receive and verify your payment. Please include your name and order email in the Cash App payment note so we can match your payment to your order. We reserve the right to correct pricing errors and to refuse or cancel any order.</p>
+
+      <h4>5. Shipping</h4>
+      <p>We currently ship within the United States only. Orders ship within 1–2 business days after payment is confirmed. Products are shipped with cold-pack insulation in plain, unmarked packaging. Title and risk of loss pass to you upon our delivery of the package to the carrier. We are not responsible for carrier delays.</p>
+
+      <h4>6. All Sales Final</h4>
+      <p>Because our products are sensitive to temperature and handling, <strong>all sales are final. We do not accept returns or issue refunds.</strong> If your order arrives damaged or does not match its accompanying COA, contact us promptly and we will work with you to make it right.</p>
+
+      <h4>7. Assumption of Risk &amp; Buyer Responsibility</h4>
+      <p>You assume all responsibility and risk for the proper, safe, and lawful handling, storage, use, and disposal of any product purchased. You agree that you have the training and facilities to handle research materials and that you will comply with all applicable federal, state, and local laws and regulations. You agree that you will not use, resell, or represent any product for human or animal consumption.</p>
+
+      <h4>8. Limitation of Liability</h4>
+      <p>To the fullest extent permitted by law, Bella Vita Labs LLC and its owners, employees, and affiliates shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising out of your access to, use of, or inability to use the products or this site. Products are provided "as is" without warranties of any kind, express or implied, except as to the purity and specifications stated in the applicable COA. Our total liability for any claim shall not exceed the amount you paid for the product giving rise to the claim.</p>
+
+      <h4>9. Indemnification</h4>
+      <p>You agree to indemnify and hold harmless Bella Vita Labs LLC from any claims, damages, losses, or expenses (including reasonable attorneys' fees) arising from your misuse of any product, your violation of these Terms, or your violation of any law or the rights of any third party.</p>
+
+      <h4>10. Intellectual Property</h4>
+      <p>All content on this site — including text, graphics, logos, and the Bella Vita Labs name and branding — is the property of Bella Vita Labs LLC and is protected by applicable intellectual property laws. You may not reproduce or use it without our prior written permission.</p>
+
+      <h4>11. Governing Law</h4>
+      <p>These Terms are governed by the laws of the State of [Your State], without regard to its conflict-of-laws principles. Any dispute shall be resolved in the state or federal courts located in [Your State].</p>
+
+      <h4>12. Changes to These Terms</h4>
+      <p>We may update these Terms at any time. Changes are effective when posted to this page. Your continued use of the site after changes are posted constitutes acceptance of the revised Terms.</p>
+
+      <h4>13. Contact</h4>
+      <p>Questions about these Terms? Contact us at <strong>[contact email]</strong> or through the contact form on this site.</p>
+    `,
+  },
+  privacy: {
+    title: "Privacy Policy",
+    html: `
+      <p class="legal-updated">Last updated: July 2026</p>
+      <p>This Privacy Policy explains how Bella Vita Labs LLC collects, uses, and protects information when you use our website and place an order.</p>
+
+      <h4>1. Information We Collect</h4>
+      <p>When you place an order or contact us, we collect the information you provide, which may include your name, email address, phone number, shipping address, and order details. We do not collect or store credit-card or bank information.</p>
+
+      <h4>2. How We Use Your Information</h4>
+      <p>We use your information solely to process and ship your order, verify your Cash App payment, communicate with you about your order, respond to inquiries, and comply with legal obligations.</p>
+
+      <h4>3. Payment Information</h4>
+      <p>Payments are made through Cash App. Your payment is handled by Cash App under its own terms and privacy policy. We only see the information necessary to match your payment to your order (such as the name and note you include).</p>
+
+      <h4>4. Information Stored in Your Browser</h4>
+      <p>To make the site work, we store certain information locally in your own browser (for example, your shopping cart, inventory data, and your age-verification acknowledgment). This information stays on your device and is not transmitted to us except when you submit an order.</p>
+
+      <h4>5. How We Share Information</h4>
+      <p>We do <strong>not</strong> sell, rent, or trade your personal information. We share it only as necessary with shipping carriers to deliver your order, or when required by law.</p>
+
+      <h4>6. Data Retention</h4>
+      <p>We retain order information only as long as necessary to fulfill orders, provide support, and meet legal or recordkeeping requirements.</p>
+
+      <h4>7. Security</h4>
+      <p>We take reasonable measures to protect the information you provide. However, no method of transmission or storage is completely secure, and we cannot guarantee absolute security.</p>
+
+      <h4>8. Children's Privacy</h4>
+      <p>This site is not directed to anyone under 18, and we do not knowingly collect information from minors.</p>
+
+      <h4>9. Your Choices</h4>
+      <p>You may request that we correct or delete the personal information associated with your order by contacting us. You can also clear locally stored data by clearing your browser storage.</p>
+
+      <h4>10. Changes to This Policy</h4>
+      <p>We may update this Privacy Policy from time to time. Changes are effective when posted to this page.</p>
+
+      <h4>11. Contact</h4>
+      <p>Questions about your privacy? Contact us at <strong>[contact email]</strong> or through the contact form on this site.</p>
+    `,
+  },
+  disclaimer: {
+    title: "Research Disclaimer",
+    html: `
+      <p class="legal-updated">Last updated: July 2026</p>
+      <p>Please read this disclaimer carefully before purchasing or using any product from Bella Vita Labs LLC.</p>
+
+      <h4>For Laboratory &amp; Research Use Only</h4>
+      <p>All products offered by Bella Vita Labs LLC are sold <strong>strictly for in-vitro laboratory and research purposes only</strong>. They are intended for use by qualified professionals and researchers.</p>
+
+      <h4>Not for Human or Animal Use</h4>
+      <p>Our products are <strong>not for human or veterinary use</strong> and are <strong>not intended for consumption, ingestion, injection, inhalation, or any in-vivo application</strong> in humans or animals. They are not to be used as a drug, food, dietary supplement, cosmetic, or medical device.</p>
+
+      <h4>No FDA Evaluation; No Medical Claims</h4>
+      <p>None of the statements on this site have been evaluated by the U.S. Food and Drug Administration. No product is intended to diagnose, treat, cure, or prevent any disease or condition. Nothing on this site constitutes medical advice.</p>
+
+      <h4>Buyer Responsibility</h4>
+      <p>By purchasing, you confirm that you are at least 18 years of age, that you are acquiring products for lawful research use only, and that you have the knowledge, training, and facilities to handle, store, and dispose of research materials safely. You assume all responsibility and liability for the proper and lawful use of any product purchased, and you agree to comply with all applicable laws and regulations.</p>
+
+      <h4>Consult a Professional</h4>
+      <p>Always consult a licensed healthcare professional before making any decisions related to health. Bella Vita Labs LLC accepts no liability for any misuse of its products.</p>
+    `,
+  },
+};
+
+const legalOverlay = document.getElementById("legalOverlay");
+const legalModal   = document.getElementById("legalModal");
+const legalTitle   = document.getElementById("legalTitle");
+const legalBody    = document.getElementById("legalBody");
+const legalClose   = document.getElementById("legalClose");
+
+function openLegal(key) {
+  const doc = LEGAL_DOCS[key];
+  if (!doc) return;
+  legalTitle.innerHTML = doc.title;
+  legalBody.innerHTML = doc.html;
+  legalBody.scrollTop = 0;
+  legalModal.classList.add("open");
+  legalOverlay.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+function closeLegal() {
+  legalModal.classList.remove("open");
+  legalOverlay.classList.remove("active");
+  document.body.style.overflow = "";
+}
+if (legalClose)   legalClose.addEventListener("click", closeLegal);
+if (legalOverlay) legalOverlay.addEventListener("click", closeLegal);
+
+document.querySelectorAll(".legal-link").forEach(link => {
+  link.addEventListener("click", e => {
+    e.preventDefault();
+    openLegal(link.dataset.legal);
+  });
+});
+
+/* =========================================================
    Age Gate (18+)
    ========================================================= */
 const ageGate = document.getElementById("ageGate");

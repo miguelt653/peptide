@@ -294,9 +294,9 @@
       </div>
       <div class="footer__col">
         <h4>Legal</h4>
-        <a href="#">Terms of Service</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Research Disclaimer</a>
+        <a href="#" class="legal-link" data-legal="terms">Terms of Service</a>
+        <a href="#" class="legal-link" data-legal="privacy">Privacy Policy</a>
+        <a href="#" class="legal-link" data-legal="disclaimer">Research Disclaimer</a>
       </div>
     </div>
     <div class="footer__bottom container">
@@ -350,6 +350,18 @@
         This Certificate of Analysis hasn't been uploaded yet. Check back soon.
       </div>
     </div>
+  </div>
+
+  <!-- LEGAL MODAL -->
+  <div class="modal-overlay" id="legalOverlay"></div>
+  <div class="modal legal-modal" id="legalModal">
+    <div class="modal__header">
+      <h3 id="legalTitle">Terms &amp; Conditions</h3>
+      <button class="cart-close" id="legalClose" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="legal-modal__body" id="legalBody"></div>
   </div>
 
   <!-- CART DRAWER -->
