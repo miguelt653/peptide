@@ -1159,13 +1159,13 @@ const LEGAL_DOCS = {
       <p>All content on this site — including text, graphics, logos, and the Bella Vita Labs name and branding — is the property of Bella Vita Labs LLC and is protected by applicable intellectual property laws. You may not reproduce or use it without our prior written permission.</p>
 
       <h4>11. Governing Law</h4>
-      <p>These Terms are governed by the laws of the State of [Your State], without regard to its conflict-of-laws principles. Any dispute shall be resolved in the state or federal courts located in [Your State].</p>
+      <p>These Terms are governed by the laws of the State of Florida, without regard to its conflict-of-laws principles. Any dispute shall be resolved in the state or federal courts located in Florida.</p>
 
       <h4>12. Changes to These Terms</h4>
       <p>We may update these Terms at any time. Changes are effective when posted to this page. Your continued use of the site after changes are posted constitutes acceptance of the revised Terms.</p>
 
       <h4>13. Contact</h4>
-      <p>Questions about these Terms? Contact us at <strong>[contact email]</strong> or through the contact form on this site.</p>
+      <p>Questions about these Terms? Contact us at <strong>frankied1974@gmail.com</strong> or through the contact form on this site.</p>
     `,
   },
   privacy: {
@@ -1205,7 +1205,7 @@ const LEGAL_DOCS = {
       <p>We may update this Privacy Policy from time to time. Changes are effective when posted to this page.</p>
 
       <h4>11. Contact</h4>
-      <p>Questions about your privacy? Contact us at <strong>[contact email]</strong> or through the contact form on this site.</p>
+      <p>Questions about your privacy? Contact us at <strong>frankied1974@gmail.com</strong> or through the contact form on this site.</p>
     `,
   },
   disclaimer: {
