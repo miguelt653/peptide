@@ -61,16 +61,14 @@ const DEFAULT_PRODUCTS = [
     meta: ["20mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
     stock: 15,
     detail: {
-      overview: "Retatrutide is a novel triple receptor agonist that simultaneously targets GLP-1, GIP, and glucagon receptors — making it the first of its kind in peptide research. Early clinical data has positioned it as one of the most potent metabolic peptides studied to date, with research showing significantly greater effects on body composition than single or dual agonists.",
+      overview: "Retatrutide is a first-in-class triple receptor agonist targeting GIP, GLP-1, and glucagon receptors simultaneously. It has been the subject of research examining multi-pathway metabolic receptor activation, with studies investigating its broad metabolic signaling interactions.",
       benefits: [
-        "Targets three metabolic receptors simultaneously (GLP-1, GIP, glucagon)",
-        "Studied for significant improvements in body composition",
-        "Supports glucose metabolism and insulin sensitivity",
-        "May enhance energy expenditure via glucagon receptor activation",
-        "Research indicates superior metabolic outcomes vs. dual agonists",
-        "Potential cardiovascular benefits under investigation",
+        "Studied as a triple-receptor metabolic agonist",
+        "Investigated for multi-pathway metabolic receptor activation",
+        "Researched for energy expenditure pathway modulation",
+        "Explored in glycemic signaling research models",
       ],
-      mechanism: "Retatrutide's triple agonism creates a synergistic metabolic effect: GLP-1 activation reduces appetite and slows gastric emptying; GIP activation enhances insulin response and fat metabolism; glucagon receptor activation increases energy expenditure and promotes fat oxidation. Together, these mechanisms produce compounding metabolic benefits.",
+      mechanism: "Targets three distinct receptor pathways simultaneously: GLP-1 (glucagon-like peptide-1), GIP (glucose-dependent insulinotropic polypeptide), and glucagon. GLP-1 and GIP reduce appetite, slow gastric emptying, and stimulate glucose-dependent insulin secretion, while glucagon activation increases energy expenditure (calorie burning) and promotes the breakdown of stored fat.",
       specs: [
         { label: "Class", value: "Triple GLP-1/GIP/Glucagon receptor agonist" },
         { label: "Molecular Weight", value: "~4,900 Da" },
@@ -96,16 +94,14 @@ const DEFAULT_PRODUCTS = [
     meta: ["500mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
     stock: 22,
     detail: {
-      overview: "NAD+ (Nicotinamide Adenine Dinucleotide) is a coenzyme found in every cell of the body, essential for converting nutrients into ATP — the body's energy currency. NAD+ levels decline significantly with age, and a growing body of research connects NAD+ restoration to mitochondrial health, cellular repair, and longevity pathways. It's one of the most actively studied molecules in aging research today.",
+      overview: "NAD+ delivers pharmaceutical-grade nicotinamide adenine dinucleotide at a 500mg research dose. NAD+ is a master coenzyme involved in every major metabolic pathway and is studied for its role in cellular signaling, declining in availability with age and metabolic stress.",
       benefits: [
-        "Supports cellular energy production via the mitochondrial electron transport chain",
-        "Activates sirtuins — proteins involved in DNA repair and longevity",
-        "Studied for improvements in mental clarity, focus, and cognitive function",
-        "Supports healthy aging and may slow markers of cellular senescence",
-        "Plays a key role in DNA damage repair via PARP enzymes",
-        "Research suggests benefits for energy, metabolism, and recovery",
+        "Investigated in cellular energy signaling and NAD+ pathway research",
+        "Studied for sirtuin and longevity pathway activation mechanisms",
+        "Researched for cognitive signaling and neurological pathway interactions",
+        "Explored for DNA repair signaling and neuroprotective pathways",
       ],
-      mechanism: "NAD+ functions as an electron carrier in cellular metabolism, shuttling electrons during the conversion of nutrients to ATP. It's also a required substrate for sirtuins (longevity-associated proteins) and PARP enzymes (DNA repair). Supplementation replenishes the natural decline of NAD+ that occurs with age, restoring cellular energy capacity and supporting key repair mechanisms.",
+      mechanism: "Investigated for its role in directly replenishing intracellular NAD+ levels, studied for electron transport chain signaling, sirtuin longevity enzyme (SIRT1-7) activation pathways, and PARP-mediated DNA damage response research — explored for foundational cellular signaling restoration.",
       specs: [
         { label: "Class", value: "Coenzyme / Cellular cofactor" },
         { label: "Molecular Weight", value: "663.43 Da" },
@@ -132,16 +128,14 @@ const DEFAULT_PRODUCTS = [
     meta: ["50mg / jar", "≥99% Purity", "Powder Form", "COA Included"],
     stock: 30,
     detail: {
-      overview: "GHK-Cu (Glycyl-L-histidyl-L-lysine copper complex) is a naturally occurring tripeptide found in human plasma, saliva, and urine. Its levels decline significantly with age. Research has shown it plays a wide-ranging role in tissue repair, anti-aging, and antioxidant defense — making it one of the most studied peptides in regenerative and aesthetic research.",
+      overview: "GHK-Cu (Copper peptide GHK) is a naturally occurring copper-binding peptide found in human plasma, studied for its role as a multi-functional signaling molecule. Research investigates its interactions with over 4,000 human genes involved in tissue remodeling and cellular signaling.",
       benefits: [
-        "Stimulates collagen and elastin synthesis in connective tissue",
-        "Accelerates wound and burn healing in multiple research models",
-        "Potent antioxidant — reduces free radical damage to cells",
-        "Studied extensively for skin regeneration and anti-aging effects",
-        "Promotes nerve regeneration and neuroprotection",
-        "Activates over 30 genes related to tissue repair and remodeling",
+        "Investigated in broad tissue regeneration signaling research",
+        "Studied for collagen and elastin synthesis pathway modulation",
+        "Researched for anti-inflammatory and antioxidant signaling mechanisms",
+        "Explored for follicular signaling and growth pathway interactions",
       ],
-      mechanism: "GHK-Cu works by acting as a biological signal that the body interprets as a cue for repair. The copper ion acts as a cofactor for enzymes involved in collagen cross-linking. GHK itself activates the proteasome system (clearing damaged proteins), upregulates antioxidant enzymes, and promotes stem cell recruitment to damaged tissue sites.",
+      mechanism: "Investigated for its role in attracting immune cells to tissue sites, studied for collagen, elastin, and glycosaminoglycan synthesis signaling, metalloproteinase activation for tissue remodeling research, and antioxidant and anti-inflammatory signaling through copper chelation pathways.",
       specs: [
         { label: "Sequence", value: "Gly-His-Lys · Cu²⁺" },
         { label: "Molecular Weight", value: "340.4 Da (peptide), 403.9 Da (Cu complex)" },
@@ -168,16 +162,13 @@ const DEFAULT_PRODUCTS = [
     meta: ["BPC-157 5mg", "TB-500 5mg", "≥99% Purity", "COA Included"],
     stock: 15,
     detail: {
-      overview: "The Wolverine Stack combines BPC-157 and TB-500 into a single recovery protocol. BPC-157 acts locally and site-specifically to accelerate healing, while TB-500 works systemically throughout the body. Together they are studied as complementary peptides that address tissue repair from two distinct angles — making this one of the most popular combinations in regenerative research.",
+      overview: "BPC-157 and TB-500 combined in one vial — two peptides studied for their complementary roles in tissue-response and repair signaling pathway research. One vial, two peptides, investigated together for their complementary roles in local and systemic tissue-response signaling pathway research — studied for their distinct but synergistic receptor mechanisms.",
       benefits: [
-        "Pairs site-specific (BPC-157) and systemic (TB-500) healing pathways",
-        "Studied for accelerated tendon, ligament, and muscle recovery",
-        "Supports soft-tissue repair and reduced inflammation at injury sites",
-        "Promotes angiogenesis and new blood vessel formation in research models",
-        "Investigated for improved flexibility and range of motion",
-        "Complementary mechanisms — broader coverage than either peptide alone",
+        "Angiogenesis and tissue-response signaling pathway research",
+        "Connective tissue signaling and inflammatory pathway modulation research",
+        "Multi-pathway tissue repair and cellular regeneration signaling research",
       ],
-      mechanism: "BPC-157 upregulates growth hormone receptors and the FAK-paxillin pathway while promoting VEGF-driven angiogenesis at the injury site. TB-500 upregulates actin to accelerate cell migration and tissue repair systemically. Used together, they target both localized and body-wide repair processes simultaneously, which is why they are commonly researched as a stack.",
+      mechanism: "Investigated together for the complementary roles of its two peptides. BPC-157 is researched for its role in tissue repair and wound healing through localized angiogenesis and tissue-response signaling, while TB-500 is researched for its role in inflammation and systemic tissue recovery — studied for distinct but synergistic receptor mechanisms.",
       specs: [
         { label: "Contents", value: "5mg BPC-157 + 5mg TB-500 (blend vial)" },
         { label: "Form", value: "Lyophilized powder" },
@@ -202,15 +193,14 @@ const DEFAULT_PRODUCTS = [
     meta: ["10mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
     stock: 20,
     detail: {
-      overview: "Melanotan II (MT-2) is a synthetic peptide analogue of the naturally occurring hormone α-MSH. It is studied primarily for its ability to stimulate melanin production in the skin, producing a tanning response with less ultraviolet exposure than would otherwise be required. It has also been investigated in research for other α-MSH-related pathways.",
+      overview: "Melanotan II is a cyclic synthetic analog of alpha-melanocyte-stimulating hormone (α-MSH). Research investigates its activation of melanocortin receptors throughout the body, with studies examining pigmentation pathway signaling, appetite-related signaling, and neuroendocrine receptor interactions.",
       benefits: [
-        "Stimulates melanogenesis (melanin production) for increased skin pigmentation",
-        "Studied for achieving a tanning response with reduced UV exposure",
-        "Activates melanocortin receptors involved in pigmentation",
-        "Investigated for appetite and libido pathways in research models",
-        "Effects studied across a range of skin types",
+        "Investigated in melanocortin receptor-mediated pigmentation signaling research",
+        "Studied for MC3R and MC4R receptor activation mechanisms",
+        "Researched for appetite-related pathway modulation",
+        "Explored for metabolic signaling interactions",
       ],
-      mechanism: "Melanotan II binds to melanocortin receptors (primarily MC1R) on melanocytes, stimulating the production and release of eumelanin — the pigment responsible for skin darkening. By activating this pathway directly, it triggers a tanning response with less reliance on UV-induced melanogenesis.",
+      mechanism: "Investigated for its non-selective agonism of MC1R (melanin signaling), MC3R (metabolic/appetite signaling), and MC4R (neuroendocrine signaling) receptors — studied for concurrent effects across pigmentation, metabolic, and neuroendocrine signaling systems.",
       specs: [
         { label: "Class", value: "Synthetic α-MSH analogue" },
         { label: "Molecular Weight", value: "1,024.2 Da" },
@@ -824,7 +814,7 @@ function openDetail(id) {
     <div class="detail-section">
       <h4 class="detail-section-title">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        Key Benefits
+        Research Focus Areas
       </h4>
       <ul class="detail-benefits">
         ${d.benefits.map(b => `<li>${b}</li>`).join("")}
@@ -834,7 +824,7 @@ function openDetail(id) {
     <div class="detail-section">
       <h4 class="detail-section-title">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        How It Works
+        Mechanism of Action
       </h4>
       <p class="detail-mechanism">${d.mechanism}</p>
     </div>
