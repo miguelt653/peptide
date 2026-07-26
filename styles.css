@@ -407,6 +407,11 @@ img { display: block; max-width: 100%; }
 }
 .how__media--primary { aspect-ratio: 4 / 5; }
 .how__media--secondary { aspect-ratio: 16 / 10; }
+.how__media--video { background: #000; }
+.how__media--video video {
+  width: 100%; height: auto; max-height: 480px;
+  object-fit: contain; display: block; background: #000;
+}
 .how__media--secondary .how__media-caption-eyebrow { color: #86efac; }
 .how__media img {
   width: 100%; height: 100%; object-fit: cover; display: block;
