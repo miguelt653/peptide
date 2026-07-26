@@ -31,11 +31,11 @@ const CASHAPP_HANDLE    = "$BellaVitaLabs"; // change to actual cashtag
 const ADMIN_PASSWORD    = "changeme123"; // change me in production
 const VALID_REFERRAL_CODES = ["VAL"];    // accepted referral codes (case-insensitive)
 const OWNER_WEBHOOK_URL = "";            // e.g. "https://hooks.zapier.com/hooks/catch/123456/abcdef/"
-const USE_EMAILJS       = false;
+const USE_EMAILJS       = true;
 const EMAILJS_CONFIG    = {
-  publicKey:  "YOUR_PUBLIC_KEY",
-  serviceId:  "YOUR_SERVICE_ID",
-  templateId: "YOUR_TEMPLATE_ID",
+  publicKey:  "xeF7Iw22TB4Gwhic2",
+  serviceId:  "service_7ho1uxb",
+  templateId: "template_peeq45r",
 };
 
 // Initialize EmailJS once, if enabled and the SDK loaded
