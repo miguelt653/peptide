@@ -287,6 +287,7 @@ const FAQS = [
 let cart = [];
 let activeCategory = "all";
 let selectedVariant = {}; // { [productId]: "vial" | "pen" }
+let shippingMethod = "standard"; // "standard" ($25) | "local" ($15, Tampa/St. Pete/Clearwater)
 
 /* ---- DOM Refs ---- */
 const productGrid = document.getElementById("productGrid");
@@ -498,9 +499,7 @@ function updateCartUI() {
   cartTotal.textContent = `$${total.toFixed(2)}`;
   const shippingNote = document.getElementById("shippingNote");
   if (shippingNote) {
-    shippingNote.textContent = total >= 150
-      ? "✓ Free shipping applied"
-      : `Add $${(150 - total).toFixed(2)} more for free shipping`;
+    shippingNote.textContent = "Shipping $25 flat · Local delivery $15 (Tampa · St. Pete · Clearwater)";
   }
 }
 
@@ -522,11 +521,22 @@ cartOverlay.addEventListener("click", closeCart);
 /* ---- Checkout Modal ---- */
 function openCheckout() {
   closeCart();
+  shippingMethod = "standard";
+  const stdRadio = document.querySelector('input[name="shipMethod"][value="standard"]');
+  if (stdRadio) stdRadio.checked = true;
   buildOrderSummary();
   checkoutModal.classList.add("open");
   modalOverlay.classList.add("active");
   document.body.style.overflow = "hidden";
 }
+
+// Shipping method selection updates totals live
+document.querySelectorAll('input[name="shipMethod"]').forEach(radio => {
+  radio.addEventListener("change", () => {
+    shippingMethod = radio.value;
+    buildOrderSummary();
+  });
+});
 function closeCheckout() {
   checkoutModal.classList.remove("open");
   modalOverlay.classList.remove("active");
@@ -536,9 +546,13 @@ checkoutBtn.addEventListener("click", openCheckout);
 modalClose.addEventListener("click", closeCheckout);
 modalOverlay.addEventListener("click", closeCheckout);
 
+const SHIPPING_RATES = { standard: 25, local: 15 };
+function shippingLabel(method) {
+  return method === "local" ? "Local Delivery (Tampa · St. Pete · Clearwater)" : "Standard Shipping";
+}
 function getOrderTotal() {
   const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const ship = sub >= 150 ? 0 : 9.99;
+  const ship = SHIPPING_RATES[shippingMethod] ?? SHIPPING_RATES.standard;
   return { sub, ship, total: sub + ship };
 }
 
@@ -553,8 +567,8 @@ function buildOrderSummary() {
       </div>
     `).join("")}
     <div class="order-line">
-      <span>Shipping</span>
-      <span>${ship === 0 ? "FREE" : "$" + ship.toFixed(2)}</span>
+      <span>${shippingMethod === "local" ? "Local Delivery" : "Shipping"}</span>
+      <span>$${ship.toFixed(2)}</span>
     </div>
     <div class="order-line">
       <span>Total</span>
@@ -620,6 +634,7 @@ function buildOrderMessage(order) {
     `${order.customer.email} · ${order.customer.phone || "no phone"}`,
     `${order.customer.address}, ${order.customer.city}, ${order.customer.state} ${order.customer.zip}`,
     `Items: ${itemsLine}`,
+    `Shipping: ${shippingLabel(order.shippingMethod)} — $${(order.shipping ?? 0).toFixed(2)}`,
     `Total: $${order.total.toFixed(2)} via Cash App (${CASHAPP_HANDLE})`,
     order.referral ? `Referral: ${order.referral}${order.referralValid ? " ✓" : " (unrecognized)"}` : "Referral: none",
   ].join("\n");
@@ -658,6 +673,7 @@ async function notifyOwner(order) {
           customer_name: `${order.customer.firstName} ${order.customer.lastName}`,
           customer_email: order.customer.email,
           customer_phone: order.customer.phone || "",
+          shipping: `${shippingLabel(order.shippingMethod)} — $${(order.shipping ?? 0).toFixed(2)}`,
           total: `$${order.total.toFixed(2)}`,
           referral: order.referral
             ? `${order.referral}${order.referralValid ? " (valid)" : " (unrecognized)"}`
@@ -674,7 +690,7 @@ async function notifyOwner(order) {
 checkoutForm.addEventListener("submit", e => {
   e.preventDefault();
   const formData = new FormData(checkoutForm);
-  const { total } = getOrderTotal();
+  const { ship, total } = getOrderTotal();
   const order = {
     id: "BV-" + Date.now().toString(36).toUpperCase(),
     date: new Date().toISOString(),
@@ -690,6 +706,8 @@ checkoutForm.addEventListener("submit", e => {
       zip: formData.get("zip"),
     },
     items: cart.map(i => ({ id: i.id, name: i.name, variant: i.variant, qty: i.qty, price: i.price })),
+    shippingMethod,
+    shipping: ship,
     total,
     referral: normalizeReferral(formData.get("referral")) || null,
     referralValid: isValidReferral(formData.get("referral")),
@@ -1039,6 +1057,7 @@ function renderOrders() {
         <div class="order-card__items">
           ${o.items.map(i => `<span>${i.name}${i.variant === 'pen' ? ' (+Pen)' : ''} × ${i.qty}</span>`).join(" · ")}
         </div>
+        ${o.shipping != null ? `<div class="order-card__ship">Shipping: ${shippingLabel(o.shippingMethod)} — $${o.shipping.toFixed(2)}</div>` : ""}
         <div class="order-card__total">Total: <strong>$${o.total.toFixed(2)}</strong></div>
         ${o.referral
           ? `<div class="order-card__referral">Referral: <strong>${o.referral}</strong> ${o.referralValid ? '<span class="ref-badge ref-badge--ok">valid</span>' : '<span class="ref-badge ref-badge--bad">unrecognized</span>'}</div>`

@@ -28,7 +28,7 @@
 
   <!-- ANNOUNCEMENT BAR -->
   <div class="announcement">
-    <strong>Free shipping</strong> on orders over $150 &nbsp;·&nbsp; Every batch independently tested &nbsp;·&nbsp; COA included with all orders
+    <strong>$25 flat-rate shipping</strong> &nbsp;·&nbsp; $15 local delivery in Tampa, St. Pete &amp; Clearwater &nbsp;·&nbsp; COA included with all orders
   </div>
 
   <!-- NAV -->
@@ -65,7 +65,7 @@
   <!-- HERO -->
   <section class="hero">
     <div class="hero__bg">
-      <img src="assets/Logo.jpg" alt="" loading="eager"
+      <img src="assets/hero-bg.jpg" alt="" loading="eager"
            onerror="this.style.display='none'" />
     </div>
     <div class="hero__inner">
@@ -449,6 +449,19 @@
           <input type="text" name="referral" id="referralInput" placeholder="Enter code" autocomplete="off" autocapitalize="characters" />
           <div class="referral-feedback" id="referralFeedback"></div>
         </div>
+      </div>
+      <div class="modal__section">
+        <h4>Shipping Method</h4>
+        <label class="ship-opt">
+          <input type="radio" name="shipMethod" value="standard" checked />
+          <span class="ship-opt__text"><span class="ship-opt__label">Standard Shipping</span><span class="ship-opt__sub">Ships anywhere in the U.S.</span></span>
+          <span class="ship-opt__price">$25.00</span>
+        </label>
+        <label class="ship-opt">
+          <input type="radio" name="shipMethod" value="local" />
+          <span class="ship-opt__text"><span class="ship-opt__label">Local Delivery</span><span class="ship-opt__sub">Tampa, St. Petersburg &amp; Clearwater only</span></span>
+          <span class="ship-opt__price">$15.00</span>
+        </label>
       </div>
       <div class="modal__order-summary" id="orderSummary"></div>
       <div class="cashapp-box">
