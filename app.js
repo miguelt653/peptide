@@ -341,13 +341,10 @@ function renderProducts() {
 
   productGrid.innerHTML = "";
   filtered.forEach((p, i) => {
-    const available = availableStock(p);
-    const soldOut = p.stock === 0;
-    const lowStock = !soldOut && p.stock <= 5;
     const variant = variantOf(p.id);
     const curPrice = priceFor(p, variant);
     const card = document.createElement("div");
-    card.className = "product-card" + (soldOut ? " product-card--soldout" : "");
+    card.className = "product-card";
     card.style.animationDelay = `${i * 0.05}s`;
     card.innerHTML = `
       <div class="product-card__img">
@@ -358,10 +355,6 @@ function renderProducts() {
         <p class="product-card__desc">${p.desc}</p>
         <div class="product-card__specs">
           ${p.meta.map(m => `<span class="spec-tag">${m}</span>`).join("")}
-        </div>
-        <div class="stock-indicator ${soldOut ? 'stock-indicator--out' : lowStock ? 'stock-indicator--low' : 'stock-indicator--in'}">
-          <span class="stock-dot"></span>
-          ${soldOut ? "Sold Out" : lowStock ? `Only ${p.stock} left` : `${p.stock} in stock`}
         </div>
         ${p.coa ? `
         <button class="view-coa" data-coa="${p.coa}" data-name="${p.name}">
@@ -385,10 +378,8 @@ function renderProducts() {
         </div>
         <div class="product-card__actions">
           <button class="view-details-btn" data-id="${p.id}">Details</button>
-          <button class="add-to-cart" data-id="${p.id}" ${available === 0 ? "disabled" : ""}>
-            ${available === 0
-              ? "Sold Out"
-              : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add`}
+          <button class="add-to-cart" data-id="${p.id}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add
           </button>
         </div>
       </div>
@@ -424,7 +415,6 @@ filterBtns.forEach(btn => {
 function addToCart(id, variant, btn) {
   const product = PRODUCTS.find(p => p.id === id);
   if (!product) return;
-  if (availableStock(product) <= 0) return;
   variant = variant === "pen" && hasPen(product) ? "pen" : "vial";
   const existing = cart.find(i => i.id === id && i.variant === variant);
   if (existing) {
@@ -461,8 +451,6 @@ function removeFromCart(id, variant) {
 function changeQty(id, variant, delta) {
   const item = cart.find(i => i.id === id && i.variant === variant);
   if (!item) return;
-  const product = PRODUCTS.find(p => p.id === id);
-  if (delta > 0 && product && inCart(id) >= product.stock) return; // can't exceed stock (all variants share stock)
   item.qty += delta;
   if (item.qty <= 0) removeFromCart(id, variant);
   else { updateCartUI(); renderProducts(); }
@@ -792,11 +780,8 @@ function openDetail(id) {
   document.getElementById("detailName").textContent     = p.name;
   document.getElementById("detailFullName").textContent = p.fullName;
 
-  const available = availableStock(p);
-  detailAddBtn.disabled = available === 0;
-  detailAddBtn.innerHTML = available === 0
-    ? "Sold Out"
-    : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart`;
+  detailAddBtn.disabled = false;
+  detailAddBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart`;
 
   const d = p.detail;
   detailBody.innerHTML = `
