@@ -523,6 +523,11 @@ img { display: block; max-width: 100%; }
 .referral-feedback--ok  { color: var(--green); }
 .referral-feedback--err { color: var(--red); }
 .order-card__referral { margin-top: 5px; font-size: 0.85rem; }
+.order-card__commission {
+  margin-top: 6px; font-size: 0.85rem; color: var(--maroon);
+  background: var(--maroon-pale); border: 1px solid #f3d0d6;
+  padding: 6px 10px; border-radius: var(--radius); display: inline-block;
+}
 .ref-badge {
   display: inline-block; font-size: 0.68rem; font-weight: 600;
   padding: 1px 7px; border-radius: 999px; text-transform: uppercase;

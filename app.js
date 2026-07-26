@@ -628,7 +628,7 @@ function saveOrders(orders) {
 /* ---- Owner SMS / Email Notification ---- */
 function buildOrderMessage(order) {
   const itemsLine = order.items.map(i => `${i.name}${i.variant === 'pen' ? ' (+Pen)' : ''} x${i.qty}`).join(", ");
-  return [
+  const lines = [
     `🛒 New Bella Vita Labs Order ${order.id}`,
     `${order.customer.firstName} ${order.customer.lastName}`,
     `${order.customer.email} · ${order.customer.phone || "no phone"}`,
@@ -636,8 +636,12 @@ function buildOrderMessage(order) {
     `Items: ${itemsLine}`,
     `Shipping: ${shippingLabel(order.shippingMethod)} — $${(order.shipping ?? 0).toFixed(2)}`,
     `Total: $${order.total.toFixed(2)} via Cash App (${CASHAPP_HANDLE})`,
-    order.referral ? `Referral: ${order.referral}${order.referralValid ? " ✓" : " (unrecognized)"}` : "Referral: none",
-  ].join("\n");
+    order.referral ? `Referral: ${order.referral}${order.referralValid ? " ✓ VALID" : " (unrecognized)"}` : "Referral: none",
+  ];
+  if (order.referralValid && order.commission) {
+    lines.push(`⭐ ${order.referral} COMMISSION OWED: $${order.commission.toFixed(2)} (30% of $${order.total.toFixed(2)})`);
+  }
+  return lines.join("\n");
 }
 
 async function notifyOwner(order) {
@@ -678,6 +682,9 @@ async function notifyOwner(order) {
           referral: order.referral
             ? `${order.referral}${order.referralValid ? " (valid)" : " (unrecognized)"}`
             : "none",
+          commission: order.referralValid && order.commission
+            ? `$${order.commission.toFixed(2)} owed to ${order.referral} (30%)`
+            : "none",
         }
       );
     } catch (err) {
@@ -712,6 +719,8 @@ checkoutForm.addEventListener("submit", e => {
     referral: normalizeReferral(formData.get("referral")) || null,
     referralValid: isValidReferral(formData.get("referral")),
   };
+  // VAL referral commission: 30% of the full order total
+  order.commission = order.referralValid ? +(order.total * 0.30).toFixed(2) : 0;
   // Decrement stock
   cart.forEach(item => {
     const p = PRODUCTS.find(x => x.id === item.id);
@@ -1061,6 +1070,9 @@ function renderOrders() {
         <div class="order-card__total">Total: <strong>$${o.total.toFixed(2)}</strong></div>
         ${o.referral
           ? `<div class="order-card__referral">Referral: <strong>${o.referral}</strong> ${o.referralValid ? '<span class="ref-badge ref-badge--ok">valid</span>' : '<span class="ref-badge ref-badge--bad">unrecognized</span>'}</div>`
+          : ""}
+        ${o.referralValid && o.commission
+          ? `<div class="order-card__commission">⭐ ${o.referral} commission (30%): <strong>$${o.commission.toFixed(2)}</strong></div>`
           : ""}
       </div>
       <div class="order-card__actions">
