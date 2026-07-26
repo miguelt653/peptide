@@ -90,7 +90,6 @@ const DEFAULT_PRODUCTS = [
     icon: "✨",
     coa: "assets/coa-nad.jpg",
     price: 115,
-    penPrice: 150,
     unit: "500mg vial",
     purity: "≥99%",
     desc: "A critical coenzyme present in every living cell, studied extensively for cellular energy production, mitochondrial function, DNA repair, and longevity pathways.",
