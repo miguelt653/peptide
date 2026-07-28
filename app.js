@@ -36,7 +36,7 @@ const EMAILJS_CONFIG    = {
   publicKey:  "xeF7Iw22TB4Gwhic2",
   serviceId:  "service_7ho1uxb",
   templateId: "template_peeq45r",   // owner "new order" notification
-  shippedTemplateId: "",             // customer "order shipped" email — paste the shipped template ID here
+  shippedTemplateId: "template_9p4zomn", // customer "order shipped" email
 };
 
 // Initialize EmailJS once, if enabled and the SDK loaded
