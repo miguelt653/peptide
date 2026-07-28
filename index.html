@@ -514,20 +514,25 @@
       </button>
     </div>
     <div class="admin-login" id="adminLogin">
-      <p>Enter your admin password to manage inventory and view orders.</p>
+      <p>Sign in with your admin account to manage inventory and view orders.</p>
       <form id="adminLoginForm">
         <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="adminPasswordInput" required autocomplete="off" />
+          <label>Email</label>
+          <input type="email" id="adminEmailInput" required autocomplete="username" placeholder="you@example.com" />
         </div>
-        <button class="btn btn--primary btn--full" type="submit">Unlock</button>
-        <div class="form-error" id="adminError">Incorrect password. Try again.</div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="adminPasswordInput" required autocomplete="current-password" />
+        </div>
+        <button class="btn btn--primary btn--full" type="submit">Sign In</button>
+        <div class="form-error" id="adminError">Incorrect email or password.</div>
       </form>
     </div>
     <div class="admin-dashboard" id="adminDashboard" style="display:none">
       <div class="admin-tabs">
         <button class="admin-tab admin-tab--active" data-tab="inventory">Inventory</button>
         <button class="admin-tab" data-tab="orders">Orders</button>
+        <button class="admin-logout" id="adminLogout" type="button">Log out</button>
       </div>
       <div class="admin-tab-content" id="tabInventory">
         <p class="admin-hint">Adjust stock counts below. Changes save immediately.</p>
@@ -540,6 +545,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="app.js"></script>
 </body>

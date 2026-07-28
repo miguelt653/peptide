@@ -44,6 +44,43 @@ if (USE_EMAILJS && window.emailjs && EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.
   catch (e) { console.warn("EmailJS init failed:", e); }
 }
 
+/* ---- Supabase (central order database + admin auth) ---- */
+const SUPABASE_URL      = "https://uggxcupkjevlvbptbrmk.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnZ3hjdXBramV2bHZicHRicm1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDc0NzcsImV4cCI6MjEwMDgyMzQ3N30.eY0W4t1h_ks5W8o7AIqPWiq-JQNjVBCn6yWArskHjL0";
+let sb = null;
+if (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) {
+  try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+  catch (e) { console.warn("Supabase init failed:", e); }
+}
+function orderToRow(order) {
+  return {
+    id: order.id,
+    status: order.status,
+    first_name: order.customer.firstName,
+    last_name: order.customer.lastName,
+    email: order.customer.email,
+    phone: order.customer.phone,
+    address: order.customer.address,
+    city: order.customer.city,
+    state: order.customer.state,
+    zip: order.customer.zip,
+    items: order.items,
+    shipping_method: order.shippingMethod,
+    shipping: order.shipping,
+    total: order.total,
+    referral: order.referral,
+    referral_valid: order.referralValid,
+    commission: order.commission,
+  };
+}
+async function saveOrderToCloud(order) {
+  if (!sb) return;
+  try {
+    const { error } = await sb.from("orders").insert(orderToRow(order));
+    if (error) console.warn("Supabase order insert failed:", error.message);
+  } catch (e) { console.warn("Supabase order insert error:", e); }
+}
+
 const DEFAULT_PRODUCTS = [
   {
     id: 2,
@@ -721,6 +758,9 @@ checkoutForm.addEventListener("submit", e => {
   orders.unshift(order);
   saveOrders(orders);
 
+  // Save to central cloud database (best-effort, non-blocking)
+  saveOrderToCloud(order);
+
   // Fire SMS / Email notification to owner (best-effort, non-blocking)
   notifyOwner(order);
 
@@ -916,27 +956,40 @@ const adminClose     = document.getElementById("adminClose");
 const adminLogin     = document.getElementById("adminLogin");
 const adminDashboard = document.getElementById("adminDashboard");
 const adminLoginForm = document.getElementById("adminLoginForm");
+const adminEmailInput    = document.getElementById("adminEmailInput");
 const adminPasswordInput = document.getElementById("adminPasswordInput");
+const adminLogout    = document.getElementById("adminLogout");
 const adminError     = document.getElementById("adminError");
 const inventoryList  = document.getElementById("inventoryList");
 const ordersList     = document.getElementById("ordersList");
 
 let adminUnlocked = false;
 
-function openAdmin() {
+function showAdminDashboard() {
+  adminUnlocked = true;
+  adminLogin.style.display = "none";
+  adminDashboard.style.display = "block";
+  renderInventory();
+  renderOrders();
+}
+function showAdminLogin() {
+  adminUnlocked = false;
+  adminLogin.style.display = "block";
+  adminDashboard.style.display = "none";
+  setTimeout(() => adminEmailInput && adminEmailInput.focus(), 100);
+}
+async function openAdmin() {
   adminModal.classList.add("open");
   adminOverlay.classList.add("active");
   document.body.style.overflow = "hidden";
-  if (adminUnlocked) {
-    adminLogin.style.display = "none";
-    adminDashboard.style.display = "block";
-    renderInventory();
-    renderOrders();
-  } else {
-    adminLogin.style.display = "block";
-    adminDashboard.style.display = "none";
-    setTimeout(() => adminPasswordInput.focus(), 100);
+  // Show a logged-in session immediately if one exists
+  if (sb) {
+    try {
+      const { data } = await sb.auth.getSession();
+      if (data && data.session) { showAdminDashboard(); return; }
+    } catch (e) { /* fall through to login */ }
   }
+  showAdminLogin();
 }
 function closeAdmin() {
   adminModal.classList.remove("open");
@@ -961,19 +1014,43 @@ window.addEventListener("hashchange", () => {
   if (window.location.hash === "#admin") openAdmin();
 });
 
-adminLoginForm.addEventListener("submit", e => {
+adminLoginForm.addEventListener("submit", async e => {
   e.preventDefault();
-  if (adminPasswordInput.value === ADMIN_PASSWORD) {
-    adminUnlocked = true;
-    adminLogin.style.display = "none";
-    adminDashboard.style.display = "block";
-    renderInventory();
-    renderOrders();
-  } else {
+  adminError.style.display = "none";
+  if (!sb) {
+    adminError.textContent = "Cloud connection unavailable. Try again in a moment.";
     adminError.style.display = "block";
-    adminPasswordInput.value = "";
+    return;
+  }
+  const submitBtn = adminLoginForm.querySelector("button[type=submit]");
+  if (submitBtn) submitBtn.disabled = true;
+  try {
+    const { error } = await sb.auth.signInWithPassword({
+      email: adminEmailInput.value.trim(),
+      password: adminPasswordInput.value,
+    });
+    if (error) {
+      adminError.textContent = "Incorrect email or password.";
+      adminError.style.display = "block";
+      adminPasswordInput.value = "";
+    } else {
+      adminPasswordInput.value = "";
+      showAdminDashboard();
+    }
+  } catch (err) {
+    adminError.textContent = "Sign-in failed. Check your connection.";
+    adminError.style.display = "block";
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 });
+
+if (adminLogout) {
+  adminLogout.addEventListener("click", async () => {
+    if (sb) { try { await sb.auth.signOut(); } catch (e) {} }
+    showAdminLogin();
+  });
+}
 
 /* Tabs */
 document.querySelectorAll(".admin-tab").forEach(tab => {
@@ -1033,35 +1110,62 @@ function renderInventory() {
   });
 }
 
-function renderOrders() {
-  const orders = loadOrders();
-  if (orders.length === 0) {
+async function renderOrders() {
+  if (!sb) {
+    ordersList.innerHTML = `<div class="empty-state">Cloud database not connected. Refresh and try again.</div>`;
+    return;
+  }
+  ordersList.innerHTML = `<div class="empty-state">Loading orders…</div>`;
+  const { data: orders, error } = await sb
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) {
+    ordersList.innerHTML = `<div class="empty-state">Couldn't load orders: ${error.message}</div>`;
+    return;
+  }
+  if (!orders || orders.length === 0) {
     ordersList.innerHTML = `<div class="empty-state">No orders yet.</div>`;
     return;
   }
-  ordersList.innerHTML = orders.map(o => `
+
+  const revenue       = orders.reduce((s, o) => s + (Number(o.total) || 0), 0);
+  const commissionAll = orders.filter(o => o.referral_valid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
+  const pending       = orders.filter(o => o.status === "awaiting_payment").length;
+
+  const summary = `
+    <div class="orders-summary">
+      <div class="orders-stat"><span class="orders-stat__num">${orders.length}</span><span class="orders-stat__label">Orders</span></div>
+      <div class="orders-stat"><span class="orders-stat__num">${pending}</span><span class="orders-stat__label">Awaiting Payment</span></div>
+      <div class="orders-stat"><span class="orders-stat__num">$${revenue.toFixed(2)}</span><span class="orders-stat__label">Total Revenue</span></div>
+      <div class="orders-stat orders-stat--commission"><span class="orders-stat__num">$${commissionAll.toFixed(2)}</span><span class="orders-stat__label">VAL Commission</span></div>
+    </div>`;
+
+  const cards = orders.map(o => {
+    const items = Array.isArray(o.items) ? o.items : [];
+    return `
     <div class="order-card">
       <div class="order-card__header">
         <div>
           <div class="order-card__id">${o.id}</div>
-          <div class="order-card__date">${new Date(o.date).toLocaleString()}</div>
+          <div class="order-card__date">${o.created_at ? new Date(o.created_at).toLocaleString() : ""}</div>
         </div>
         <span class="order-status order-status--${o.status}">${o.status === "shipped" ? "Shipped" : o.status === "paid" ? "Paid" : "Awaiting Payment"}</span>
       </div>
       <div class="order-card__body">
-        <div><strong>${o.customer.firstName} ${o.customer.lastName}</strong></div>
-        <div>${o.customer.email} · ${o.customer.phone || "—"}</div>
-        <div>${o.customer.address}, ${o.customer.city}, ${o.customer.state} ${o.customer.zip}</div>
+        <div><strong>${o.first_name || ""} ${o.last_name || ""}</strong></div>
+        <div>${o.email || ""} · ${o.phone || "—"}</div>
+        <div>${o.address || ""}, ${o.city || ""}, ${o.state || ""} ${o.zip || ""}</div>
         <div class="order-card__items">
-          ${o.items.map(i => `<span>${i.name}${i.variant === 'pen' ? ' (+Pen)' : ''} × ${i.qty}</span>`).join(" · ")}
+          ${items.map(i => `<span>${i.name}${i.variant === 'pen' ? ' (+Pen)' : ''} × ${i.qty}</span>`).join(" · ")}
         </div>
-        ${o.shipping != null ? `<div class="order-card__ship">Shipping: ${shippingLabel(o.shippingMethod)} — $${o.shipping.toFixed(2)}</div>` : ""}
-        <div class="order-card__total">Total: <strong>$${o.total.toFixed(2)}</strong></div>
+        ${o.shipping != null ? `<div class="order-card__ship">Shipping: ${shippingLabel(o.shipping_method)} — $${Number(o.shipping).toFixed(2)}</div>` : ""}
+        <div class="order-card__total">Total: <strong>$${Number(o.total).toFixed(2)}</strong></div>
         ${o.referral
-          ? `<div class="order-card__referral">Referral: <strong>${o.referral}</strong> ${o.referralValid ? '<span class="ref-badge ref-badge--ok">valid</span>' : '<span class="ref-badge ref-badge--bad">unrecognized</span>'}</div>`
+          ? `<div class="order-card__referral">Referral: <strong>${o.referral}</strong> ${o.referral_valid ? '<span class="ref-badge ref-badge--ok">valid</span>' : '<span class="ref-badge ref-badge--bad">unrecognized</span>'}</div>`
           : ""}
-        ${o.referralValid && o.commission
-          ? `<div class="order-card__commission">⭐ ${o.referral} commission (30%): <strong>$${o.commission.toFixed(2)}</strong></div>`
+        ${o.referral_valid && o.commission
+          ? `<div class="order-card__commission">⭐ ${o.referral} commission (30%): <strong>$${Number(o.commission).toFixed(2)}</strong></div>`
           : ""}
       </div>
       <div class="order-card__actions">
@@ -1069,21 +1173,30 @@ function renderOrders() {
         ${o.status !== "shipped" ? `<button class="btn-mini btn-mini--primary" data-action="shipped" data-id="${o.id}">Mark Shipped</button>` : ""}
         <button class="btn-mini btn-mini--danger" data-action="delete" data-id="${o.id}">Delete</button>
       </div>
-    </div>
-  `).join("");
+    </div>`;
+  }).join("");
+
+  ordersList.innerHTML = summary + cards;
+
   ordersList.querySelectorAll("[data-action]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      let orders = loadOrders();
+    btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
       const action = btn.dataset.action;
-      if (action === "delete") {
-        orders = orders.filter(o => o.id !== id);
-      } else {
-        const o = orders.find(x => x.id === id);
-        if (o) o.status = action;
+      if (action === "delete" && !confirm("Delete this order? This cannot be undone.")) return;
+      btn.disabled = true;
+      try {
+        if (action === "delete") {
+          const { error: delErr } = await sb.from("orders").delete().eq("id", id);
+          if (delErr) throw delErr;
+        } else {
+          const { error: updErr } = await sb.from("orders").update({ status: action }).eq("id", id);
+          if (updErr) throw updErr;
+        }
+        renderOrders();
+      } catch (e) {
+        alert("Action failed: " + (e.message || "check your connection."));
+        btn.disabled = false;
       }
-      saveOrders(orders);
-      renderOrders();
     });
   });
 }
