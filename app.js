@@ -35,7 +35,8 @@ const USE_EMAILJS       = true;
 const EMAILJS_CONFIG    = {
   publicKey:  "xeF7Iw22TB4Gwhic2",
   serviceId:  "service_7ho1uxb",
-  templateId: "template_peeq45r",
+  templateId: "template_peeq45r",   // owner "new order" notification
+  shippedTemplateId: "",             // customer "order shipped" email — paste the shipped template ID here
 };
 
 // Initialize EmailJS once, if enabled and the SDK loaded
@@ -573,17 +574,23 @@ modalClose.addEventListener("click", closeCheckout);
 modalOverlay.addEventListener("click", closeCheckout);
 
 const SHIPPING_RATES = { standard: 25, local: 15 };
+const VAL_DISCOUNT_RATE = 0.10; // 10% off product subtotal when a valid referral code is used
 function shippingLabel(method) {
   return method === "local" ? "Local Delivery (Tampa · St. Pete · Clearwater)" : "Standard Shipping";
+}
+function activeReferralValid() {
+  return referralInput ? isValidReferral(referralInput.value) : false;
 }
 function getOrderTotal() {
   const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const ship = SHIPPING_RATES[shippingMethod] ?? SHIPPING_RATES.standard;
-  return { sub, ship, total: sub + ship };
+  const discount = activeReferralValid() ? +(sub * VAL_DISCOUNT_RATE).toFixed(2) : 0;
+  const total = sub - discount + ship;
+  return { sub, ship, discount, total };
 }
 
 function buildOrderSummary() {
-  const { sub, ship, total } = getOrderTotal();
+  const { sub, ship, discount, total } = getOrderTotal();
   orderSummary.innerHTML = `
     <h4>Order Summary</h4>
     ${cart.map(i => `
@@ -592,6 +599,9 @@ function buildOrderSummary() {
         <span>$${(i.price * i.qty).toFixed(2)}</span>
       </div>
     `).join("")}
+    ${discount > 0 ? `
+    <div class="order-line"><span>Subtotal</span><span>$${sub.toFixed(2)}</span></div>
+    <div class="order-line order-line--discount"><span>VAL discount (10%)</span><span>−$${discount.toFixed(2)}</span></div>` : ""}
     <div class="order-line">
       <span>${shippingMethod === "local" ? "Local Delivery" : "Shipping"}</span>
       <span>$${ship.toFixed(2)}</span>
@@ -633,12 +643,14 @@ function updateReferralFeedback() {
     referralFeedback.textContent = "";
     referralFeedback.className = "referral-feedback";
   } else if (isValidReferral(code)) {
-    referralFeedback.textContent = `✓ Code ${code} applied`;
+    referralFeedback.textContent = `✓ Code ${code} applied — 10% off`;
     referralFeedback.className = "referral-feedback referral-feedback--ok";
   } else {
     referralFeedback.textContent = "Code not recognized";
     referralFeedback.className = "referral-feedback referral-feedback--err";
   }
+  // Recalculate totals live if the checkout is open (discount may have changed)
+  if (checkoutModal.classList.contains("open")) buildOrderSummary();
 }
 if (referralInput) referralInput.addEventListener("input", updateReferralFeedback);
 
@@ -651,6 +663,24 @@ function saveOrders(orders) {
   localStorage.setItem("bellavita_orders", JSON.stringify(orders));
 }
 
+/* ---- Customer "order shipped" email ---- */
+async function sendShippedEmail(o) {
+  if (!(USE_EMAILJS && window.emailjs && EMAILJS_CONFIG.shippedTemplateId && o && o.email)) return;
+  const items = Array.isArray(o.items)
+    ? o.items.map(i => `${i.name}${i.variant === 'pen' ? ' (+Pen)' : ''} x${i.qty}`).join(", ")
+    : "";
+  try {
+    await window.emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.shippedTemplateId, {
+      to_email: o.email,
+      customer_name: `${o.first_name || ""} ${o.last_name || ""}`.trim(),
+      order_id: o.id,
+      items,
+      total: `$${Number(o.total).toFixed(2)}`,
+      tracking: o.tracking ? o.tracking : "Tracking info will follow shortly.",
+    });
+  } catch (e) { console.warn("Shipped email failed:", e); }
+}
+
 /* ---- Owner SMS / Email Notification ---- */
 function buildOrderMessage(order) {
   const itemsLine = order.items.map(i => `${i.name}${i.variant === 'pen' ? ' (+Pen)' : ''} x${i.qty}`).join(", ");
@@ -660,6 +690,7 @@ function buildOrderMessage(order) {
     `${order.customer.email} · ${order.customer.phone || "no phone"}`,
     `${order.customer.address}, ${order.customer.city}, ${order.customer.state} ${order.customer.zip}`,
     `Items: ${itemsLine}`,
+    ...(order.discount ? [`Discount: VAL 10% — −$${order.discount.toFixed(2)}`] : []),
     `Shipping: ${shippingLabel(order.shippingMethod)} — $${(order.shipping ?? 0).toFixed(2)}`,
     `Total: $${order.total.toFixed(2)} via Cash App (${CASHAPP_HANDLE})`,
     order.referral ? `Referral: ${order.referral}${order.referralValid ? " ✓ VALID" : " (unrecognized)"}` : "Referral: none",
@@ -723,7 +754,7 @@ async function notifyOwner(order) {
 checkoutForm.addEventListener("submit", e => {
   e.preventDefault();
   const formData = new FormData(checkoutForm);
-  const { ship, total } = getOrderTotal();
+  const { sub, ship, discount, total } = getOrderTotal();
   const order = {
     id: "BV-" + Date.now().toString(36).toUpperCase(),
     date: new Date().toISOString(),
@@ -741,12 +772,13 @@ checkoutForm.addEventListener("submit", e => {
     items: cart.map(i => ({ id: i.id, name: i.name, variant: i.variant, qty: i.qty, price: i.price })),
     shippingMethod,
     shipping: ship,
+    discount,
     total,
     referral: normalizeReferral(formData.get("referral")) || null,
     referralValid: isValidReferral(formData.get("referral")),
   };
-  // VAL referral commission: 30% of the full order total
-  order.commission = order.referralValid ? +(order.total * 0.30).toFixed(2) : 0;
+  // VAL referral commission: 30% of the pre-discount order total (subtotal + shipping)
+  order.commission = order.referralValid ? +((sub + ship) * 0.30).toFixed(2) : 0;
   // Decrement stock
   cart.forEach(item => {
     const p = PRODUCTS.find(x => x.id === item.id);
@@ -1137,14 +1169,26 @@ function orderCardHTML(o) {
         ${o.referral_valid && o.commission
           ? `<div class="order-card__commission">⭐ ${o.referral} commission (30%): <strong>$${Number(o.commission).toFixed(2)}</strong></div>`
           : ""}
+        ${shipped && o.tracking
+          ? `<div class="order-card__tracking">📦 Tracking: ${/^https?:\/\//i.test(o.tracking) ? `<a href="${o.tracking}" target="_blank" rel="noopener">${o.tracking}</a>` : o.tracking}</div>`
+          : ""}
       </div>
       <div class="order-card__actions">
         <label class="pay-check ${paid ? 'pay-check--done' : ''}">
           <input type="checkbox" data-action="togglepaid" data-id="${o.id}" ${paid ? 'checked' : ''} ${shipped ? 'disabled' : ''} />
           <span>Payment received</span>
         </label>
-        ${o.status === "paid" ? `<button class="btn-mini btn-mini--primary" data-action="shipped" data-id="${o.id}">Mark Shipped</button>` : ""}
+        ${o.status === "paid" ? `
+        <div class="ship-row">
+          <input type="text" class="tracking-input" id="track-${o.id}" placeholder="Tracking # or link (optional)" value="${o.tracking || ''}" />
+          <button class="btn-mini btn-mini--primary" data-action="shipped" data-id="${o.id}">Mark Shipped</button>
+        </div>` : ""}
         ${shipped ? `<span class="shipped-tag">✓ Shipped</span>` : ""}
+        ${o.referral_valid && o.commission ? `
+        <label class="pay-check payout-check ${o.commission_paid ? 'pay-check--done' : ''}">
+          <input type="checkbox" data-action="togglecommission" data-id="${o.id}" ${o.commission_paid ? 'checked' : ''} />
+          <span>Paid ${o.referral} $${Number(o.commission).toFixed(2)}</span>
+        </label>` : ""}
         <button class="btn-mini btn-mini--danger" data-action="delete" data-id="${o.id}">Delete</button>
       </div>
     </div>`;
@@ -1170,8 +1214,10 @@ async function renderOrders() {
   const received = all.filter(o => o.status === "paid");           // payment in, ready to ship
   const shipped  = all.filter(o => o.status === "shipped");
   const valOrders = all.filter(o => o.referral_valid);
+  const custPaid  = valOrders.filter(o => o.status === "paid" || o.status === "shipped"); // customer's payment received
   const commissionAll     = valOrders.reduce((s, o) => s + (Number(o.commission) || 0), 0);
-  const commissionOwed    = valOrders.filter(o => o.status === "paid" || o.status === "shipped").reduce((s, o) => s + (Number(o.commission) || 0), 0);
+  const commissionPaidOut = custPaid.filter(o => o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
+  const commissionOwed    = custPaid.filter(o => !o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
   const commissionPending = valOrders.filter(o => o.status === "awaiting_payment").reduce((s, o) => s + (Number(o.commission) || 0), 0);
 
   const summary = `
@@ -1190,9 +1236,10 @@ async function renderOrders() {
       : `<div class="empty-state">No orders have used the VAL code yet.</div>`;
     body = `
       <div class="commission-panel">
+        <div class="commission-panel__row commission-panel__row--owed"><span>Owed now — payment received, not yet paid out</span><strong>$${commissionOwed.toFixed(2)}</strong></div>
+        <div class="commission-panel__row"><span>Already paid out to VAL</span><strong>$${commissionPaidOut.toFixed(2)}</strong></div>
+        <div class="commission-panel__row"><span>Pending — awaiting customer payment</span><strong>$${commissionPending.toFixed(2)}</strong></div>
         <div class="commission-panel__row"><span>Total commission — all VAL orders</span><strong>$${commissionAll.toFixed(2)}</strong></div>
-        <div class="commission-panel__row commission-panel__row--owed"><span>Owed now — payment received</span><strong>$${commissionOwed.toFixed(2)}</strong></div>
-        <div class="commission-panel__row"><span>Pending — awaiting payment</span><strong>$${commissionPending.toFixed(2)}</strong></div>
       </div>
       ${rows}`;
   } else {
@@ -1220,9 +1267,16 @@ async function renderOrders() {
           const newStatus = el.checked ? "paid" : "awaiting_payment";
           const { error: e2 } = await sb.from("orders").update({ status: newStatus }).eq("id", id);
           if (e2) throw e2;
+        } else if (action === "togglecommission") {
+          const { error: e4 } = await sb.from("orders").update({ commission_paid: el.checked }).eq("id", id);
+          if (e4) throw e4;
         } else if (action === "shipped") {
-          const { error: e3 } = await sb.from("orders").update({ status: "shipped" }).eq("id", id);
+          const trackEl = document.getElementById("track-" + id);
+          const tracking = trackEl ? trackEl.value.trim() : "";
+          const { error: e3 } = await sb.from("orders").update({ status: "shipped", tracking: tracking || null }).eq("id", id);
           if (e3) throw e3;
+          const ord = all.find(o => o.id === id);
+          if (ord) sendShippedEmail({ ...ord, tracking });
         }
         renderOrders();
       } catch (e) {

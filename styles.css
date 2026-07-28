@@ -910,6 +910,20 @@ img { display: block; max-width: 100%; }
 .commission-panel__row + .commission-panel__row { border-top: 1px solid rgba(139,30,45,0.12); }
 .commission-panel__row strong { font-size: 1rem; color: var(--navy); }
 .commission-panel__row--owed strong { color: var(--maroon); font-size: 1.15rem; }
+
+/* Discount line in checkout order summary */
+.order-line--discount { color: var(--green); font-weight: 600; }
+
+/* Tracking input + shipped tracking display */
+.ship-row { flex: 1 1 100%; display: flex; gap: 7px; margin-top: 2px; }
+.tracking-input {
+  flex: 1; min-width: 0; font-family: inherit; font-size: 0.82rem;
+  padding: 8px 10px; border: 1.5px solid var(--border); border-radius: var(--radius);
+}
+.tracking-input:focus { outline: none; border-color: var(--blue); }
+.order-card__tracking { margin-top: 5px; font-size: 0.82rem; color: var(--gray-700); }
+.order-card__tracking a { color: var(--blue); text-decoration: underline; word-break: break-all; }
+.payout-check span { white-space: nowrap; }
 .admin-hint { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; }
 .inv-row {
   display: flex; align-items: center; justify-content: space-between;
