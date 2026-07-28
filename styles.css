@@ -867,15 +867,49 @@ img { display: block; max-width: 100%; }
 .admin-login > p { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 20px; text-align: center; }
 .admin-login form { display: flex; flex-direction: column; gap: 14px; max-width: 300px; margin: 0 auto; }
 .admin-dashboard {}
-.admin-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--gray-50); }
+.admin-dash-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px 0;
+}
+.admin-dash-title { font-size: 0.95rem; font-weight: 800; color: var(--navy); }
+.admin-tabs {
+  display: flex; gap: 4px; border-bottom: 1px solid var(--border); background: var(--gray-50);
+  padding: 0 12px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.admin-tabs::-webkit-scrollbar { height: 0; }
 .admin-tab {
-  flex: 1; background: none; border: none; color: var(--gray-500);
-  padding: 12px; font-family: inherit; font-size: 0.875rem; font-weight: 600;
+  flex: 0 0 auto; background: none; border: none; color: var(--gray-500);
+  padding: 12px 12px; font-family: inherit; font-size: 0.85rem; font-weight: 600;
   cursor: pointer; border-bottom: 2px solid transparent; transition: all var(--transition);
+  white-space: nowrap;
 }
 .admin-tab:hover { color: var(--text); }
 .admin-tab--active { color: var(--blue); border-bottom-color: var(--blue); }
 .admin-tab-content { padding: 18px 20px; }
+
+/* Payment-received checkbox */
+.pay-check {
+  display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+  font-size: 0.82rem; font-weight: 600; color: var(--gray-600);
+  background: var(--gray-50); border: 1.5px solid var(--border);
+  padding: 7px 12px; border-radius: var(--radius); user-select: none;
+}
+.pay-check input { width: 16px; height: 16px; accent-color: var(--green); cursor: pointer; }
+.pay-check--done { background: var(--green-pale); border-color: #bbf7d0; color: var(--green); }
+.shipped-tag { font-size: 0.8rem; font-weight: 700; color: var(--green); align-self: center; }
+
+/* Commission panel */
+.commission-panel {
+  background: var(--maroon-pale); border: 1px solid #f3d0d6; border-radius: var(--radius-lg);
+  padding: 14px 16px; margin-bottom: 16px;
+}
+.commission-panel__row {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.85rem; color: var(--gray-700); padding: 6px 0;
+}
+.commission-panel__row + .commission-panel__row { border-top: 1px solid rgba(139,30,45,0.12); }
+.commission-panel__row strong { font-size: 1rem; color: var(--navy); }
+.commission-panel__row--owed strong { color: var(--maroon); font-size: 1.15rem; }
 .admin-hint { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; }
 .inv-row {
   display: flex; align-items: center; justify-content: space-between;
@@ -936,7 +970,7 @@ img { display: block; max-width: 100%; }
 .order-card__items { margin-top: 5px; font-size: 0.8rem; color: var(--text); }
 .order-card__total { margin-top: 5px; font-size: 0.875rem; }
 .order-card__actions {
-  display: flex; gap: 7px; flex-wrap: wrap;
+  display: flex; gap: 7px; flex-wrap: wrap; align-items: center;
   padding-top: 10px; border-top: 1px solid var(--border);
 }
 .btn-mini {

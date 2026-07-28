@@ -965,11 +965,11 @@ const ordersList     = document.getElementById("ordersList");
 
 let adminUnlocked = false;
 
+let orderFilter = "all";
 function showAdminDashboard() {
   adminUnlocked = true;
   adminLogin.style.display = "none";
   adminDashboard.style.display = "block";
-  renderInventory();
   renderOrders();
 }
 function showAdminLogin() {
@@ -1052,15 +1052,13 @@ if (adminLogout) {
   });
 }
 
-/* Tabs */
+/* Tabs — filter the order list */
 document.querySelectorAll(".admin-tab").forEach(tab => {
   tab.addEventListener("click", () => {
     document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("admin-tab--active"));
     tab.classList.add("admin-tab--active");
-    const target = tab.dataset.tab;
-    document.getElementById("tabInventory").style.display = target === "inventory" ? "block" : "none";
-    document.getElementById("tabOrders").style.display    = target === "orders"    ? "block" : "none";
-    if (target === "orders") renderOrders();
+    orderFilter = tab.dataset.filter;
+    renderOrders();
   });
 });
 
@@ -1110,47 +1108,19 @@ function renderInventory() {
   });
 }
 
-async function renderOrders() {
-  if (!sb) {
-    ordersList.innerHTML = `<div class="empty-state">Cloud database not connected. Refresh and try again.</div>`;
-    return;
-  }
-  ordersList.innerHTML = `<div class="empty-state">Loading orders…</div>`;
-  const { data: orders, error } = await sb
-    .from("orders")
-    .select("*")
-    .order("created_at", { ascending: false });
-  if (error) {
-    ordersList.innerHTML = `<div class="empty-state">Couldn't load orders: ${error.message}</div>`;
-    return;
-  }
-  if (!orders || orders.length === 0) {
-    ordersList.innerHTML = `<div class="empty-state">No orders yet.</div>`;
-    return;
-  }
-
-  const revenue       = orders.reduce((s, o) => s + (Number(o.total) || 0), 0);
-  const commissionAll = orders.filter(o => o.referral_valid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
-  const pending       = orders.filter(o => o.status === "awaiting_payment").length;
-
-  const summary = `
-    <div class="orders-summary">
-      <div class="orders-stat"><span class="orders-stat__num">${orders.length}</span><span class="orders-stat__label">Orders</span></div>
-      <div class="orders-stat"><span class="orders-stat__num">${pending}</span><span class="orders-stat__label">Awaiting Payment</span></div>
-      <div class="orders-stat"><span class="orders-stat__num">$${revenue.toFixed(2)}</span><span class="orders-stat__label">Total Revenue</span></div>
-      <div class="orders-stat orders-stat--commission"><span class="orders-stat__num">$${commissionAll.toFixed(2)}</span><span class="orders-stat__label">VAL Commission</span></div>
-    </div>`;
-
-  const cards = orders.map(o => {
-    const items = Array.isArray(o.items) ? o.items : [];
-    return `
-    <div class="order-card">
+function orderCardHTML(o) {
+  const items = Array.isArray(o.items) ? o.items : [];
+  const shipped = o.status === "shipped";
+  const paid = o.status === "paid" || shipped;
+  const statusLabel = shipped ? "Shipped" : (o.status === "paid" ? "Payment Received" : "Awaiting Payment");
+  return `
+    <div class="order-card order-card--${o.status}">
       <div class="order-card__header">
         <div>
           <div class="order-card__id">${o.id}</div>
           <div class="order-card__date">${o.created_at ? new Date(o.created_at).toLocaleString() : ""}</div>
         </div>
-        <span class="order-status order-status--${o.status}">${o.status === "shipped" ? "Shipped" : o.status === "paid" ? "Paid" : "Awaiting Payment"}</span>
+        <span class="order-status order-status--${o.status}">${statusLabel}</span>
       </div>
       <div class="order-card__body">
         <div><strong>${o.first_name || ""} ${o.last_name || ""}</strong></div>
@@ -1169,33 +1139,95 @@ async function renderOrders() {
           : ""}
       </div>
       <div class="order-card__actions">
-        ${o.status === "awaiting_payment" ? `<button class="btn-mini btn-mini--success" data-action="paid" data-id="${o.id}">Mark Paid</button>` : ""}
-        ${o.status !== "shipped" ? `<button class="btn-mini btn-mini--primary" data-action="shipped" data-id="${o.id}">Mark Shipped</button>` : ""}
+        <label class="pay-check ${paid ? 'pay-check--done' : ''}">
+          <input type="checkbox" data-action="togglepaid" data-id="${o.id}" ${paid ? 'checked' : ''} ${shipped ? 'disabled' : ''} />
+          <span>Payment received</span>
+        </label>
+        ${o.status === "paid" ? `<button class="btn-mini btn-mini--primary" data-action="shipped" data-id="${o.id}">Mark Shipped</button>` : ""}
+        ${shipped ? `<span class="shipped-tag">✓ Shipped</span>` : ""}
         <button class="btn-mini btn-mini--danger" data-action="delete" data-id="${o.id}">Delete</button>
       </div>
     </div>`;
-  }).join("");
+}
 
-  ordersList.innerHTML = summary + cards;
+async function renderOrders() {
+  if (!sb) {
+    ordersList.innerHTML = `<div class="empty-state">Cloud database not connected. Refresh and try again.</div>`;
+    return;
+  }
+  ordersList.innerHTML = `<div class="empty-state">Loading orders…</div>`;
+  const { data, error } = await sb
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) {
+    ordersList.innerHTML = `<div class="empty-state">Couldn't load orders: ${error.message}</div>`;
+    return;
+  }
+  const all = data || [];
 
-  ordersList.querySelectorAll("[data-action]").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const id = btn.dataset.id;
-      const action = btn.dataset.action;
+  const pending  = all.filter(o => o.status === "awaiting_payment");
+  const received = all.filter(o => o.status === "paid");           // payment in, ready to ship
+  const shipped  = all.filter(o => o.status === "shipped");
+  const valOrders = all.filter(o => o.referral_valid);
+  const commissionAll     = valOrders.reduce((s, o) => s + (Number(o.commission) || 0), 0);
+  const commissionOwed    = valOrders.filter(o => o.status === "paid" || o.status === "shipped").reduce((s, o) => s + (Number(o.commission) || 0), 0);
+  const commissionPending = valOrders.filter(o => o.status === "awaiting_payment").reduce((s, o) => s + (Number(o.commission) || 0), 0);
+
+  const summary = `
+    <div class="orders-summary">
+      <div class="orders-stat"><span class="orders-stat__num">${all.length}</span><span class="orders-stat__label">All Orders</span></div>
+      <div class="orders-stat"><span class="orders-stat__num">${pending.length}</span><span class="orders-stat__label">Pending Payment</span></div>
+      <div class="orders-stat"><span class="orders-stat__num">${received.length}</span><span class="orders-stat__label">To Ship</span></div>
+      <div class="orders-stat"><span class="orders-stat__num">${shipped.length}</span><span class="orders-stat__label">Shipped</span></div>
+      <div class="orders-stat orders-stat--commission"><span class="orders-stat__num">$${commissionOwed.toFixed(2)}</span><span class="orders-stat__label">VAL Owed</span></div>
+    </div>`;
+
+  let body;
+  if (orderFilter === "commission") {
+    const rows = valOrders.length
+      ? valOrders.map(orderCardHTML).join("")
+      : `<div class="empty-state">No orders have used the VAL code yet.</div>`;
+    body = `
+      <div class="commission-panel">
+        <div class="commission-panel__row"><span>Total commission — all VAL orders</span><strong>$${commissionAll.toFixed(2)}</strong></div>
+        <div class="commission-panel__row commission-panel__row--owed"><span>Owed now — payment received</span><strong>$${commissionOwed.toFixed(2)}</strong></div>
+        <div class="commission-panel__row"><span>Pending — awaiting payment</span><strong>$${commissionPending.toFixed(2)}</strong></div>
+      </div>
+      ${rows}`;
+  } else {
+    const map = { all: all, awaiting_payment: pending, paid: received, shipped: shipped };
+    const list = map[orderFilter] || all;
+    body = list.length
+      ? list.map(orderCardHTML).join("")
+      : `<div class="empty-state">No orders in this view.</div>`;
+  }
+
+  ordersList.innerHTML = summary + body;
+
+  ordersList.querySelectorAll("[data-action]").forEach(el => {
+    const evt = el.tagName === "INPUT" ? "change" : "click";
+    el.addEventListener(evt, async () => {
+      const id = el.dataset.id;
+      const action = el.dataset.action;
       if (action === "delete" && !confirm("Delete this order? This cannot be undone.")) return;
-      btn.disabled = true;
+      el.disabled = true;
       try {
         if (action === "delete") {
-          const { error: delErr } = await sb.from("orders").delete().eq("id", id);
-          if (delErr) throw delErr;
-        } else {
-          const { error: updErr } = await sb.from("orders").update({ status: action }).eq("id", id);
-          if (updErr) throw updErr;
+          const { error: e1 } = await sb.from("orders").delete().eq("id", id);
+          if (e1) throw e1;
+        } else if (action === "togglepaid") {
+          const newStatus = el.checked ? "paid" : "awaiting_payment";
+          const { error: e2 } = await sb.from("orders").update({ status: newStatus }).eq("id", id);
+          if (e2) throw e2;
+        } else if (action === "shipped") {
+          const { error: e3 } = await sb.from("orders").update({ status: "shipped" }).eq("id", id);
+          if (e3) throw e3;
         }
         renderOrders();
       } catch (e) {
         alert("Action failed: " + (e.message || "check your connection."));
-        btn.disabled = false;
+        el.disabled = false;
       }
     });
   });

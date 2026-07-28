@@ -529,17 +529,18 @@
       </form>
     </div>
     <div class="admin-dashboard" id="adminDashboard" style="display:none">
-      <div class="admin-tabs">
-        <button class="admin-tab admin-tab--active" data-tab="inventory">Inventory</button>
-        <button class="admin-tab" data-tab="orders">Orders</button>
+      <div class="admin-dash-head">
+        <span class="admin-dash-title">Order Dashboard</span>
         <button class="admin-logout" id="adminLogout" type="button">Log out</button>
       </div>
-      <div class="admin-tab-content" id="tabInventory">
-        <p class="admin-hint">Adjust stock counts below. Changes save immediately.</p>
-        <div id="inventoryList"></div>
+      <div class="admin-tabs" id="adminTabs">
+        <button class="admin-tab admin-tab--active" data-filter="all">All Orders</button>
+        <button class="admin-tab" data-filter="awaiting_payment">Pending Payment</button>
+        <button class="admin-tab" data-filter="paid">Payment Received</button>
+        <button class="admin-tab" data-filter="shipped">Shipped</button>
+        <button class="admin-tab" data-filter="commission">VAL Commission</button>
       </div>
-      <div class="admin-tab-content" id="tabOrders" style="display:none">
-        <p class="admin-hint">Pending and recent orders. Mark as shipped once Cash App payment is confirmed.</p>
+      <div class="admin-tab-content">
         <div id="ordersList"></div>
       </div>
     </div>
