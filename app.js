@@ -552,6 +552,7 @@ function openCheckout() {
   const stdRadio = document.querySelector('input[name="shipMethod"][value="standard"]');
   if (stdRadio) stdRadio.checked = true;
   buildOrderSummary();
+  updateLocalShipWarning();
   checkoutModal.classList.add("open");
   modalOverlay.classList.add("active");
   document.body.style.overflow = "hidden";
@@ -562,6 +563,7 @@ document.querySelectorAll('input[name="shipMethod"]').forEach(radio => {
   radio.addEventListener("change", () => {
     shippingMethod = radio.value;
     buildOrderSummary();
+    updateLocalShipWarning();
   });
 });
 function closeCheckout() {
@@ -578,6 +580,21 @@ const VAL_DISCOUNT_RATE = 0.10; // 10% off product subtotal when a valid referra
 function shippingLabel(method) {
   return method === "local" ? "Local Delivery (Tampa · St. Pete · Clearwater)" : "Standard Shipping";
 }
+
+/* ---- Local delivery eligibility (Tampa / St. Petersburg / Clearwater only) ---- */
+const LOCAL_DELIVERY_KEYWORDS = ["tampa", "clearwater", "st petersburg", "saint petersburg", "st pete"];
+function isLocalDeliveryEligible(city) {
+  const c = (city || "").trim().toLowerCase().replace(/\./g, "").replace(/\s+/g, " ");
+  if (!c) return true; // don't warn before a city has been entered
+  return LOCAL_DELIVERY_KEYWORDS.some(k => c.includes(k));
+}
+const cityInput = document.querySelector('input[name="city"]');
+const localShipWarning = document.getElementById("localShipWarning");
+function updateLocalShipWarning() {
+  if (!localShipWarning || !cityInput) return;
+  localShipWarning.style.display = (shippingMethod === "local" && !isLocalDeliveryEligible(cityInput.value)) ? "block" : "none";
+}
+if (cityInput) cityInput.addEventListener("input", updateLocalShipWarning);
 function activeReferralValid() {
   return referralInput ? isValidReferral(referralInput.value) : false;
 }
@@ -754,6 +771,11 @@ async function notifyOwner(order) {
 checkoutForm.addEventListener("submit", e => {
   e.preventDefault();
   const formData = new FormData(checkoutForm);
+  if (shippingMethod === "local" && !isLocalDeliveryEligible(formData.get("city"))) {
+    updateLocalShipWarning();
+    if (localShipWarning) localShipWarning.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
   const { sub, ship, discount, total } = getOrderTotal();
   const order = {
     id: "BV-" + Date.now().toString(36).toUpperCase(),
@@ -992,7 +1014,6 @@ const adminEmailInput    = document.getElementById("adminEmailInput");
 const adminPasswordInput = document.getElementById("adminPasswordInput");
 const adminLogout    = document.getElementById("adminLogout");
 const adminError     = document.getElementById("adminError");
-const inventoryList  = document.getElementById("inventoryList");
 const ordersList     = document.getElementById("ordersList");
 
 let adminUnlocked = false;
@@ -1093,52 +1114,6 @@ document.querySelectorAll(".admin-tab").forEach(tab => {
     renderOrders();
   });
 });
-
-function renderInventory() {
-  inventoryList.innerHTML = "";
-  PRODUCTS.forEach(p => {
-    const row = document.createElement("div");
-    row.className = "inv-row" + (p.stock === 0 ? " inv-row--out" : "");
-    row.innerHTML = `
-      <div class="inv-row__info">
-        <div class="inv-row__icon">${p.icon}</div>
-        <div>
-          <div class="inv-row__name">
-            ${p.name}
-            ${p.stock === 0 ? '<span class="inv-out-tag">Out of Stock</span>' : ''}
-          </div>
-          <div class="inv-row__sub">$${p.price.toFixed(2)} · ${p.unit}</div>
-        </div>
-      </div>
-      <div class="inv-row__controls">
-        <button class="qty-btn" data-id="${p.id}" data-delta="-1" ${p.stock === 0 ? 'disabled' : ''}>−</button>
-        <input type="number" class="inv-input" data-id="${p.id}" value="${p.stock}" min="0" />
-        <button class="qty-btn" data-id="${p.id}" data-delta="1">+</button>
-      </div>
-    `;
-    inventoryList.appendChild(row);
-  });
-  inventoryList.querySelectorAll(".qty-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const p = PRODUCTS.find(x => x.id === parseInt(btn.dataset.id));
-      if (!p) return;
-      p.stock = Math.max(0, p.stock + parseInt(btn.dataset.delta));
-      saveProducts();
-      renderInventory();
-      renderProducts();
-    });
-  });
-  inventoryList.querySelectorAll(".inv-input").forEach(input => {
-    input.addEventListener("change", () => {
-      const p = PRODUCTS.find(x => x.id === parseInt(input.dataset.id));
-      if (!p) return;
-      p.stock = Math.max(0, parseInt(input.value) || 0);
-      saveProducts();
-      renderInventory();
-      renderProducts();
-    });
-  });
-}
 
 function orderCardHTML(o) {
   const items = Array.isArray(o.items) ? o.items : [];
