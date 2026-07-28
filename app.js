@@ -1015,14 +1015,31 @@ const adminPasswordInput = document.getElementById("adminPasswordInput");
 const adminLogout    = document.getElementById("adminLogout");
 const adminError     = document.getElementById("adminError");
 const ordersList     = document.getElementById("ordersList");
+const orderSearchInput = document.getElementById("orderSearchInput");
+const selectAllOrders  = document.getElementById("selectAllOrders");
+const bulkBar          = document.getElementById("bulkBar");
+const bulkCount        = document.getElementById("bulkCount");
+const bulkMarkPaidBtn  = document.getElementById("bulkMarkPaid");
+const bulkDeleteBtn    = document.getElementById("bulkDelete");
+const bulkClearBtn     = document.getElementById("bulkClear");
 
 let adminUnlocked = false;
 
 let orderFilter = "all";
+let ordersCache = [];
+let orderSearch = "";
+let selectedOrderIds = new Set();
+let lastRenderedOrderIds = [];
+
 function showAdminDashboard() {
   adminUnlocked = true;
   adminLogin.style.display = "none";
   adminDashboard.style.display = "block";
+  orderFilter = "all";
+  orderSearch = "";
+  if (orderSearchInput) orderSearchInput.value = "";
+  selectedOrderIds.clear();
+  document.querySelectorAll(".admin-tab").forEach(t => t.classList.toggle("admin-tab--active", t.dataset.filter === "all"));
   renderOrders();
 }
 function showAdminLogin() {
@@ -1105,27 +1122,115 @@ if (adminLogout) {
   });
 }
 
-/* Tabs — filter the order list */
+/* Tabs — filter the order list (no refetch, just re-render from cache) */
 document.querySelectorAll(".admin-tab").forEach(tab => {
   tab.addEventListener("click", () => {
     document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("admin-tab--active"));
     tab.classList.add("admin-tab--active");
     orderFilter = tab.dataset.filter;
-    renderOrders();
+    selectedOrderIds.clear();
+    renderOrdersList();
   });
 });
 
-function orderCardHTML(o) {
+/* Search — filters the visible list client-side, no refetch */
+if (orderSearchInput) {
+  orderSearchInput.addEventListener("input", () => {
+    orderSearch = orderSearchInput.value.trim();
+    renderOrdersList();
+  });
+}
+
+/* Select all currently-visible (tab + search filtered) orders */
+if (selectAllOrders) {
+  selectAllOrders.addEventListener("change", () => {
+    if (selectAllOrders.checked) lastRenderedOrderIds.forEach(id => selectedOrderIds.add(id));
+    else lastRenderedOrderIds.forEach(id => selectedOrderIds.delete(id));
+    renderOrdersList();
+  });
+}
+
+function toggleOrderSelection(id, checked) {
+  if (checked) selectedOrderIds.add(id);
+  else selectedOrderIds.delete(id);
+  const card = ordersList.querySelector(`.order-card[data-order-id="${CSS.escape(id)}"]`);
+  if (card) card.classList.toggle("order-card--selected", checked);
+  syncBulkUI();
+}
+
+function syncBulkUI() {
+  const count = selectedOrderIds.size;
+  if (bulkBar) bulkBar.style.display = count > 0 ? "flex" : "none";
+  if (bulkCount) bulkCount.textContent = `${count} selected`;
+  if (bulkMarkPaidBtn) {
+    const eligible = ordersCache.filter(o => selectedOrderIds.has(o.id) && o.status === "awaiting_payment").length;
+    bulkMarkPaidBtn.textContent = eligible > 0 ? `Mark ${eligible} Paid` : "Mark Paid";
+    bulkMarkPaidBtn.disabled = eligible === 0;
+  }
+  if (selectAllOrders) {
+    const visible = lastRenderedOrderIds;
+    const allSelected = visible.length > 0 && visible.every(id => selectedOrderIds.has(id));
+    selectAllOrders.checked = allSelected;
+    selectAllOrders.indeterminate = !allSelected && visible.some(id => selectedOrderIds.has(id));
+  }
+}
+
+if (bulkClearBtn) {
+  bulkClearBtn.addEventListener("click", () => {
+    selectedOrderIds.clear();
+    renderOrdersList();
+  });
+}
+
+if (bulkMarkPaidBtn) {
+  bulkMarkPaidBtn.addEventListener("click", async () => {
+    const ids = ordersCache.filter(o => selectedOrderIds.has(o.id) && o.status === "awaiting_payment").map(o => o.id);
+    if (!ids.length || !sb) return;
+    bulkMarkPaidBtn.disabled = true;
+    try {
+      const { error } = await sb.from("orders").update({ status: "paid" }).in("id", ids);
+      if (error) throw error;
+      selectedOrderIds.clear();
+      renderOrders();
+    } catch (e) {
+      alert("Bulk update failed: " + (e.message || "check your connection."));
+      bulkMarkPaidBtn.disabled = false;
+    }
+  });
+}
+
+if (bulkDeleteBtn) {
+  bulkDeleteBtn.addEventListener("click", async () => {
+    const ids = Array.from(selectedOrderIds);
+    if (!ids.length || !sb) return;
+    if (!confirm(`Delete ${ids.length} selected order${ids.length > 1 ? "s" : ""}? This cannot be undone.`)) return;
+    bulkDeleteBtn.disabled = true;
+    try {
+      const { error } = await sb.from("orders").delete().in("id", ids);
+      if (error) throw error;
+      selectedOrderIds.clear();
+      renderOrders();
+    } catch (e) {
+      alert("Bulk delete failed: " + (e.message || "check your connection."));
+      bulkDeleteBtn.disabled = false;
+    }
+  });
+}
+
+function orderCardHTML(o, selected) {
   const items = Array.isArray(o.items) ? o.items : [];
   const shipped = o.status === "shipped";
   const paid = o.status === "paid" || shipped;
   const statusLabel = shipped ? "Shipped" : (o.status === "paid" ? "Payment Received" : "Awaiting Payment");
   return `
-    <div class="order-card order-card--${o.status}">
+    <div class="order-card order-card--${o.status}${selected ? ' order-card--selected' : ''}" data-order-id="${o.id}">
       <div class="order-card__header">
-        <div>
-          <div class="order-card__id">${o.id}</div>
-          <div class="order-card__date">${o.created_at ? new Date(o.created_at).toLocaleString() : ""}</div>
+        <div class="order-card__header-left">
+          <input type="checkbox" class="order-select-check" data-id="${o.id}" aria-label="Select order ${o.id}" ${selected ? 'checked' : ''} />
+          <div>
+            <div class="order-card__id">${o.id}</div>
+            <div class="order-card__date">${o.created_at ? new Date(o.created_at).toLocaleString() : ""}</div>
+          </div>
         </div>
         <span class="order-status order-status--${o.status}">${statusLabel}</span>
       </div>
@@ -1169,6 +1274,8 @@ function orderCardHTML(o) {
     </div>`;
 }
 
+/* Fetches orders from the cloud DB, then hands off to the pure renderer below.
+   Called on dashboard open and after any action that mutates order data. */
 async function renderOrders() {
   if (!sb) {
     ordersList.innerHTML = `<div class="empty-state">Cloud database not connected. Refresh and try again.</div>`;
@@ -1183,49 +1290,79 @@ async function renderOrders() {
     ordersList.innerHTML = `<div class="empty-state">Couldn't load orders: ${error.message}</div>`;
     return;
   }
-  const all = data || [];
+  ordersCache = data || [];
+  selectedOrderIds.clear();
+  renderOrdersList();
+}
 
-  const pending  = all.filter(o => o.status === "awaiting_payment");
-  const received = all.filter(o => o.status === "paid");           // payment in, ready to ship
-  const shipped  = all.filter(o => o.status === "shipped");
-  const valOrders = all.filter(o => o.referral_valid);
-  const custPaid  = valOrders.filter(o => o.status === "paid" || o.status === "shipped"); // customer's payment received
+function orderMatchesSearch(o, q) {
+  if (!q) return true;
+  const haystack = [o.id, o.first_name, o.last_name, o.email, o.phone].filter(Boolean).join(" ").toLowerCase();
+  return haystack.includes(q.toLowerCase());
+}
+
+/* Pure re-render from ordersCache — no network call. Used for tab switches,
+   search-as-you-type, and selection changes so those stay instant. */
+function renderOrdersList() {
+  const all = ordersCache;
+
+  // Stat tiles always reflect the full dataset, unaffected by search
+  const pendingAll  = all.filter(o => o.status === "awaiting_payment");
+  const receivedAll = all.filter(o => o.status === "paid");
+  const shippedAll  = all.filter(o => o.status === "shipped");
+  const valAll      = all.filter(o => o.referral_valid);
+  const custPaidAll = valAll.filter(o => o.status === "paid" || o.status === "shipped");
+  const commissionOwedAll = custPaidAll.filter(o => !o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
+
+  const summary = `
+    <div class="orders-summary">
+      <div class="orders-stat"><span class="orders-stat__num">${all.length}</span><span class="orders-stat__label">All Orders</span></div>
+      <div class="orders-stat"><span class="orders-stat__num">${pendingAll.length}</span><span class="orders-stat__label">Pending Payment</span></div>
+      <div class="orders-stat"><span class="orders-stat__num">${receivedAll.length}</span><span class="orders-stat__label">To Ship</span></div>
+      <div class="orders-stat"><span class="orders-stat__num">${shippedAll.length}</span><span class="orders-stat__label">Shipped</span></div>
+      <div class="orders-stat orders-stat--commission"><span class="orders-stat__num">$${commissionOwedAll.toFixed(2)}</span><span class="orders-stat__label">VAL Owed</span></div>
+    </div>`;
+
+  // Tab + search filter for the visible card list
+  const searched = orderSearch ? all.filter(o => orderMatchesSearch(o, orderSearch)) : all;
+  const pending  = searched.filter(o => o.status === "awaiting_payment");
+  const received = searched.filter(o => o.status === "paid");
+  const shipped  = searched.filter(o => o.status === "shipped");
+  const valOrders = searched.filter(o => o.referral_valid);
+  const custPaid  = valOrders.filter(o => o.status === "paid" || o.status === "shipped");
   const commissionAll     = valOrders.reduce((s, o) => s + (Number(o.commission) || 0), 0);
   const commissionPaidOut = custPaid.filter(o => o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
   const commissionOwed    = custPaid.filter(o => !o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
   const commissionPending = valOrders.filter(o => o.status === "awaiting_payment").reduce((s, o) => s + (Number(o.commission) || 0), 0);
 
-  const summary = `
-    <div class="orders-summary">
-      <div class="orders-stat"><span class="orders-stat__num">${all.length}</span><span class="orders-stat__label">All Orders</span></div>
-      <div class="orders-stat"><span class="orders-stat__num">${pending.length}</span><span class="orders-stat__label">Pending Payment</span></div>
-      <div class="orders-stat"><span class="orders-stat__num">${received.length}</span><span class="orders-stat__label">To Ship</span></div>
-      <div class="orders-stat"><span class="orders-stat__num">${shipped.length}</span><span class="orders-stat__label">Shipped</span></div>
-      <div class="orders-stat orders-stat--commission"><span class="orders-stat__num">$${commissionOwed.toFixed(2)}</span><span class="orders-stat__label">VAL Owed</span></div>
-    </div>`;
+  const list = orderFilter === "commission"
+    ? valOrders
+    : ({ all: searched, awaiting_payment: pending, paid: received, shipped: shipped }[orderFilter] || searched);
+  const emptyMsg = orderSearch
+    ? `No orders match "${orderSearch}".`
+    : (orderFilter === "commission" ? "No orders have used the VAL code yet." : "No orders in this view.");
+  const cards = list.length
+    ? list.map(o => orderCardHTML(o, selectedOrderIds.has(o.id))).join("")
+    : `<div class="empty-state">${emptyMsg}</div>`;
 
-  let body;
-  if (orderFilter === "commission") {
-    const rows = valOrders.length
-      ? valOrders.map(orderCardHTML).join("")
-      : `<div class="empty-state">No orders have used the VAL code yet.</div>`;
-    body = `
+  const body = orderFilter === "commission"
+    ? `
       <div class="commission-panel">
         <div class="commission-panel__row commission-panel__row--owed"><span>Owed now — payment received, not yet paid out</span><strong>$${commissionOwed.toFixed(2)}</strong></div>
         <div class="commission-panel__row"><span>Already paid out to VAL</span><strong>$${commissionPaidOut.toFixed(2)}</strong></div>
         <div class="commission-panel__row"><span>Pending — awaiting customer payment</span><strong>$${commissionPending.toFixed(2)}</strong></div>
         <div class="commission-panel__row"><span>Total commission — all VAL orders</span><strong>$${commissionAll.toFixed(2)}</strong></div>
       </div>
-      ${rows}`;
-  } else {
-    const map = { all: all, awaiting_payment: pending, paid: received, shipped: shipped };
-    const list = map[orderFilter] || all;
-    body = list.length
-      ? list.map(orderCardHTML).join("")
-      : `<div class="empty-state">No orders in this view.</div>`;
-  }
+      ${cards}`
+    : cards;
 
   ordersList.innerHTML = summary + body;
+  lastRenderedOrderIds = list.map(o => o.id);
+  syncBulkUI();
+
+  ordersList.querySelectorAll(".order-select-check").forEach(cb => {
+    cb.addEventListener("change", () => toggleOrderSelection(cb.dataset.id, cb.checked));
+  });
 
   ordersList.querySelectorAll("[data-action]").forEach(el => {
     const evt = el.tagName === "INPUT" ? "change" : "click";

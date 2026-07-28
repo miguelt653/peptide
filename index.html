@@ -541,6 +541,21 @@
         <button class="admin-tab" data-filter="shipped">Shipped</button>
         <button class="admin-tab" data-filter="commission">VAL Commission</button>
       </div>
+      <div class="admin-toolbar">
+        <input type="search" id="orderSearchInput" class="admin-search-input" placeholder="Search name, email, or order ID…" />
+        <label class="select-all-check">
+          <input type="checkbox" id="selectAllOrders" />
+          <span>Select all</span>
+        </label>
+      </div>
+      <div class="bulk-bar" id="bulkBar" style="display:none">
+        <span class="bulk-bar__count" id="bulkCount">0 selected</span>
+        <div class="bulk-bar__actions">
+          <button type="button" class="btn-mini btn-mini--primary" id="bulkMarkPaid">Mark Paid</button>
+          <button type="button" class="btn-mini btn-mini--danger" id="bulkDelete">Delete Selected</button>
+          <button type="button" class="bulk-bar__clear" id="bulkClear">Clear</button>
+        </div>
+      </div>
       <div class="admin-tab-content">
         <div id="ordersList"></div>
       </div>
