@@ -1271,12 +1271,21 @@ async function renderOrders() {
           const { error: e4 } = await sb.from("orders").update({ commission_paid: el.checked }).eq("id", id);
           if (e4) throw e4;
         } else if (action === "shipped") {
+          const ord = all.find(o => o.id === id) || {};
           const trackEl = document.getElementById("track-" + id);
           const tracking = trackEl ? trackEl.value.trim() : "";
+          const who = `${ord.first_name || ""} ${ord.last_name || ""}`.trim();
+          const addr = `${ord.address || ""}, ${ord.city || ""}, ${ord.state || ""} ${ord.zip || ""}`;
+          const ok = confirm(
+            `Ship order ${id}?\n\n` +
+            `To: ${who}\n${addr}\n${ord.email || ""}\n\n` +
+            `Tracking: ${tracking || "(none entered)"}\n\n` +
+            `This marks ONLY this order shipped and emails this customer.`
+          );
+          if (!ok) { el.disabled = false; return; }
           const { error: e3 } = await sb.from("orders").update({ status: "shipped", tracking: tracking || null }).eq("id", id);
           if (e3) throw e3;
-          const ord = all.find(o => o.id === id);
-          if (ord) sendShippedEmail({ ...ord, tracking });
+          sendShippedEmail({ ...ord, tracking });
         }
         renderOrders();
       } catch (e) {
