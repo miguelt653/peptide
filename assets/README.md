@@ -7,8 +7,6 @@
 | Filename | Photo | Where it shows |
 |---|---|---|
 | `hero-bg.jpg` | Molecule render (dark, 3D structure) | Behind hero headline |
-| `pen.jpg` | Peptide pen close-up | "How It Works" — top image |
-| `usage.jpg` | Peptide pen in use | "How It Works" — second image |
 | `science-bg.jpg` | Light/transparent molecule render | "Why Us" section background |
 
 ## Certificate of Analysis (COA) images
