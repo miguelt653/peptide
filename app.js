@@ -75,11 +75,12 @@ function orderToRow(order) {
   };
 }
 async function saveOrderToCloud(order) {
-  if (!sb) return;
+  if (!sb) return false;
   try {
     const { error } = await sb.from("orders").insert(orderToRow(order));
-    if (error) console.warn("Supabase order insert failed:", error.message);
-  } catch (e) { console.warn("Supabase order insert error:", e); }
+    if (error) { console.warn("Supabase order insert failed:", error.message); return false; }
+    return true;
+  } catch (e) { console.warn("Supabase order insert error:", e); return false; }
 }
 
 const DEFAULT_PRODUCTS = [
@@ -337,6 +338,10 @@ const checkoutForm  = document.getElementById("checkoutForm");
 const orderSummary  = document.getElementById("orderSummary");
 const orderSuccess  = document.getElementById("orderSuccess");
 const successClose  = document.getElementById("successClose");
+const orderIssue       = document.getElementById("orderIssue");
+const orderIssueId     = document.getElementById("orderIssueId");
+const orderIssueRetry  = document.getElementById("orderIssueRetry");
+const orderIssueClose  = document.getElementById("orderIssueClose");
 const faqList       = document.getElementById("faqList");
 const contactForm   = document.getElementById("contactForm");
 const formSuccess   = document.getElementById("formSuccess");
@@ -785,7 +790,32 @@ async function notifyOwner(order) {
 }
 
 /* ---- Checkout Submit ---- */
-checkoutForm.addEventListener("submit", e => {
+let pendingOrder = null;
+
+// Attempts the cloud save. On success: notifies the owner and shows the
+// success screen. On failure: shows the error panel with a Retry option
+// instead of silently pretending the order went through.
+async function attemptSaveOrder(order) {
+  const saved = await saveOrderToCloud(order);
+  if (saved) {
+    notifyOwner(order);
+    orderIssue.style.display = "none";
+    checkoutForm.style.display = "none";
+    orderSuccess.style.display = "flex";
+    pendingOrder = null;
+    cart = [];
+    updateCartUI();
+    renderProducts();
+  } else {
+    orderSuccess.style.display = "none";
+    checkoutForm.style.display = "none";
+    orderIssueId.textContent = order.id;
+    orderIssue.style.display = "flex";
+  }
+  return saved;
+}
+
+checkoutForm.addEventListener("submit", async e => {
   e.preventDefault();
   const formData = new FormData(checkoutForm);
   if (shippingMethod === "local" && !isLocalDeliveryEligible(formData.get("city"))) {
@@ -824,29 +854,39 @@ checkoutForm.addEventListener("submit", e => {
     if (p) p.stock = Math.max(0, p.stock - item.qty);
   });
   saveProducts();
-  // Save order
+  // Save order locally as a backup regardless of cloud outcome
   const orders = loadOrders();
   orders.unshift(order);
   saveOrders(orders);
 
-  // Save to central cloud database (best-effort, non-blocking)
-  saveOrderToCloud(order);
-
-  // Fire SMS / Email notification to owner (best-effort, non-blocking)
-  notifyOwner(order);
-
-  checkoutForm.style.display = "none";
-  orderSuccess.style.display = "flex";
-  cart = [];
-  updateCartUI();
-  renderProducts();
+  pendingOrder = order;
+  const submitBtn = checkoutForm.querySelector('button[type="submit"]');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Submitting…"; }
+  await attemptSaveOrder(order);
+  if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = "I've Sent the Payment →"; }
 });
+
 successClose.addEventListener("click", () => {
   closeCheckout();
   checkoutForm.style.display = "flex";
   orderSuccess.style.display = "none";
   checkoutForm.reset();
   updateReferralFeedback();
+});
+
+orderIssueRetry.addEventListener("click", async () => {
+  if (!pendingOrder) return;
+  orderIssueRetry.disabled = true;
+  orderIssueRetry.textContent = "Retrying…";
+  await attemptSaveOrder(pendingOrder);
+  orderIssueRetry.disabled = false;
+  orderIssueRetry.textContent = "Try Again";
+});
+
+orderIssueClose.addEventListener("click", () => {
+  closeCheckout();
+  orderIssue.style.display = "none";
+  checkoutForm.style.display = "flex";
 });
 
 /* ---- FAQ ---- */

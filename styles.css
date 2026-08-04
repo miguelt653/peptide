@@ -822,6 +822,16 @@ img { display: block; max-width: 100%; }
 .order-success h3 { font-size: 1.4rem; font-weight: 800; color: var(--navy); }
 .order-success p { color: var(--text-muted); max-width: 300px; font-size: 0.9rem; line-height: 1.6; }
 
+.order-issue {
+  padding: 48px 24px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.order-issue svg { color: var(--amber); }
+.order-issue h3 { font-size: 1.4rem; font-weight: 800; color: var(--navy); }
+.order-issue p { color: var(--text-muted); max-width: 360px; font-size: 0.9rem; line-height: 1.6; }
+.order-issue p strong { color: var(--text); }
+.order-issue__actions { display: flex; gap: 10px; margin-top: 4px; }
+
 /* ---- Cash App box ---- */
 .cashapp-box {
   background: #f0fdf4; border: 1px solid #bbf7d0;

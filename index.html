@@ -517,6 +517,15 @@
       <p>We'll confirm your Cash App payment and ship within 1–2 business days. Check your email for details.</p>
       <button class="btn btn--primary" id="successClose">Close</button>
     </div>
+    <div class="order-issue" id="orderIssue" style="display:none">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <h3>We Couldn't Save Your Order</h3>
+      <p>Your order didn't go through to our system — please don't send your Cash App payment yet. Try again, or email us directly at <strong>frankied1974@gmail.com</strong> with your order details (reference <strong id="orderIssueId"></strong>) and we'll take care of it manually.</p>
+      <div class="order-issue__actions">
+        <button class="btn btn--primary" id="orderIssueRetry">Try Again</button>
+        <button class="btn btn--outline" id="orderIssueClose">Close</button>
+      </div>
+    </div>
   </div>
 
   <!-- ADMIN PANEL -->
@@ -576,8 +585,8 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="assets/vendor/supabase.js"></script>
+  <script src="assets/vendor/emailjs.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
