@@ -404,6 +404,34 @@ img { display: block; max-width: 100%; }
 .why-card__title { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
 .why-card__desc { font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
 
+/* ---- Storage & Supplies ---- */
+.storage { padding: 64px 0; background: #fff; border-top: 1px solid var(--border); }
+.storage__grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px; margin-top: 40px; max-width: 900px; margin-left: auto; margin-right: auto;
+}
+.storage-card {
+  background: var(--gray-50); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px 26px;
+}
+.storage-card__title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1rem; font-weight: 800; color: var(--navy);
+  margin-bottom: 16px;
+}
+.storage-card__title svg { color: var(--blue); flex-shrink: 0; }
+.storage-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.storage-list li {
+  font-size: 0.875rem; color: var(--gray-600); line-height: 1.6;
+  padding-left: 20px; position: relative;
+}
+.storage-list li::before {
+  content: ''; position: absolute; left: 0; top: 7px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--blue-light);
+}
+.storage-list strong { color: var(--text); font-weight: 700; }
+.storage__note { text-align: center; margin-top: 28px; font-size: 0.78rem; color: var(--text-muted); }
+
 /* ---- Process / How it works ---- */
 .how { padding: 72px 0; background: #fff; }
 .how__container {
