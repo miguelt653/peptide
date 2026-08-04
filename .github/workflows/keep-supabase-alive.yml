@@ -1,0 +1,32 @@
+name: Keep Supabase Alive
+
+# Supabase's free tier auto-pauses a project after ~7 days with no API
+# activity, which silently breaks order saving/admin login until someone
+# manually restores it. This pings the database every few days — well
+# under that threshold — so real traffic is never the thing standing
+# between "working" and "paused."
+on:
+  schedule:
+    - cron: "0 12 * * 1,4" # Mondays and Thursdays, 12:00 UTC
+  workflow_dispatch: {} # allows a manual run from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ping Supabase to prevent free-tier auto-pause
+        run: |
+          SUPABASE_URL=$(grep -oP 'const SUPABASE_URL\s*=\s*"\K[^"]+' app.js)
+          SUPABASE_ANON_KEY=$(grep -oP 'const SUPABASE_ANON_KEY\s*=\s*"\K[^"]+' app.js)
+
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::Could not read Supabase credentials from app.js — check they haven't moved or been renamed."
+            exit 1
+          fi
+
+          curl -sS -f -o /dev/null -w "Supabase ping: HTTP %{http_code}\n" \
+            "$SUPABASE_URL/rest/v1/orders?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY"
