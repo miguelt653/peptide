@@ -236,6 +236,26 @@ img { display: block; max-width: 100%; }
 }
 .product-card--soldout { opacity: 0.6; }
 
+/* "Other Peptides Available" inquiry card */
+.product-card--inquiry {
+  border: 1.5px dashed var(--gray-200);
+  background: var(--gray-50);
+  align-items: center; justify-content: center;
+  text-align: center;
+}
+.product-card--inquiry:hover { border-color: var(--blue); box-shadow: none; transform: none; }
+.product-card__inquiry-body {
+  padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.product-card__inquiry-icon {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--blue-pale); color: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 4px;
+}
+.product-card__inquiry-body .product-card__desc { flex: none; }
+.product-card__inquiry-cta { margin-top: 6px; }
+
 /* Card image/header band */
 .product-card__img {
   background: linear-gradient(135deg, #0f1c2e 0%, #162036 100%);

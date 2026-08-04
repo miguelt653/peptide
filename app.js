@@ -415,6 +415,23 @@ function renderProducts() {
     productGrid.appendChild(card);
   });
 
+  if (activeCategory === "all") {
+    const inquiryCard = document.createElement("div");
+    inquiryCard.className = "product-card product-card--inquiry";
+    inquiryCard.style.animationDelay = `${filtered.length * 0.05}s`;
+    inquiryCard.innerHTML = `
+      <div class="product-card__inquiry-body">
+        <div class="product-card__inquiry-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="product-card__name">Other Peptides Available</div>
+        <p class="product-card__desc">Looking for something not listed here? Reach out and we'll do our best to source it upon request.</p>
+        <a href="#contact" class="btn btn--outline btn--sm product-card__inquiry-cta">Contact Us</a>
+      </div>
+    `;
+    productGrid.appendChild(inquiryCard);
+  }
+
   document.querySelectorAll(".variant-opt").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedVariant[parseInt(btn.dataset.id)] = btn.dataset.variant;
