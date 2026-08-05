@@ -992,6 +992,24 @@ img { display: block; max-width: 100%; }
 }
 .product-sales-revenue { font-weight: 800; font-size: 0.92rem; color: var(--navy); min-width: 70px; text-align: right; }
 
+/* Customers tab */
+.customer-list { display: flex; flex-direction: column; gap: 10px; }
+.customer-card {
+  background: var(--gray-50); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px;
+}
+.customer-card__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.customer-card__name { font-weight: 800; font-size: 0.92rem; color: var(--navy); }
+.customer-card__email { font-size: 0.78rem; color: var(--text-muted); margin-top: 1px; }
+.customer-card__stats { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+.customer-card__count {
+  font-size: 0.72rem; font-weight: 700; color: var(--blue);
+  background: var(--blue-pale); padding: 3px 10px; border-radius: 100px; white-space: nowrap;
+}
+.customer-card__spent { font-weight: 800; font-size: 0.95rem; color: var(--navy); }
+.customer-card__items { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.customer-card__last { font-size: 0.72rem; color: var(--text-muted); margin-top: 10px; }
+
 /* Discount line in checkout order summary */
 .order-line--discount { color: var(--green); font-weight: 600; }
 

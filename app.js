@@ -1402,6 +1402,40 @@ function computeProductSales(orders) {
   return Object.values(tally).sort((a, b) => b.qty - a.qty);
 }
 
+// Groups confirmed orders by customer email so repeat buyers are visible —
+// order count, lifetime spend, and every product they've bought (with qty).
+// Sorted by order count first (who buys most often), then by spend.
+function computeCustomerHistory(orders) {
+  const tally = {};
+  orders.forEach(o => {
+    const email = (o.email || "").trim().toLowerCase();
+    if (!email) return;
+    if (!tally[email]) {
+      tally[email] = {
+        email: o.email,
+        name: `${o.first_name || ""} ${o.last_name || ""}`.trim() || "(no name)",
+        orderCount: 0,
+        totalSpent: 0,
+        items: {},
+        lastOrderAt: o.created_at,
+      };
+    }
+    const c = tally[email];
+    c.orderCount += 1;
+    c.totalSpent += Number(o.total) || 0;
+    if (!c.lastOrderAt || new Date(o.created_at) > new Date(c.lastOrderAt)) {
+      c.lastOrderAt = o.created_at;
+      c.name = `${o.first_name || ""} ${o.last_name || ""}`.trim() || c.name;
+      c.email = o.email || c.email;
+    }
+    (Array.isArray(o.items) ? o.items : []).forEach(i => {
+      const key = `${i.name}${i.variant === "pen" ? " (+Pen)" : ""}`;
+      c.items[key] = (c.items[key] || 0) + i.qty;
+    });
+  });
+  return Object.values(tally).sort((a, b) => b.orderCount - a.orderCount || b.totalSpent - a.totalSpent);
+}
+
 /* Pure re-render from ordersCache — no network call. Used for tab switches,
    search-as-you-type, and selection changes so those stay instant. */
 function renderOrdersList() {
@@ -1434,12 +1468,40 @@ function renderOrdersList() {
   const commissionOrders = searched.filter(o => o.referral_valid && Number(o.commission) > 0);
 
   const list = orderFilter === "commission" ? commissionOrders
-    : orderFilter === "products" ? []
+    : (orderFilter === "products" || orderFilter === "customers") ? []
     : ({ all: searched, awaiting_payment: pending, paid: received, shipped: shipped }[orderFilter] || searched);
   const emptyMsg = orderSearch ? `No orders match "${orderSearch}".` : "No orders in this view.";
 
   let body;
-  if (orderFilter === "products") {
+  if (orderFilter === "customers") {
+    // Confirmed orders only — same reasoning as Product Sales, an unpaid
+    // order isn't a real purchase to attribute to a customer yet.
+    const confirmedSearched = searched.filter(o => o.status === "paid" || o.status === "shipped");
+    const customers = computeCustomerHistory(confirmedSearched);
+    body = customers.length ? `
+      <div class="product-sales-summary">${customers.length} customer${customers.length === 1 ? "" : "s"}${orderSearch ? ` matching "${orderSearch}"` : ""}</div>
+      <div class="customer-list">
+        ${customers.map(c => `
+          <div class="customer-card">
+            <div class="customer-card__header">
+              <div>
+                <div class="customer-card__name">${c.name}</div>
+                <div class="customer-card__email">${c.email}</div>
+              </div>
+              <div class="customer-card__stats">
+                <span class="customer-card__count">${c.orderCount} order${c.orderCount === 1 ? "" : "s"}</span>
+                <span class="customer-card__spent">$${c.totalSpent.toFixed(2)}</span>
+              </div>
+            </div>
+            <div class="customer-card__items">
+              ${Object.entries(c.items).map(([name, qty]) => `<span class="spec-tag">${name} × ${qty}</span>`).join("")}
+            </div>
+            <div class="customer-card__last">Last order: ${c.lastOrderAt ? new Date(c.lastOrderAt).toLocaleDateString() : "—"}</div>
+          </div>
+        `).join("")}
+      </div>`
+      : `<div class="empty-state">No confirmed customers${orderSearch ? ` match "${orderSearch}"` : " yet"}.</div>`;
+  } else if (orderFilter === "products") {
     // Confirmed sales only (paid or shipped) — awaiting-payment orders aren't real sales yet.
     const confirmed = all.filter(o => o.status === "paid" || o.status === "shipped");
     const sales = computeProductSales(confirmed);
