@@ -29,7 +29,16 @@
 /* ---- Config ---- */
 const CASHAPP_HANDLE    = "$BellaVitaLabs"; // change to actual cashtag
 const ADMIN_PASSWORD    = "changeme123"; // change me in production
-const VALID_REFERRAL_CODES = ["VAL"];    // accepted referral codes (case-insensitive)
+// Accepted referral/discount codes (case-insensitive). discountRate applies to
+// the customer's subtotal; commissionRate (if any) is paid to the referrer on
+// the pre-discount subtotal + shipping. Codes with commissionRate 0 are
+// plain discount codes with no referrer payout.
+const REFERRAL_CODES = {
+  VAL:   { discountRate: 0.10, commissionRate: 0.30 },
+  VINCE: { discountRate: 0.10, commissionRate: 0.30 },
+  NEW:   { discountRate: 0.10, commissionRate: 0 },
+  LOYAL: { discountRate: 0.10, commissionRate: 0 },
+};
 const OWNER_WEBHOOK_URL = "";            // e.g. "https://hooks.zapier.com/hooks/catch/123456/abcdef/"
 const USE_EMAILJS       = true;
 const EMAILJS_CONFIG    = {
@@ -598,7 +607,6 @@ modalClose.addEventListener("click", closeCheckout);
 modalOverlay.addEventListener("click", closeCheckout);
 
 const SHIPPING_RATES = { standard: 25, local: 15 };
-const VAL_DISCOUNT_RATE = 0.10; // 10% off product subtotal when a valid referral code is used
 function shippingLabel(method) {
   return method === "local" ? "Local Delivery (Tampa · St. Pete · Clearwater)" : "Standard Shipping";
 }
@@ -623,13 +631,15 @@ function activeReferralValid() {
 function getOrderTotal() {
   const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const ship = SHIPPING_RATES[shippingMethod] ?? SHIPPING_RATES.standard;
-  const discount = activeReferralValid() ? +(sub * VAL_DISCOUNT_RATE).toFixed(2) : 0;
+  const referralCode = referralInput ? normalizeReferral(referralInput.value) : "";
+  const referralConfig = getReferralConfig(referralCode);
+  const discount = referralConfig ? +(sub * referralConfig.discountRate).toFixed(2) : 0;
   const total = sub - discount + ship;
-  return { sub, ship, discount, total };
+  return { sub, ship, discount, total, referralCode, referralConfig };
 }
 
 function buildOrderSummary() {
-  const { sub, ship, discount, total } = getOrderTotal();
+  const { sub, ship, discount, total, referralCode, referralConfig } = getOrderTotal();
   orderSummary.innerHTML = `
     <h4>Order Summary</h4>
     ${cart.map(i => `
@@ -640,7 +650,7 @@ function buildOrderSummary() {
     `).join("")}
     ${discount > 0 ? `
     <div class="order-line"><span>Subtotal</span><span>$${sub.toFixed(2)}</span></div>
-    <div class="order-line order-line--discount"><span>VAL discount (10%)</span><span>−$${discount.toFixed(2)}</span></div>` : ""}
+    <div class="order-line order-line--discount"><span>${referralCode} discount (${Math.round(referralConfig.discountRate * 100)}%)</span><span>−$${discount.toFixed(2)}</span></div>` : ""}
     <div class="order-line">
       <span>${shippingMethod === "local" ? "Local Delivery" : "Shipping"}</span>
       <span>$${ship.toFixed(2)}</span>
@@ -668,8 +678,11 @@ document.getElementById("copyVenmo").addEventListener("click", () => {
 function normalizeReferral(code) {
   return (code || "").trim().toUpperCase();
 }
+function getReferralConfig(code) {
+  return REFERRAL_CODES[normalizeReferral(code)] || null;
+}
 function isValidReferral(code) {
-  return VALID_REFERRAL_CODES.includes(normalizeReferral(code));
+  return !!getReferralConfig(code);
 }
 
 const referralInput    = document.getElementById("referralInput");
@@ -678,11 +691,12 @@ const referralFeedback = document.getElementById("referralFeedback");
 function updateReferralFeedback() {
   if (!referralInput || !referralFeedback) return;
   const code = normalizeReferral(referralInput.value);
+  const config = getReferralConfig(code);
   if (!code) {
     referralFeedback.textContent = "";
     referralFeedback.className = "referral-feedback";
-  } else if (isValidReferral(code)) {
-    referralFeedback.textContent = `✓ Code ${code} applied — 10% off`;
+  } else if (config) {
+    referralFeedback.textContent = `✓ Code ${code} applied — ${Math.round(config.discountRate * 100)}% off`;
     referralFeedback.className = "referral-feedback referral-feedback--ok";
   } else {
     referralFeedback.textContent = "Code not recognized";
@@ -729,13 +743,13 @@ function buildOrderMessage(order) {
     `${order.customer.email} · ${order.customer.phone || "no phone"}`,
     `${order.customer.address}, ${order.customer.city}, ${order.customer.state} ${order.customer.zip}`,
     `Items: ${itemsLine}`,
-    ...(order.discount ? [`Discount: VAL 10% — −$${order.discount.toFixed(2)}`] : []),
+    ...(order.discount ? [`Discount: ${order.referral} ${Math.round((getReferralConfig(order.referral)?.discountRate || 0) * 100)}% — −$${order.discount.toFixed(2)}`] : []),
     `Shipping: ${shippingLabel(order.shippingMethod)} — $${(order.shipping ?? 0).toFixed(2)}`,
     `Total: $${order.total.toFixed(2)} via Cash App (${CASHAPP_HANDLE})`,
     order.referral ? `Referral: ${order.referral}${order.referralValid ? " ✓ VALID" : " (unrecognized)"}` : "Referral: none",
   ];
   if (order.referralValid && order.commission) {
-    lines.push(`⭐ ${order.referral} COMMISSION OWED: $${order.commission.toFixed(2)} (30% of $${order.total.toFixed(2)})`);
+    lines.push(`⭐ ${order.referral} COMMISSION OWED: $${order.commission.toFixed(2)} (${Math.round((getReferralConfig(order.referral)?.commissionRate || 0) * 100)}%)`);
   }
   return lines.join("\n");
 }
@@ -779,7 +793,7 @@ async function notifyOwner(order) {
             ? `${order.referral}${order.referralValid ? " (valid)" : " (unrecognized)"}`
             : "none",
           commission: order.referralValid && order.commission
-            ? `$${order.commission.toFixed(2)} owed to ${order.referral} (30%)`
+            ? `$${order.commission.toFixed(2)} owed to ${order.referral} (${Math.round((getReferralConfig(order.referral)?.commissionRate || 0) * 100)}%)`
             : "none",
         }
       );
@@ -823,7 +837,7 @@ checkoutForm.addEventListener("submit", async e => {
     if (localShipWarning) localShipWarning.scrollIntoView({ behavior: "smooth", block: "center" });
     return;
   }
-  const { sub, ship, discount, total } = getOrderTotal();
+  const { sub, ship, discount, total, referralConfig } = getOrderTotal();
   const order = {
     id: "BV-" + Date.now().toString(36).toUpperCase(),
     date: new Date().toISOString(),
@@ -846,8 +860,8 @@ checkoutForm.addEventListener("submit", async e => {
     referral: normalizeReferral(formData.get("referral")) || null,
     referralValid: isValidReferral(formData.get("referral")),
   };
-  // VAL referral commission: 30% of the pre-discount order total (subtotal + shipping)
-  order.commission = order.referralValid ? +((sub + ship) * 0.30).toFixed(2) : 0;
+  // Referral commission (if the code has one): rate applies to the pre-discount subtotal + shipping
+  order.commission = referralConfig ? +((sub + ship) * referralConfig.commissionRate).toFixed(2) : 0;
   // Decrement stock
   cart.forEach(item => {
     const p = PRODUCTS.find(x => x.id === item.id);
@@ -1304,7 +1318,7 @@ function orderCardHTML(o, selected) {
           ? `<div class="order-card__referral">Referral: <strong>${o.referral}</strong> ${o.referral_valid ? '<span class="ref-badge ref-badge--ok">valid</span>' : '<span class="ref-badge ref-badge--bad">unrecognized</span>'}</div>`
           : ""}
         ${o.referral_valid && o.commission
-          ? `<div class="order-card__commission">⭐ ${o.referral} commission (30%): <strong>$${Number(o.commission).toFixed(2)}</strong></div>`
+          ? `<div class="order-card__commission">⭐ ${o.referral} commission: <strong>$${Number(o.commission).toFixed(2)}</strong></div>`
           : ""}
         ${shipped && o.tracking
           ? `<div class="order-card__tracking">📦 Tracking: ${/^https?:\/\//i.test(o.tracking) ? `<a href="${o.tracking}" target="_blank" rel="noopener">${o.tracking}</a>` : o.tracking}</div>`
@@ -1367,8 +1381,8 @@ function renderOrdersList() {
   const pendingAll  = all.filter(o => o.status === "awaiting_payment");
   const receivedAll = all.filter(o => o.status === "paid");
   const shippedAll  = all.filter(o => o.status === "shipped");
-  const valAll      = all.filter(o => o.referral_valid);
-  const custPaidAll = valAll.filter(o => o.status === "paid" || o.status === "shipped");
+  const commissionOrdersAll = all.filter(o => o.referral_valid && Number(o.commission) > 0);
+  const custPaidAll = commissionOrdersAll.filter(o => o.status === "paid" || o.status === "shipped");
   const commissionOwedAll = custPaidAll.filter(o => !o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
 
   const summary = `
@@ -1377,7 +1391,7 @@ function renderOrdersList() {
       <div class="orders-stat"><span class="orders-stat__num">${pendingAll.length}</span><span class="orders-stat__label">Pending Payment</span></div>
       <div class="orders-stat"><span class="orders-stat__num">${receivedAll.length}</span><span class="orders-stat__label">To Ship</span></div>
       <div class="orders-stat"><span class="orders-stat__num">${shippedAll.length}</span><span class="orders-stat__label">Shipped</span></div>
-      <div class="orders-stat orders-stat--commission"><span class="orders-stat__num">$${commissionOwedAll.toFixed(2)}</span><span class="orders-stat__label">VAL Owed</span></div>
+      <div class="orders-stat orders-stat--commission"><span class="orders-stat__num">$${commissionOwedAll.toFixed(2)}</span><span class="orders-stat__label">Referral Owed</span></div>
     </div>`;
 
   // Tab + search filter for the visible card list
@@ -1385,19 +1399,21 @@ function renderOrdersList() {
   const pending  = searched.filter(o => o.status === "awaiting_payment");
   const received = searched.filter(o => o.status === "paid");
   const shipped  = searched.filter(o => o.status === "shipped");
-  const valOrders = searched.filter(o => o.referral_valid);
-  const custPaid  = valOrders.filter(o => o.status === "paid" || o.status === "shipped");
-  const commissionAll     = valOrders.reduce((s, o) => s + (Number(o.commission) || 0), 0);
+  // Commission tab only shows codes that actually pay a referrer (commission > 0) —
+  // plain discount-only codes (0% commission) don't belong here.
+  const commissionOrders = searched.filter(o => o.referral_valid && Number(o.commission) > 0);
+  const custPaid  = commissionOrders.filter(o => o.status === "paid" || o.status === "shipped");
+  const commissionAll     = commissionOrders.reduce((s, o) => s + (Number(o.commission) || 0), 0);
   const commissionPaidOut = custPaid.filter(o => o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
   const commissionOwed    = custPaid.filter(o => !o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
-  const commissionPending = valOrders.filter(o => o.status === "awaiting_payment").reduce((s, o) => s + (Number(o.commission) || 0), 0);
+  const commissionPending = commissionOrders.filter(o => o.status === "awaiting_payment").reduce((s, o) => s + (Number(o.commission) || 0), 0);
 
   const list = orderFilter === "commission"
-    ? valOrders
+    ? commissionOrders
     : ({ all: searched, awaiting_payment: pending, paid: received, shipped: shipped }[orderFilter] || searched);
   const emptyMsg = orderSearch
     ? `No orders match "${orderSearch}".`
-    : (orderFilter === "commission" ? "No orders have used the VAL code yet." : "No orders in this view.");
+    : (orderFilter === "commission" ? "No commission-earning referral codes have been used yet." : "No orders in this view.");
   const cards = list.length
     ? list.map(o => orderCardHTML(o, selectedOrderIds.has(o.id))).join("")
     : `<div class="empty-state">${emptyMsg}</div>`;
@@ -1406,9 +1422,9 @@ function renderOrdersList() {
     ? `
       <div class="commission-panel">
         <div class="commission-panel__row commission-panel__row--owed"><span>Owed now — payment received, not yet paid out</span><strong>$${commissionOwed.toFixed(2)}</strong></div>
-        <div class="commission-panel__row"><span>Already paid out to VAL</span><strong>$${commissionPaidOut.toFixed(2)}</strong></div>
+        <div class="commission-panel__row"><span>Already paid out</span><strong>$${commissionPaidOut.toFixed(2)}</strong></div>
         <div class="commission-panel__row"><span>Pending — awaiting customer payment</span><strong>$${commissionPending.toFixed(2)}</strong></div>
-        <div class="commission-panel__row"><span>Total commission — all VAL orders</span><strong>$${commissionAll.toFixed(2)}</strong></div>
+        <div class="commission-panel__row"><span>Total commission — all referral orders</span><strong>$${commissionAll.toFixed(2)}</strong></div>
       </div>
       ${cards}`
     : cards;
