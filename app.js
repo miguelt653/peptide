@@ -1503,11 +1503,13 @@ function renderOrdersList() {
       : `<div class="empty-state">No confirmed customers${orderSearch ? ` match "${orderSearch}"` : " yet"}.</div>`;
   } else if (orderFilter === "products") {
     // Confirmed sales only (paid or shipped) — awaiting-payment orders aren't real sales yet.
-    const confirmed = all.filter(o => o.status === "paid" || o.status === "shipped");
+    // Respects the search box: searching a name/email shows just what that person bought.
+    const confirmed = searched.filter(o => o.status === "paid" || o.status === "shipped");
     const sales = computeProductSales(confirmed);
     const totalUnits = sales.reduce((s, x) => s + x.qty, 0);
+    const searchNote = orderSearch ? ` matching "${orderSearch}"` : "";
     body = sales.length ? `
-      <div class="product-sales-summary">${totalUnits} unit${totalUnits === 1 ? "" : "s"} sold across ${confirmed.length} confirmed order${confirmed.length === 1 ? "" : "s"}</div>
+      <div class="product-sales-summary">${totalUnits} unit${totalUnits === 1 ? "" : "s"} sold across ${confirmed.length} confirmed order${confirmed.length === 1 ? "" : "s"}${searchNote}</div>
       <div class="product-sales-list">
         ${sales.map((s, i) => `
           <div class="product-sales-row">
@@ -1519,7 +1521,7 @@ function renderOrdersList() {
           </div>
         `).join("")}
       </div>`
-      : `<div class="empty-state">No confirmed sales yet.</div>`;
+      : `<div class="empty-state">No confirmed sales${orderSearch ? ` matching "${orderSearch}"` : " yet"}.</div>`;
   } else if (orderFilter === "commission") {
     // A separate tracker per commission-earning referral code (VAL, VINCE, ...) —
     // each is paid out independently, so their totals and order lists never mix.
