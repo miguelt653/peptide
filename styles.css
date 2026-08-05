@@ -968,6 +968,30 @@ img { display: block; max-width: 100%; }
 .commission-panel__row strong { font-size: 1rem; color: var(--navy); }
 .commission-panel__row--owed strong { color: var(--maroon); font-size: 1.15rem; }
 
+/* Product Sales tab */
+.product-sales-summary {
+  font-size: 0.82rem; color: var(--text-muted); font-weight: 600;
+  margin-bottom: 14px;
+}
+.product-sales-list { display: flex; flex-direction: column; gap: 8px; }
+.product-sales-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--gray-50); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.product-sales-rank {
+  font-family: monospace; font-weight: 800; font-size: 0.8rem; color: var(--text-muted);
+  width: 24px; flex-shrink: 0;
+}
+.product-sales-icon { font-size: 1.2rem; flex-shrink: 0; }
+.product-sales-name { flex: 1; font-weight: 700; font-size: 0.88rem; color: var(--navy); }
+.product-sales-variant { font-weight: 500; font-size: 0.75rem; color: var(--text-muted); }
+.product-sales-qty {
+  font-size: 0.78rem; font-weight: 700; color: var(--blue);
+  background: var(--blue-pale); padding: 3px 10px; border-radius: 100px; white-space: nowrap;
+}
+.product-sales-revenue { font-weight: 800; font-size: 0.92rem; color: var(--navy); min-width: 70px; text-align: right; }
+
 /* Discount line in checkout order summary */
 .order-line--discount { color: var(--green); font-weight: 600; }
 

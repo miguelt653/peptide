@@ -1272,9 +1272,19 @@ if (bulkMarkPaidBtn) {
 
 if (bulkDeleteBtn) {
   bulkDeleteBtn.addEventListener("click", async () => {
-    const ids = Array.from(selectedOrderIds);
-    if (!ids.length || !sb) return;
-    if (!confirm(`Delete ${ids.length} selected order${ids.length > 1 ? "s" : ""}? This cannot be undone.`)) return;
+    const selected = Array.from(selectedOrderIds);
+    // Shipped orders are the permanent sales record — never deletable, even in bulk.
+    const ids = selected.filter(id => {
+      const o = ordersCache.find(x => x.id === id);
+      return o && o.status !== "shipped";
+    });
+    if (!ids.length || !sb) {
+      if (selected.length) alert("Shipped orders can't be deleted — they're kept as your permanent sales record.");
+      return;
+    }
+    const skipped = selected.length - ids.length;
+    const skipNote = skipped ? ` (${skipped} shipped order${skipped > 1 ? "s" : ""} will be skipped)` : "";
+    if (!confirm(`Delete ${ids.length} selected order${ids.length > 1 ? "s" : ""}?${skipNote} This cannot be undone.`)) return;
     bulkDeleteBtn.disabled = true;
     try {
       const { error } = await sb.from("orders").delete().in("id", ids);
@@ -1340,7 +1350,7 @@ function orderCardHTML(o, selected) {
           <input type="checkbox" data-action="togglecommission" data-id="${o.id}" ${o.commission_paid ? 'checked' : ''} />
           <span>Paid ${o.referral} $${Number(o.commission).toFixed(2)}</span>
         </label>` : ""}
-        <button class="btn-mini btn-mini--danger" data-action="delete" data-id="${o.id}">Delete</button>
+        ${shipped ? "" : `<button class="btn-mini btn-mini--danger" data-action="delete" data-id="${o.id}">Delete</button>`}
       </div>
     </div>`;
 }
@@ -1370,6 +1380,26 @@ function orderMatchesSearch(o, q) {
   if (!q) return true;
   const haystack = [o.id, o.first_name, o.last_name, o.email, o.phone].filter(Boolean).join(" ").toLowerCase();
   return haystack.includes(q.toLowerCase());
+}
+
+// Tallies units/revenue per product+variant across confirmed (paid or shipped)
+// orders only — awaiting-payment orders may never actually clear, so they'd
+// skew "what's actually selling" if counted.
+function computeProductSales(orders) {
+  const tally = {};
+  orders.forEach(o => {
+    const items = Array.isArray(o.items) ? o.items : [];
+    items.forEach(i => {
+      const key = `${i.id}|${i.variant}`;
+      if (!tally[key]) {
+        const product = PRODUCTS.find(p => p.id === i.id);
+        tally[key] = { name: i.name, variant: i.variant, icon: product ? product.icon : "📦", qty: 0, revenue: 0 };
+      }
+      tally[key].qty += i.qty;
+      tally[key].revenue += i.price * i.qty;
+    });
+  });
+  return Object.values(tally).sort((a, b) => b.qty - a.qty);
 }
 
 /* Pure re-render from ordersCache — no network call. Used for tab switches,
@@ -1403,13 +1433,32 @@ function renderOrdersList() {
   // plain discount-only codes (0% commission) don't belong here.
   const commissionOrders = searched.filter(o => o.referral_valid && Number(o.commission) > 0);
 
-  const list = orderFilter === "commission"
-    ? commissionOrders
+  const list = orderFilter === "commission" ? commissionOrders
+    : orderFilter === "products" ? []
     : ({ all: searched, awaiting_payment: pending, paid: received, shipped: shipped }[orderFilter] || searched);
   const emptyMsg = orderSearch ? `No orders match "${orderSearch}".` : "No orders in this view.";
 
   let body;
-  if (orderFilter === "commission") {
+  if (orderFilter === "products") {
+    // Confirmed sales only (paid or shipped) — awaiting-payment orders aren't real sales yet.
+    const confirmed = all.filter(o => o.status === "paid" || o.status === "shipped");
+    const sales = computeProductSales(confirmed);
+    const totalUnits = sales.reduce((s, x) => s + x.qty, 0);
+    body = sales.length ? `
+      <div class="product-sales-summary">${totalUnits} unit${totalUnits === 1 ? "" : "s"} sold across ${confirmed.length} confirmed order${confirmed.length === 1 ? "" : "s"}</div>
+      <div class="product-sales-list">
+        ${sales.map((s, i) => `
+          <div class="product-sales-row">
+            <span class="product-sales-rank">#${i + 1}</span>
+            <span class="product-sales-icon">${s.icon}</span>
+            <span class="product-sales-name">${s.name}${s.variant === "pen" ? ' <span class="product-sales-variant">+ Pen</span>' : ""}</span>
+            <span class="product-sales-qty">${s.qty} sold</span>
+            <span class="product-sales-revenue">$${s.revenue.toFixed(2)}</span>
+          </div>
+        `).join("")}
+      </div>`
+      : `<div class="empty-state">No confirmed sales yet.</div>`;
+  } else if (orderFilter === "commission") {
     // A separate tracker per commission-earning referral code (VAL, VINCE, ...) —
     // each is paid out independently, so their totals and order lists never mix.
     const referrerCodes = Object.keys(REFERRAL_CODES).filter(code => REFERRAL_CODES[code].commissionRate > 0);
