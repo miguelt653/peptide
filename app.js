@@ -1402,32 +1402,44 @@ function renderOrdersList() {
   // Commission tab only shows codes that actually pay a referrer (commission > 0) —
   // plain discount-only codes (0% commission) don't belong here.
   const commissionOrders = searched.filter(o => o.referral_valid && Number(o.commission) > 0);
-  const custPaid  = commissionOrders.filter(o => o.status === "paid" || o.status === "shipped");
-  const commissionAll     = commissionOrders.reduce((s, o) => s + (Number(o.commission) || 0), 0);
-  const commissionPaidOut = custPaid.filter(o => o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
-  const commissionOwed    = custPaid.filter(o => !o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
-  const commissionPending = commissionOrders.filter(o => o.status === "awaiting_payment").reduce((s, o) => s + (Number(o.commission) || 0), 0);
 
   const list = orderFilter === "commission"
     ? commissionOrders
     : ({ all: searched, awaiting_payment: pending, paid: received, shipped: shipped }[orderFilter] || searched);
-  const emptyMsg = orderSearch
-    ? `No orders match "${orderSearch}".`
-    : (orderFilter === "commission" ? "No commission-earning referral codes have been used yet." : "No orders in this view.");
-  const cards = list.length
-    ? list.map(o => orderCardHTML(o, selectedOrderIds.has(o.id))).join("")
-    : `<div class="empty-state">${emptyMsg}</div>`;
+  const emptyMsg = orderSearch ? `No orders match "${orderSearch}".` : "No orders in this view.";
 
-  const body = orderFilter === "commission"
-    ? `
-      <div class="commission-panel">
-        <div class="commission-panel__row commission-panel__row--owed"><span>Owed now — payment received, not yet paid out</span><strong>$${commissionOwed.toFixed(2)}</strong></div>
-        <div class="commission-panel__row"><span>Already paid out</span><strong>$${commissionPaidOut.toFixed(2)}</strong></div>
-        <div class="commission-panel__row"><span>Pending — awaiting customer payment</span><strong>$${commissionPending.toFixed(2)}</strong></div>
-        <div class="commission-panel__row"><span>Total commission — all referral orders</span><strong>$${commissionAll.toFixed(2)}</strong></div>
-      </div>
-      ${cards}`
-    : cards;
+  let body;
+  if (orderFilter === "commission") {
+    // A separate tracker per commission-earning referral code (VAL, VINCE, ...) —
+    // each is paid out independently, so their totals and order lists never mix.
+    const referrerCodes = Object.keys(REFERRAL_CODES).filter(code => REFERRAL_CODES[code].commissionRate > 0);
+    body = referrerCodes.map(code => {
+      const codeOrders  = commissionOrders.filter(o => o.referral === code);
+      const codePaid    = codeOrders.filter(o => o.status === "paid" || o.status === "shipped");
+      const codeTotal   = codeOrders.reduce((s, o) => s + (Number(o.commission) || 0), 0);
+      const codePaidOut = codePaid.filter(o => o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
+      const codeOwed    = codePaid.filter(o => !o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
+      const codePending = codeOrders.filter(o => o.status === "awaiting_payment").reduce((s, o) => s + (Number(o.commission) || 0), 0);
+      const codeCards = codeOrders.length
+        ? codeOrders.map(o => orderCardHTML(o, selectedOrderIds.has(o.id))).join("")
+        : `<div class="empty-state">No ${code} orders${orderSearch ? ` match "${orderSearch}"` : " yet"}.</div>`;
+      return `
+        <div class="commission-group">
+          <div class="commission-group__title">${code}</div>
+          <div class="commission-panel">
+            <div class="commission-panel__row commission-panel__row--owed"><span>Owed now — payment received, not yet paid out</span><strong>$${codeOwed.toFixed(2)}</strong></div>
+            <div class="commission-panel__row"><span>Already paid out</span><strong>$${codePaidOut.toFixed(2)}</strong></div>
+            <div class="commission-panel__row"><span>Pending — awaiting customer payment</span><strong>$${codePending.toFixed(2)}</strong></div>
+            <div class="commission-panel__row"><span>Total commission</span><strong>$${codeTotal.toFixed(2)}</strong></div>
+          </div>
+          ${codeCards}
+        </div>`;
+    }).join("");
+  } else {
+    body = list.length
+      ? list.map(o => orderCardHTML(o, selectedOrderIds.has(o.id))).join("")
+      : `<div class="empty-state">${emptyMsg}</div>`;
+  }
 
   ordersList.innerHTML = summary + body;
   lastRenderedOrderIds = list.map(o => o.id);

@@ -946,6 +946,15 @@ img { display: block; max-width: 100%; }
 .pay-check--done { background: var(--green-pale); border-color: #bbf7d0; color: var(--green); }
 .shipped-tag { font-size: 0.8rem; font-weight: 700; color: var(--green); align-self: center; }
 
+/* Per-referrer commission group */
+.commission-group { margin-bottom: 28px; }
+.commission-group:last-child { margin-bottom: 0; }
+.commission-group__title {
+  font-size: 0.8rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--maroon); margin-bottom: 10px;
+  padding-bottom: 6px; border-bottom: 2px solid var(--maroon-pale);
+}
+
 /* Commission panel */
 .commission-panel {
   background: var(--maroon-pale); border: 1px solid #f3d0d6; border-radius: var(--radius-lg);
