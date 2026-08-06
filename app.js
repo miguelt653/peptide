@@ -1533,8 +1533,14 @@ function renderOrdersList() {
       const codePaidOut = codePaid.filter(o => o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
       const codeOwed    = codePaid.filter(o => !o.commission_paid).reduce((s, o) => s + (Number(o.commission) || 0), 0);
       const codePending = codeOrders.filter(o => o.status === "awaiting_payment").reduce((s, o) => s + (Number(o.commission) || 0), 0);
+      // Orders are collapsed behind a toggle so a referrer with dozens of
+      // orders doesn't force scrolling past all of them to reach the next
+      // referrer's tracker — the summary panel above is always visible.
       const codeCards = codeOrders.length
-        ? codeOrders.map(o => orderCardHTML(o, selectedOrderIds.has(o.id))).join("")
+        ? `<details class="commission-orders">
+            <summary>${codeOrders.length} order${codeOrders.length === 1 ? "" : "s"} <span class="commission-orders__hint">click to view</span></summary>
+            <div class="commission-orders__list">${codeOrders.map(o => orderCardHTML(o, selectedOrderIds.has(o.id))).join("")}</div>
+          </details>`
         : `<div class="empty-state">No ${code} orders${orderSearch ? ` match "${orderSearch}"` : " yet"}.</div>`;
       return `
         <div class="commission-group">

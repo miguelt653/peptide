@@ -955,6 +955,24 @@ img { display: block; max-width: 100%; }
   padding-bottom: 6px; border-bottom: 2px solid var(--maroon-pale);
 }
 
+/* Collapsible order list within each commission group */
+.commission-orders { margin-top: 2px; }
+.commission-orders summary {
+  cursor: pointer; list-style: none;
+  display: flex; align-items: center; gap: 7px;
+  font-size: 0.82rem; font-weight: 700; color: var(--blue);
+  padding: 8px 4px; user-select: none; border-radius: 6px;
+}
+.commission-orders summary:hover { background: var(--blue-pale); }
+.commission-orders summary::-webkit-details-marker { display: none; }
+.commission-orders summary::before {
+  content: '▸'; display: inline-block; font-size: 0.7rem; color: var(--text-muted);
+  transition: transform 0.15s;
+}
+.commission-orders[open] summary::before { transform: rotate(90deg); }
+.commission-orders__hint { font-weight: 500; color: var(--text-muted); font-size: 0.75rem; }
+.commission-orders__list { margin-top: 8px; }
+
 /* Commission panel */
 .commission-panel {
   background: var(--maroon-pale); border: 1px solid #f3d0d6; border-radius: var(--radius-lg);
