@@ -1459,11 +1459,16 @@ function computePnL(orders, period, monthOffset) {
   const revenue = confirmed.reduce((s, o) => s + (Number(o.total) || 0), 0);
   const withCost = confirmed.filter(o => o.cost_amount != null);
   const cogs = withCost.reduce((s, o) => s + Number(o.cost_amount), 0);
+  // Referral commission is a real cost of the sale, same as COGS — counted
+  // the moment the order is confirmed (accrual-style), not when it's
+  // actually paid out to the referrer.
+  const commission = confirmed.reduce((s, o) => s + (o.referral_valid && Number(o.commission) > 0 ? Number(o.commission) : 0), 0);
   const grossProfit = revenue - cogs;
+  const netProfit = grossProfit - commission;
   return {
     orderCount: confirmed.length,
-    revenue, cogs, grossProfit,
-    margin: revenue > 0 ? (grossProfit / revenue) * 100 : 0,
+    revenue, cogs, commission, grossProfit, netProfit,
+    netMargin: revenue > 0 ? (netProfit / revenue) * 100 : 0,
     avgOrderValue: confirmed.length ? revenue / confirmed.length : 0,
     missingCost: confirmed.length - withCost.length,
   };
@@ -1530,23 +1535,28 @@ function exportPnlCsv(period, monthOffset) {
     ["Period", label],
     ["Revenue", `$${pnl.revenue.toFixed(2)}`],
     ["COGS", `$${pnl.cogs.toFixed(2)}`],
+    ["Commission", `$${pnl.commission.toFixed(2)}`],
     ["Gross Profit", `$${pnl.grossProfit.toFixed(2)}`],
-    ["Gross Margin", `${pnl.margin.toFixed(1)}%`],
+    ["Net Profit", `$${pnl.netProfit.toFixed(2)}`],
+    ["Net Margin", `${pnl.netMargin.toFixed(1)}%`],
     ["Orders", pnl.orderCount],
     ["Avg Order Value", `$${pnl.avgOrderValue.toFixed(2)}`],
     [],
-    ["Order ID", "Date Confirmed", "Customer", "Email", "Revenue", "COGS", "Profit"],
+    ["Order ID", "Date Confirmed", "Customer", "Email", "Referral", "Revenue", "COGS", "Commission", "Net Profit"],
     ...confirmed.map(o => {
       const cost = o.cost_amount != null ? Number(o.cost_amount) : null;
       const revenue = Number(o.total) || 0;
+      const commission = o.referral_valid && Number(o.commission) > 0 ? Number(o.commission) : 0;
       return [
         o.id,
         new Date(o.payment_confirmed_at).toLocaleDateString(),
         `${o.first_name || ""} ${o.last_name || ""}`.trim(),
         o.email || "",
+        commission > 0 ? o.referral : "",
         `$${revenue.toFixed(2)}`,
         cost != null ? `$${cost.toFixed(2)}` : "unknown",
-        cost != null ? `$${(revenue - cost).toFixed(2)}` : "unknown",
+        `$${commission.toFixed(2)}`,
+        cost != null ? `$${(revenue - cost - commission).toFixed(2)}` : "unknown",
       ];
     }),
   ];
@@ -1775,8 +1785,10 @@ function renderOrdersList() {
       <div class="pnl-stats">
         <div class="pnl-stat"><span class="pnl-stat__label">Revenue</span><span class="pnl-stat__value">$${pnl.revenue.toFixed(2)}</span></div>
         <div class="pnl-stat"><span class="pnl-stat__label">COGS</span><span class="pnl-stat__value">$${pnl.cogs.toFixed(2)}</span></div>
-        <div class="pnl-stat pnl-stat--profit"><span class="pnl-stat__label">Gross Profit</span><span class="pnl-stat__value">$${pnl.grossProfit.toFixed(2)}</span></div>
-        <div class="pnl-stat"><span class="pnl-stat__label">Gross Margin</span><span class="pnl-stat__value">${pnl.margin.toFixed(1)}%</span></div>
+        <div class="pnl-stat"><span class="pnl-stat__label">Commission</span><span class="pnl-stat__value">$${pnl.commission.toFixed(2)}</span></div>
+        <div class="pnl-stat"><span class="pnl-stat__label">Gross Profit</span><span class="pnl-stat__value">$${pnl.grossProfit.toFixed(2)}</span></div>
+        <div class="pnl-stat pnl-stat--profit"><span class="pnl-stat__label">Net Profit</span><span class="pnl-stat__value">$${pnl.netProfit.toFixed(2)}</span></div>
+        <div class="pnl-stat"><span class="pnl-stat__label">Net Margin</span><span class="pnl-stat__value">${pnl.netMargin.toFixed(1)}%</span></div>
         <div class="pnl-stat"><span class="pnl-stat__label">Orders</span><span class="pnl-stat__value">${pnl.orderCount}</span></div>
         <div class="pnl-stat"><span class="pnl-stat__label">Avg Order Value</span><span class="pnl-stat__value">$${pnl.avgOrderValue.toFixed(2)}</span></div>
       </div>
