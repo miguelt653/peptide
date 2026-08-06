@@ -1125,6 +1125,7 @@ let orderSearch = "";
 let selectedOrderIds = new Set();
 let lastRenderedOrderIds = [];
 let plPeriod = "month"; // "today" | "week" | "month" | "all" — P&L tab's date range
+let plMonthOffset = 0; // 0 = current calendar month, -1 = last month, etc. — only used when plPeriod === "month"
 
 function showAdminDashboard() {
   adminUnlocked = true;
@@ -1421,7 +1422,7 @@ function computeOrderCost(order) {
   return total;
 }
 
-function isInPnlPeriod(dateStr, period) {
+function isInPnlPeriod(dateStr, period, monthOffset) {
   if (!dateStr) return false;
   const d = new Date(dateStr);
   const now = new Date();
@@ -1432,15 +1433,27 @@ function isInPnlPeriod(dateStr, period) {
     start.setHours(0, 0, 0, 0);
     return d >= start;
   }
-  if (period === "month") return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  if (period === "month") {
+    const target = new Date(now.getFullYear(), now.getMonth() + (monthOffset || 0), 1);
+    return d.getFullYear() === target.getFullYear() && d.getMonth() === target.getMonth();
+  }
   return true; // all-time
+}
+
+function pnlMonthLabel(monthOffset) {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth() + (monthOffset || 0), 1)
+    .toLocaleDateString(undefined, { month: "long", year: "numeric" });
 }
 
 // P&L is built from payment_confirmed_at, not order status — a reversed
 // (refunded/corrected) payment shouldn't count as revenue even if the order
-// is still sitting in "paid" for fulfillment purposes.
-function computePnL(orders, period) {
-  const confirmed = orders.filter(o => o.payment_confirmed_at && !o.payment_reversed_at && isInPnlPeriod(o.payment_confirmed_at, period));
+// is still sitting in "paid" for fulfillment purposes. Cost is read straight
+// from each order's own cost_amount snapshot, so numbers for a past month
+// never drift even if product costs or prices change later — this is what
+// makes the export trustworthy as a tax record.
+function computePnL(orders, period, monthOffset) {
+  const confirmed = orders.filter(o => o.payment_confirmed_at && !o.payment_reversed_at && isInPnlPeriod(o.payment_confirmed_at, period, monthOffset));
   const revenue = confirmed.reduce((s, o) => s + (Number(o.total) || 0), 0);
   const withCost = confirmed.filter(o => o.cost_amount != null);
   const cogs = withCost.reduce((s, o) => s + Number(o.cost_amount), 0);
@@ -1496,6 +1509,55 @@ async function backfillHistoricalPayments() {
     alert("Backfill failed: " + (e.message || "check your connection."));
     if (btn) { btn.disabled = false; btn.textContent = "Backfill Historical Orders"; }
   }
+}
+
+// Downloads a CSV of the currently selected P&L period — a summary block
+// plus one row per confirmed order — as a saveable/printable tax record.
+// Built with a plain Blob + temporary link; no library needed.
+function exportPnlCsv(period, monthOffset) {
+  const periodLabels = { today: "Today", week: "This Week", all: "All-Time" };
+  const label = period === "month" ? pnlMonthLabel(monthOffset) : periodLabels[period];
+  const confirmed = ordersCache
+    .filter(o => o.payment_confirmed_at && !o.payment_reversed_at && isInPnlPeriod(o.payment_confirmed_at, period, monthOffset))
+    .sort((a, b) => new Date(a.payment_confirmed_at) - new Date(b.payment_confirmed_at));
+  const pnl = computePnL(ordersCache, period, monthOffset);
+
+  const esc = v => `"${String(v).replace(/"/g, '""')}"`;
+  const rows = [
+    ["Bella Vita Labs — P&L Report"],
+    ["Period", label],
+    ["Revenue", `$${pnl.revenue.toFixed(2)}`],
+    ["COGS", `$${pnl.cogs.toFixed(2)}`],
+    ["Gross Profit", `$${pnl.grossProfit.toFixed(2)}`],
+    ["Gross Margin", `${pnl.margin.toFixed(1)}%`],
+    ["Orders", pnl.orderCount],
+    ["Avg Order Value", `$${pnl.avgOrderValue.toFixed(2)}`],
+    [],
+    ["Order ID", "Date Confirmed", "Customer", "Email", "Revenue", "COGS", "Profit"],
+    ...confirmed.map(o => {
+      const cost = o.cost_amount != null ? Number(o.cost_amount) : null;
+      const revenue = Number(o.total) || 0;
+      return [
+        o.id,
+        new Date(o.payment_confirmed_at).toLocaleDateString(),
+        `${o.first_name || ""} ${o.last_name || ""}`.trim(),
+        o.email || "",
+        `$${revenue.toFixed(2)}`,
+        cost != null ? `$${cost.toFixed(2)}` : "unknown",
+        cost != null ? `$${(revenue - cost).toFixed(2)}` : "unknown",
+      ];
+    }),
+  ];
+  const csv = rows.map(r => r.map(esc).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `bella-vita-pnl-${label.replace(/\s+/g, "-")}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // Tallies units/revenue per product+variant across confirmed (paid or shipped)
@@ -1672,7 +1734,7 @@ function renderOrdersList() {
     const needsBackfill = all.filter(o => (o.status === "paid" || o.status === "shipped") && !o.payment_confirmed_at);
     const shippedUnconfirmed = all.filter(o => o.status === "shipped" && !o.payment_confirmed_at);
     const awaitingFulfillmentCount = all.filter(o => o.status === "paid").length;
-    const pnl = computePnL(all, plPeriod);
+    const pnl = computePnL(all, plPeriod, plMonthOffset);
     const trend = computePnlTrend(all);
     const maxDaily = Math.max(1, ...trend.map(d => Math.max(d.revenue, d.cogs)));
     const periodLabel = { today: "Today", week: "This Week", month: "This Month", all: "All-Time" };
@@ -1695,9 +1757,18 @@ function renderOrdersList() {
         </div>
       </div>
 
-      <div class="pnl-period-toggle">
-        ${Object.keys(periodLabel).map(p => `<button type="button" class="pnl-period-btn ${plPeriod === p ? "pnl-period-btn--active" : ""}" data-period="${p}">${periodLabel[p]}</button>`).join("")}
+      <div class="pnl-toolbar">
+        <div class="pnl-period-toggle">
+          ${Object.keys(periodLabel).map(p => `<button type="button" class="pnl-period-btn ${plPeriod === p ? "pnl-period-btn--active" : ""}" data-period="${p}">${periodLabel[p]}</button>`).join("")}
+        </div>
+        <button type="button" class="btn-mini btn-mini--primary" id="pnlExportBtn">⬇ Export CSV</button>
       </div>
+      ${plPeriod === "month" ? `
+      <div class="pnl-month-nav">
+        <button type="button" class="btn-mini" id="pnlMonthPrev">‹ Prev</button>
+        <span class="pnl-month-label">${pnlMonthLabel(plMonthOffset)}</span>
+        <button type="button" class="btn-mini" id="pnlMonthNext" ${plMonthOffset >= 0 ? "disabled" : ""}>Next ›</button>
+      </div>` : ""}
 
       <div class="pnl-stats">
         <div class="pnl-stat"><span class="pnl-stat__label">Revenue</span><span class="pnl-stat__value">$${pnl.revenue.toFixed(2)}</span></div>
@@ -1779,11 +1850,18 @@ function renderOrdersList() {
   ordersList.querySelectorAll(".pnl-period-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       plPeriod = btn.dataset.period;
+      plMonthOffset = 0;
       renderOrdersList();
     });
   });
   const pnlBackfillBtn = document.getElementById("pnlBackfillBtn");
   if (pnlBackfillBtn) pnlBackfillBtn.addEventListener("click", backfillHistoricalPayments);
+  const pnlMonthPrev = document.getElementById("pnlMonthPrev");
+  if (pnlMonthPrev) pnlMonthPrev.addEventListener("click", () => { plMonthOffset -= 1; renderOrdersList(); });
+  const pnlMonthNext = document.getElementById("pnlMonthNext");
+  if (pnlMonthNext) pnlMonthNext.addEventListener("click", () => { if (plMonthOffset < 0) { plMonthOffset += 1; renderOrdersList(); } });
+  const pnlExportBtn = document.getElementById("pnlExportBtn");
+  if (pnlExportBtn) pnlExportBtn.addEventListener("click", () => exportPnlCsv(plPeriod, plMonthOffset));
 
   ordersList.querySelectorAll("[data-action]").forEach(el => {
     const evt = el.tagName === "INPUT" ? "change" : "click";
