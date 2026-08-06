@@ -1048,6 +1048,65 @@ img { display: block; max-width: 100%; }
 }
 .pricing-input:focus { outline: none; border-color: var(--blue); }
 
+/* P&L tab */
+.pnl-backfill-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  background: var(--amber-pale); border: 1px solid #fde68a; border-radius: var(--radius);
+  padding: 10px 14px; margin-bottom: 14px; font-size: 0.82rem; font-weight: 600; color: var(--amber);
+}
+.pnl-recon { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+.pnl-recon__item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--gray-50); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 9px 14px; font-size: 0.82rem; font-weight: 600; color: var(--gray-700);
+}
+.pnl-recon__item strong { color: var(--navy); font-size: 0.9rem; }
+.pnl-recon__item--warn { background: var(--red-pale); border-color: #fecaca; color: var(--red); }
+.pnl-recon__item--warn strong { color: var(--red); }
+
+.pnl-period-toggle { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.pnl-period-btn {
+  background: #fff; border: 1.5px solid var(--border); color: var(--gray-600);
+  padding: 6px 14px; border-radius: 100px; font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: all var(--transition);
+}
+.pnl-period-btn--active { background: var(--blue); border-color: var(--blue); color: #fff; }
+.pnl-period-btn:not(.pnl-period-btn--active):hover { border-color: var(--blue-light); color: var(--blue); }
+
+.pnl-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 6px; }
+.pnl-stat {
+  background: var(--gray-50); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;
+}
+.pnl-stat__label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+.pnl-stat__value { font-size: 1.15rem; font-weight: 800; color: var(--navy); }
+.pnl-stat--profit { background: var(--green-pale); border-color: #bbf7d0; }
+.pnl-stat--profit .pnl-stat__value { color: var(--green); }
+
+.pnl-missing-cost {
+  font-size: 0.78rem; font-weight: 600; color: var(--amber); background: var(--amber-pale);
+  border: 1px solid #fde68a; border-radius: var(--radius); padding: 9px 12px; margin: 10px 0;
+}
+
+.pnl-chart-label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin: 18px 0 10px; }
+.pnl-chart {
+  display: flex; align-items: flex-end; gap: 4px; height: 120px;
+  border-bottom: 1px solid var(--border); padding-bottom: 4px;
+}
+.pnl-chart__bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.pnl-chart__bars { display: flex; align-items: flex-end; gap: 2px; height: 100%; width: 100%; justify-content: center; }
+.pnl-chart__bar { width: 6px; min-height: 2px; border-radius: 2px 2px 0 0; }
+.pnl-chart__bar--revenue { background: var(--blue); }
+.pnl-chart__bar--cogs { background: var(--amber); }
+.pnl-chart__day { font-size: 0.62rem; color: var(--text-muted); }
+.pnl-chart-legend { display: flex; gap: 16px; margin-top: 8px; font-size: 0.75rem; color: var(--gray-600); font-weight: 600; }
+.pnl-legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+.pnl-legend-dot--revenue { background: var(--blue); }
+.pnl-legend-dot--cogs { background: var(--amber); }
+@media (max-width: 480px) {
+  .pnl-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* Discount line in checkout order summary */
 .order-line--discount { color: var(--green); font-weight: 600; }
 

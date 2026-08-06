@@ -1124,6 +1124,7 @@ let ordersCache = [];
 let orderSearch = "";
 let selectedOrderIds = new Set();
 let lastRenderedOrderIds = [];
+let plPeriod = "month"; // "today" | "week" | "month" | "all" — P&L tab's date range
 
 function showAdminDashboard() {
   adminUnlocked = true;
@@ -1405,6 +1406,98 @@ function orderMatchesSearch(o, q) {
   return haystack.includes(q.toLowerCase());
 }
 
+// Sums COGS for an order from each line item's current product cost. Returns
+// null (not 0) if any item's cost isn't set yet, so we never silently show a
+// fake 100% margin — the P&L view flags those orders instead of guessing.
+function computeOrderCost(order) {
+  const items = Array.isArray(order.items) ? order.items : [];
+  let total = 0;
+  for (const i of items) {
+    const p = PRODUCTS.find(x => x.id === i.id);
+    const unitCost = p ? (i.variant === "pen" ? p.penCost : p.cost) : null;
+    if (unitCost == null || Number.isNaN(Number(unitCost))) return null;
+    total += Number(unitCost) * i.qty;
+  }
+  return total;
+}
+
+function isInPnlPeriod(dateStr, period) {
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  const now = new Date();
+  if (period === "today") return d.toDateString() === now.toDateString();
+  if (period === "week") {
+    const start = new Date(now);
+    start.setDate(now.getDate() - now.getDay());
+    start.setHours(0, 0, 0, 0);
+    return d >= start;
+  }
+  if (period === "month") return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  return true; // all-time
+}
+
+// P&L is built from payment_confirmed_at, not order status — a reversed
+// (refunded/corrected) payment shouldn't count as revenue even if the order
+// is still sitting in "paid" for fulfillment purposes.
+function computePnL(orders, period) {
+  const confirmed = orders.filter(o => o.payment_confirmed_at && !o.payment_reversed_at && isInPnlPeriod(o.payment_confirmed_at, period));
+  const revenue = confirmed.reduce((s, o) => s + (Number(o.total) || 0), 0);
+  const withCost = confirmed.filter(o => o.cost_amount != null);
+  const cogs = withCost.reduce((s, o) => s + Number(o.cost_amount), 0);
+  const grossProfit = revenue - cogs;
+  return {
+    orderCount: confirmed.length,
+    revenue, cogs, grossProfit,
+    margin: revenue > 0 ? (grossProfit / revenue) * 100 : 0,
+    avgOrderValue: confirmed.length ? revenue / confirmed.length : 0,
+    missingCost: confirmed.length - withCost.length,
+  };
+}
+
+// Daily revenue/COGS for the last 14 days, independent of the period toggle
+// above, so there's always a usable trend line even when "Today" is selected.
+function computePnlTrend(orders) {
+  const days = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    days.push({ key: d.toDateString(), day: d.getDate(), revenue: 0, cogs: 0 });
+  }
+  const byKey = Object.fromEntries(days.map(d => [d.key, d]));
+  orders.forEach(o => {
+    if (!o.payment_confirmed_at || o.payment_reversed_at) return;
+    const bucket = byKey[new Date(o.payment_confirmed_at).toDateString()];
+    if (!bucket) return;
+    bucket.revenue += Number(o.total) || 0;
+    bucket.cogs += Number(o.cost_amount) || 0;
+  });
+  return days;
+}
+
+// One-time migration helper: existing orders that were paid/shipped before
+// the P&L feature existed have no payment_confirmed_at or cost_amount yet.
+// Backfills both using created_at as an approximate confirm date.
+async function backfillHistoricalPayments() {
+  const targets = ordersCache.filter(o => (o.status === "paid" || o.status === "shipped") && !o.payment_confirmed_at);
+  if (!targets.length || !sb) return;
+  if (!confirm(`Backfill payment records for ${targets.length} historical order${targets.length === 1 ? "" : "s"}? This uses each order's original date as an approximate confirm time and only needs to run once.`)) return;
+  const btn = document.getElementById("pnlBackfillBtn");
+  if (btn) { btn.disabled = true; btn.textContent = "Backfilling…"; }
+  try {
+    for (const o of targets) {
+      const { error } = await sb.from("orders").update({
+        payment_confirmed_at: o.created_at,
+        cost_amount: computeOrderCost(o),
+      }).eq("id", o.id);
+      if (error) throw error;
+    }
+    renderOrders();
+  } catch (e) {
+    alert("Backfill failed: " + (e.message || "check your connection."));
+    if (btn) { btn.disabled = false; btn.textContent = "Backfill Historical Orders"; }
+  }
+}
+
 // Tallies units/revenue per product+variant across confirmed (paid or shipped)
 // orders only — awaiting-payment orders may never actually clear, so they'd
 // skew "what's actually selling" if counted.
@@ -1491,7 +1584,7 @@ function renderOrdersList() {
   const commissionOrders = searched.filter(o => o.referral_valid && Number(o.commission) > 0);
 
   const list = orderFilter === "commission" ? commissionOrders
-    : (orderFilter === "products" || orderFilter === "customers" || orderFilter === "pricing") ? []
+    : (orderFilter === "products" || orderFilter === "customers" || orderFilter === "pricing" || orderFilter === "pnl") ? []
     : ({ all: searched, awaiting_payment: pending, paid: received, shipped: shipped }[orderFilter] || searched);
   const emptyMsg = orderSearch ? `No orders match "${orderSearch}".` : "No orders in this view.";
 
@@ -1575,6 +1668,64 @@ function renderOrdersList() {
           </div>
         `).join("")}
       </div>`;
+  } else if (orderFilter === "pnl") {
+    const needsBackfill = all.filter(o => (o.status === "paid" || o.status === "shipped") && !o.payment_confirmed_at);
+    const shippedUnconfirmed = all.filter(o => o.status === "shipped" && !o.payment_confirmed_at);
+    const awaitingFulfillmentCount = all.filter(o => o.status === "paid").length;
+    const pnl = computePnL(all, plPeriod);
+    const trend = computePnlTrend(all);
+    const maxDaily = Math.max(1, ...trend.map(d => Math.max(d.revenue, d.cogs)));
+    const periodLabel = { today: "Today", week: "This Week", month: "This Month", all: "All-Time" };
+
+    body = `
+      ${needsBackfill.length ? `
+      <div class="pnl-backfill-banner">
+        <span>${needsBackfill.length} historical order${needsBackfill.length === 1 ? "" : "s"} ${needsBackfill.length === 1 ? "isn't" : "aren't"} counted in P&L yet.</span>
+        <button type="button" class="btn-mini btn-mini--primary" id="pnlBackfillBtn">Backfill Historical Orders</button>
+      </div>` : ""}
+
+      <div class="pnl-recon">
+        <div class="pnl-recon__item ${shippedUnconfirmed.length ? "pnl-recon__item--warn" : ""}">
+          <span>${shippedUnconfirmed.length ? "⚠️" : "✓"} Shipped without a confirmed-payment record</span>
+          <strong>${shippedUnconfirmed.length}</strong>
+        </div>
+        <div class="pnl-recon__item">
+          <span>📦 Confirmed paid, awaiting shipment</span>
+          <strong>${awaitingFulfillmentCount}</strong>
+        </div>
+      </div>
+
+      <div class="pnl-period-toggle">
+        ${Object.keys(periodLabel).map(p => `<button type="button" class="pnl-period-btn ${plPeriod === p ? "pnl-period-btn--active" : ""}" data-period="${p}">${periodLabel[p]}</button>`).join("")}
+      </div>
+
+      <div class="pnl-stats">
+        <div class="pnl-stat"><span class="pnl-stat__label">Revenue</span><span class="pnl-stat__value">$${pnl.revenue.toFixed(2)}</span></div>
+        <div class="pnl-stat"><span class="pnl-stat__label">COGS</span><span class="pnl-stat__value">$${pnl.cogs.toFixed(2)}</span></div>
+        <div class="pnl-stat pnl-stat--profit"><span class="pnl-stat__label">Gross Profit</span><span class="pnl-stat__value">$${pnl.grossProfit.toFixed(2)}</span></div>
+        <div class="pnl-stat"><span class="pnl-stat__label">Gross Margin</span><span class="pnl-stat__value">${pnl.margin.toFixed(1)}%</span></div>
+        <div class="pnl-stat"><span class="pnl-stat__label">Orders</span><span class="pnl-stat__value">${pnl.orderCount}</span></div>
+        <div class="pnl-stat"><span class="pnl-stat__label">Avg Order Value</span><span class="pnl-stat__value">$${pnl.avgOrderValue.toFixed(2)}</span></div>
+      </div>
+      ${pnl.missingCost ? `<div class="pnl-missing-cost">⚠️ ${pnl.missingCost} order${pnl.missingCost === 1 ? "" : "s"} in this period ${pnl.missingCost === 1 ? "is" : "are"} missing cost data on ${pnl.missingCost === 1 ? "its" : "their"} products — COGS and profit above are understated until it's filled in on the Pricing tab.</div>` : ""}
+
+      <div class="pnl-chart-label">Last 14 days — revenue vs. COGS</div>
+      <div class="pnl-chart">
+        ${trend.map(d => `
+          <div class="pnl-chart__bar-wrap" title="$${d.revenue.toFixed(2)} revenue, $${d.cogs.toFixed(2)} COGS">
+            <div class="pnl-chart__bars">
+              <div class="pnl-chart__bar pnl-chart__bar--revenue" style="height:${Math.round((d.revenue / maxDaily) * 100)}%"></div>
+              <div class="pnl-chart__bar pnl-chart__bar--cogs" style="height:${Math.round((d.cogs / maxDaily) * 100)}%"></div>
+            </div>
+            <span class="pnl-chart__day">${d.day}</span>
+          </div>
+        `).join("")}
+      </div>
+      <div class="pnl-chart-legend">
+        <span><i class="pnl-legend-dot pnl-legend-dot--revenue"></i> Revenue</span>
+        <span><i class="pnl-legend-dot pnl-legend-dot--cogs"></i> COGS</span>
+      </div>
+    `;
   } else if (orderFilter === "commission") {
     // A separate tracker per commission-earning referral code (VAL, VINCE, ...) —
     // each is paid out independently, so their totals and order lists never mix.
@@ -1625,6 +1776,15 @@ function renderOrdersList() {
     btn.addEventListener("click", () => savePricing(btn.dataset.id));
   });
 
+  ordersList.querySelectorAll(".pnl-period-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      plPeriod = btn.dataset.period;
+      renderOrdersList();
+    });
+  });
+  const pnlBackfillBtn = document.getElementById("pnlBackfillBtn");
+  if (pnlBackfillBtn) pnlBackfillBtn.addEventListener("click", backfillHistoricalPayments);
+
   ordersList.querySelectorAll("[data-action]").forEach(el => {
     const evt = el.tagName === "INPUT" ? "change" : "click";
     el.addEventListener(evt, async () => {
@@ -1638,7 +1798,18 @@ function renderOrdersList() {
           if (e1) throw e1;
         } else if (action === "togglepaid") {
           const newStatus = el.checked ? "paid" : "awaiting_payment";
-          const { error: e2 } = await sb.from("orders").update({ status: newStatus }).eq("id", id);
+          const payload = { status: newStatus };
+          if (el.checked) {
+            // Snapshot cost at confirm time so a later cost edit never
+            // rewrites this order's historical margin.
+            const ord = all.find(o => o.id === id) || {};
+            payload.payment_confirmed_at = new Date().toISOString();
+            payload.payment_reversed_at = null;
+            payload.cost_amount = computeOrderCost(ord);
+          } else {
+            payload.payment_reversed_at = new Date().toISOString();
+          }
+          const { error: e2 } = await sb.from("orders").update(payload).eq("id", id);
           if (e2) throw e2;
         } else if (action === "togglecommission") {
           const { error: e4 } = await sb.from("orders").update({ commission_paid: el.checked }).eq("id", id);
