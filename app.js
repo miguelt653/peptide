@@ -281,6 +281,29 @@ function saveProducts() {
 }
 const PRODUCTS = loadProducts();
 
+// Price/cost live in Supabase's `products` table so an admin can update them
+// from the dashboard without a code change. On load, overlay the live values
+// onto the hardcoded product details; if Supabase is unreachable, the
+// hardcoded defaults above stay in effect so the storefront never breaks.
+async function loadLivePricing() {
+  if (!sb) return;
+  try {
+    const { data, error } = await sb.from("products").select("id, price, pen_price, cost, pen_cost");
+    if (error || !data) return;
+    data.forEach(row => {
+      const p = PRODUCTS.find(x => x.id === row.id);
+      if (!p) return;
+      p.price = Number(row.price);
+      if (row.pen_price != null) p.penPrice = Number(row.pen_price);
+      p.cost = row.cost != null ? Number(row.cost) : null;
+      p.penCost = row.pen_cost != null ? Number(row.pen_cost) : null;
+    });
+    renderProducts();
+  } catch (e) {
+    console.warn("Live pricing fetch failed, using defaults:", e);
+  }
+}
+
 const FAQS = [
   {
     q: "What does 'research purposes only' mean?",
@@ -1468,7 +1491,7 @@ function renderOrdersList() {
   const commissionOrders = searched.filter(o => o.referral_valid && Number(o.commission) > 0);
 
   const list = orderFilter === "commission" ? commissionOrders
-    : (orderFilter === "products" || orderFilter === "customers") ? []
+    : (orderFilter === "products" || orderFilter === "customers" || orderFilter === "pricing") ? []
     : ({ all: searched, awaiting_payment: pending, paid: received, shipped: shipped }[orderFilter] || searched);
   const emptyMsg = orderSearch ? `No orders match "${orderSearch}".` : "No orders in this view.";
 
@@ -1522,6 +1545,36 @@ function renderOrdersList() {
         `).join("")}
       </div>`
       : `<div class="empty-state">No confirmed sales${orderSearch ? ` matching "${orderSearch}"` : " yet"}.</div>`;
+  } else if (orderFilter === "pricing") {
+    const shown = orderSearch
+      ? PRODUCTS.filter(p => p.name.toLowerCase().includes(orderSearch.toLowerCase()))
+      : PRODUCTS;
+    body = `
+      <div class="product-sales-summary">Changes apply site-wide immediately. Cost fields are optional but required for accurate profit tracking.</div>
+      <div class="pricing-list">
+        ${shown.map(p => `
+          <div class="pricing-row" data-product-id="${p.id}">
+            <div class="pricing-row__name">${p.icon} ${p.name}</div>
+            <div class="pricing-row__fields">
+              <label class="pricing-field">Vial Price
+                <input type="number" step="0.01" min="0" class="pricing-input" data-field="price" value="${p.price}">
+              </label>
+              ${hasPen(p) ? `
+              <label class="pricing-field">Pen Price
+                <input type="number" step="0.01" min="0" class="pricing-input" data-field="penPrice" value="${p.penPrice}">
+              </label>` : ""}
+              <label class="pricing-field pricing-field--cost">Vial Cost
+                <input type="number" step="0.01" min="0" class="pricing-input" data-field="cost" value="${p.cost ?? ""}" placeholder="not set">
+              </label>
+              ${hasPen(p) ? `
+              <label class="pricing-field pricing-field--cost">Pen Cost
+                <input type="number" step="0.01" min="0" class="pricing-input" data-field="penCost" value="${p.penCost ?? ""}" placeholder="not set">
+              </label>` : ""}
+            </div>
+            <button type="button" class="btn-mini btn-mini--primary pricing-save" data-id="${p.id}">Save</button>
+          </div>
+        `).join("")}
+      </div>`;
   } else if (orderFilter === "commission") {
     // A separate tracker per commission-earning referral code (VAL, VINCE, ...) —
     // each is paid out independently, so their totals and order lists never mix.
@@ -1568,6 +1621,10 @@ function renderOrdersList() {
     cb.addEventListener("change", () => toggleOrderSelection(cb.dataset.id, cb.checked));
   });
 
+  ordersList.querySelectorAll(".pricing-save").forEach(btn => {
+    btn.addEventListener("click", () => savePricing(btn.dataset.id));
+  });
+
   ordersList.querySelectorAll("[data-action]").forEach(el => {
     const evt = el.tagName === "INPUT" ? "change" : "click";
     el.addEventListener(evt, async () => {
@@ -1610,6 +1667,52 @@ function renderOrdersList() {
       }
     });
   });
+}
+
+/* Save an edited price/cost row from the Pricing tab straight to Supabase,
+   then update the live PRODUCTS array so the storefront reflects it without
+   a reload. */
+async function savePricing(id) {
+  const row = ordersList.querySelector(`.pricing-row[data-product-id="${CSS.escape(id)}"]`);
+  if (!row || !sb) return;
+  const field = name => row.querySelector(`.pricing-input[data-field="${name}"]`);
+  const readNum = el => {
+    if (!el) return undefined;
+    const v = el.value.trim();
+    return v === "" ? null : Number(v);
+  };
+  const price    = readNum(field("price"));
+  const penPrice = field("penPrice") ? readNum(field("penPrice")) : undefined;
+  const cost     = readNum(field("cost"));
+  const penCost  = field("penCost") ? readNum(field("penCost")) : undefined;
+
+  if (price === null || Number.isNaN(price)) { alert("Vial price is required."); return; }
+  if (penPrice !== undefined && (penPrice === null || Number.isNaN(penPrice))) { alert("Pen price is required for this product."); return; }
+
+  const btn = row.querySelector(".pricing-save");
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+  try {
+    const payload = { price, cost, updated_at: new Date().toISOString() };
+    if (penPrice !== undefined) payload.pen_price = penPrice;
+    if (penCost !== undefined) payload.pen_cost = penCost;
+    const { error } = await sb.from("products").update(payload).eq("id", Number(id));
+    if (error) throw error;
+    const p = PRODUCTS.find(x => x.id === Number(id));
+    if (p) {
+      p.price = price;
+      if (penPrice !== undefined) p.penPrice = penPrice;
+      p.cost = cost;
+      if (penCost !== undefined) p.penCost = penCost;
+      renderProducts();
+    }
+    btn.textContent = "Saved ✓";
+    setTimeout(() => { btn.textContent = "Save"; btn.disabled = false; }, 1200);
+  } catch (e) {
+    alert("Save failed: " + (e.message || "check your connection."));
+    btn.textContent = "Save";
+    btn.disabled = false;
+  }
 }
 
 /* =========================================================
@@ -1825,3 +1928,4 @@ if (ageGate) {
 renderProducts();
 renderFAQ();
 updateCartUI();
+loadLivePricing();

@@ -1028,6 +1028,26 @@ img { display: block; max-width: 100%; }
 .customer-card__items { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .customer-card__last { font-size: 0.72rem; color: var(--text-muted); margin-top: 10px; }
 
+/* Pricing tab */
+.pricing-list { display: flex; flex-direction: column; gap: 10px; }
+.pricing-row {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  background: var(--gray-50); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.pricing-row__name { font-weight: 800; font-size: 0.88rem; color: var(--navy); min-width: 130px; }
+.pricing-row__fields { display: flex; gap: 10px; flex-wrap: wrap; flex: 1; }
+.pricing-field {
+  display: flex; flex-direction: column; gap: 3px;
+  font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px;
+}
+.pricing-field--cost { color: var(--blue); }
+.pricing-input {
+  font-family: inherit; font-size: 0.85rem; font-weight: 600; color: var(--text);
+  width: 90px; padding: 6px 8px; border: 1.5px solid var(--border); border-radius: 6px;
+}
+.pricing-input:focus { outline: none; border-color: var(--blue); }
+
 /* Discount line in checkout order summary */
 .order-line--discount { color: var(--green); font-weight: 600; }
 
