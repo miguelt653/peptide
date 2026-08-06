@@ -1126,6 +1126,10 @@ let selectedOrderIds = new Set();
 let lastRenderedOrderIds = [];
 let plPeriod = "month"; // "today" | "week" | "month" | "all" — P&L tab's date range
 let plMonthOffset = 0; // 0 = current calendar month, -1 = last month, etc. — only used when plPeriod === "month"
+// Keys of currently-expanded collapsible order lists (e.g. "all", "paid",
+// "commission:VAL"), so an admin working through orders one at a time
+// doesn't have the list re-collapse on them after every action re-render.
+let openOrderListTabs = new Set();
 
 function showAdminDashboard() {
   adminUnlocked = true;
@@ -1705,7 +1709,7 @@ function renderOrdersList() {
           <div class="product-sales-row">
             <span class="product-sales-rank">#${i + 1}</span>
             <span class="product-sales-icon">${s.icon}</span>
-            <span class="product-sales-name">${s.name}${s.variant === "pen" ? ' <span class="product-sales-variant">+ Pen</span>' : ""}</span>
+            <span class="product-sales-name">${s.name} <span class="product-sales-variant">${s.variant === "pen" ? "+ Pen" : "Vial Only"}</span></span>
             <span class="product-sales-qty">${s.qty} sold</span>
             <span class="product-sales-revenue">$${s.revenue.toFixed(2)}</span>
           </div>
@@ -1825,10 +1829,11 @@ function renderOrdersList() {
       // Orders are collapsed behind a toggle so a referrer with dozens of
       // orders doesn't force scrolling past all of them to reach the next
       // referrer's tracker — the summary panel above is always visible.
+      const codeListKey = `commission:${code}`;
       const codeCards = codeOrders.length
-        ? `<details class="commission-orders">
-            <summary>${codeOrders.length} order${codeOrders.length === 1 ? "" : "s"} <span class="commission-orders__hint">click to view</span></summary>
-            <div class="commission-orders__list">${codeOrders.map(o => orderCardHTML(o, selectedOrderIds.has(o.id))).join("")}</div>
+        ? `<details class="order-list-collapse" data-list-key="${codeListKey}" ${openOrderListTabs.has(codeListKey) ? "open" : ""}>
+            <summary>${codeOrders.length} order${codeOrders.length === 1 ? "" : "s"} <span class="order-list-collapse__hint">click to view</span></summary>
+            <div class="order-list-collapse__list">${codeOrders.map(o => orderCardHTML(o, selectedOrderIds.has(o.id))).join("")}</div>
           </details>`
         : `<div class="empty-state">No ${code} orders${orderSearch ? ` match "${orderSearch}"` : " yet"}.</div>`;
       return `
@@ -1844,14 +1849,29 @@ function renderOrdersList() {
         </div>`;
     }).join("");
   } else {
+    // Same collapsed-by-default treatment as the Commission tab: a tab full
+    // of orders doesn't dump every card on screen at once, just a count you
+    // click into. State persists per tab so checking off orders one at a
+    // time doesn't re-collapse the list after each click.
+    const listKey = orderFilter;
     body = list.length
-      ? list.map(o => orderCardHTML(o, selectedOrderIds.has(o.id))).join("")
+      ? `<details class="order-list-collapse" data-list-key="${listKey}" ${openOrderListTabs.has(listKey) ? "open" : ""}>
+          <summary>${list.length} order${list.length === 1 ? "" : "s"} <span class="order-list-collapse__hint">click to view</span></summary>
+          <div class="order-list-collapse__list">${list.map(o => orderCardHTML(o, selectedOrderIds.has(o.id))).join("")}</div>
+        </details>`
       : `<div class="empty-state">${emptyMsg}</div>`;
   }
 
   ordersList.innerHTML = summary + body;
   lastRenderedOrderIds = list.map(o => o.id);
   syncBulkUI();
+
+  ordersList.querySelectorAll(".order-list-collapse[data-list-key]").forEach(details => {
+    details.addEventListener("toggle", () => {
+      const key = details.dataset.listKey;
+      if (details.open) openOrderListTabs.add(key); else openOrderListTabs.delete(key);
+    });
+  });
 
   ordersList.querySelectorAll(".order-select-check").forEach(cb => {
     cb.addEventListener("change", () => toggleOrderSelection(cb.dataset.id, cb.checked));
