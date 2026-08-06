@@ -1413,17 +1413,24 @@ function orderMatchesSearch(o, q) {
   return haystack.includes(q.toLowerCase());
 }
 
-// Sums COGS for an order from each line item's current product cost. Returns
-// null (not 0) if any item's cost isn't set yet, so we never silently show a
-// fake 100% margin — the P&L view flags those orders instead of guessing.
+// Sums COGS for an order from each line item's current product cost. Every
+// order includes the vial itself — "pen" is an add-on applicator, not a
+// substitute — so a pen-variant item's true unit cost is vial cost + pen
+// add-on cost combined, not the pen add-on cost alone. Returns null (not 0)
+// if any item's cost isn't set yet, so we never silently show a fake 100%
+// margin — the P&L view flags those orders instead of guessing.
 function computeOrderCost(order) {
   const items = Array.isArray(order.items) ? order.items : [];
   let total = 0;
   for (const i of items) {
     const p = PRODUCTS.find(x => x.id === i.id);
-    const unitCost = p ? (i.variant === "pen" ? p.penCost : p.cost) : null;
-    if (unitCost == null || Number.isNaN(Number(unitCost))) return null;
-    total += Number(unitCost) * i.qty;
+    if (!p || p.cost == null || Number.isNaN(Number(p.cost))) return null;
+    let unitCost = Number(p.cost);
+    if (i.variant === "pen") {
+      if (p.penCost == null || Number.isNaN(Number(p.penCost))) return null;
+      unitCost += Number(p.penCost);
+    }
+    total += unitCost * i.qty;
   }
   return total;
 }
@@ -1738,7 +1745,7 @@ function renderOrdersList() {
                 <input type="number" step="0.01" min="0" class="pricing-input" data-field="cost" value="${p.cost ?? ""}" placeholder="not set">
               </label>
               ${hasPen(p) ? `
-              <label class="pricing-field pricing-field--cost">Pen Cost
+              <label class="pricing-field pricing-field--cost">Pen Add-on Cost
                 <input type="number" step="0.01" min="0" class="pricing-input" data-field="penCost" value="${p.penCost ?? ""}" placeholder="not set">
               </label>` : ""}
             </div>
