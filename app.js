@@ -1375,7 +1375,9 @@ function orderCardHTML(o, selected) {
           <input type="checkbox" data-action="togglecommission" data-id="${o.id}" ${o.commission_paid ? 'checked' : ''} />
           <span>Paid ${o.referral} $${Number(o.commission).toFixed(2)}</span>
         </label>` : ""}
-        ${shipped ? "" : `<button class="btn-mini btn-mini--danger" data-action="delete" data-id="${o.id}">Delete</button>`}
+        ${shipped
+          ? `<button class="btn-mini btn-mini--danger" data-action="delete-shipped" data-id="${o.id}">Delete</button>`
+          : `<button class="btn-mini btn-mini--danger" data-action="delete" data-id="${o.id}">Delete</button>`}
       </div>
     </div>`;
 }
@@ -1869,9 +1871,14 @@ function renderOrdersList() {
       const id = el.dataset.id;
       const action = el.dataset.action;
       if (action === "delete" && !confirm("Delete this order? This cannot be undone.")) return;
+      if (action === "delete-shipped" && !confirm(
+        "This order has already SHIPPED and is part of your permanent sales/tax record.\n\n" +
+        "Deleting it will PERMANENTLY remove it from your revenue history, P&L reports, and commission tracking — this cannot be undone.\n\n" +
+        "Only do this if it was a mistake (test data, duplicate, etc.) — not a real sale.\n\nDelete anyway?"
+      )) return;
       el.disabled = true;
       try {
-        if (action === "delete") {
+        if (action === "delete" || action === "delete-shipped") {
           const { error: e1 } = await sb.from("orders").delete().eq("id", id);
           if (e1) throw e1;
         } else if (action === "togglepaid") {
