@@ -1745,7 +1745,7 @@ function renderOrdersList() {
                 <input type="number" step="0.01" min="0" class="pricing-input" data-field="cost" value="${p.cost ?? ""}" placeholder="not set">
               </label>
               ${hasPen(p) ? `
-              <label class="pricing-field pricing-field--cost">Pen Add-on Cost
+              <label class="pricing-field pricing-field--cost">Pen Cost
                 <input type="number" step="0.01" min="0" class="pricing-input" data-field="penCost" value="${p.penCost ?? ""}" placeholder="not set">
               </label>` : ""}
             </div>
