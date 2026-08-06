@@ -35,7 +35,7 @@ const ADMIN_PASSWORD    = "changeme123"; // change me in production
 // plain discount codes with no referrer payout.
 const REFERRAL_CODES = {
   VAL:   { discountRate: 0.10, commissionRate: 0.30 },
-  VINCE: { discountRate: 0.10, commissionRate: 0.30 },
+  VINCE: { discountRate: 0.10, commissionRate: 0.20 },
   NEW:   { discountRate: 0.10, commissionRate: 0 },
   LOYAL: { discountRate: 0.10, commissionRate: 0 },
 };
