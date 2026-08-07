@@ -1388,16 +1388,24 @@ function orderCardHTML(o, selected) {
 
 /* Fetches orders from the cloud DB, then hands off to the pure renderer below.
    Called on dashboard open and after any action that mutates order data. */
+let ordersFetchToken = 0;
 async function renderOrders() {
   if (!sb) {
     ordersList.innerHTML = `<div class="empty-state">Cloud database not connected. Refresh and try again.</div>`;
     return;
   }
+  // Guards against overlapping fetches racing each other — if two actions
+  // fire in quick succession (e.g. checking two payment boxes back to
+  // back), their network responses can arrive out of order. Without this,
+  // whichever resolves last wins even if it was issued first, silently
+  // showing stale data (an order that looks missing, a count that's off).
+  const myToken = ++ordersFetchToken;
   ordersList.innerHTML = `<div class="empty-state">Loading orders…</div>`;
   const { data, error } = await sb
     .from("orders")
     .select("*")
     .order("created_at", { ascending: false });
+  if (myToken !== ordersFetchToken) return; // a newer request superseded this one
   if (error) {
     ordersList.innerHTML = `<div class="empty-state">Couldn't load orders: ${error.message}</div>`;
     return;
