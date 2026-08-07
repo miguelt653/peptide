@@ -35,6 +35,7 @@ const CASHAPP_HANDLE    = "$BellaVitaLabs"; // change to actual cashtag
 const REFERRAL_CODES = {
   VAL:   { discountRate: 0.10, commissionRate: 0.30 },
   VINCE: { discountRate: 0.10, commissionRate: 0.20 },
+  KELLY: { discountRate: 0.10, commissionRate: 0.20 },
   NEW:   { discountRate: 0.10, commissionRate: 0 },
   LOYAL: { discountRate: 0.10, commissionRate: 0 },
 };
