@@ -332,7 +332,7 @@ const FAQS = [
 let cart = [];
 let activeCategory = "all";
 let selectedVariant = {}; // { [productId]: "vial" | "pen" }
-let shippingMethod = "standard"; // "standard" ($25) | "local" ($15, Tampa/St. Pete/Clearwater)
+let shippingMethod = "standard"; // "standard" ($25) | "local" ($10, Tampa/St. Pete/Clearwater)
 
 /* ---- DOM Refs ---- */
 const productGrid = document.getElementById("productGrid");
@@ -556,7 +556,7 @@ function updateCartUI() {
   cartTotal.textContent = `$${total.toFixed(2)}`;
   const shippingNote = document.getElementById("shippingNote");
   if (shippingNote) {
-    shippingNote.textContent = "Shipping $25 flat · Local delivery $15 (Tampa · St. Pete · Clearwater)";
+    shippingNote.textContent = "Shipping $25 flat · Local Delivery/Meet to Drop Off Fee $10 (Tampa · St. Pete · Clearwater)";
   }
 }
 
@@ -605,9 +605,9 @@ checkoutBtn.addEventListener("click", openCheckout);
 modalClose.addEventListener("click", closeCheckout);
 modalOverlay.addEventListener("click", closeCheckout);
 
-const SHIPPING_RATES = { standard: 25, local: 15 };
+const SHIPPING_RATES = { standard: 25, local: 10 };
 function shippingLabel(method) {
-  return method === "local" ? "Local Delivery (Tampa · St. Pete · Clearwater)" : "Standard Shipping";
+  return method === "local" ? "Local Delivery/Meet to Drop Off Fee (Tampa · St. Pete · Clearwater)" : "Standard Shipping";
 }
 
 /* ---- Local delivery eligibility (Tampa / St. Petersburg / Clearwater only) ---- */
@@ -648,7 +648,7 @@ function buildOrderSummary() {
     <div class="order-line"><span>Subtotal</span><span>$${sub.toFixed(2)}</span></div>
     <div class="order-line order-line--discount"><span>${referralCode} discount (${Math.round(referralConfig.discountRate * 100)}%)</span><span>−$${discount.toFixed(2)}</span></div>` : ""}
     <div class="order-line">
-      <span>${shippingMethod === "local" ? "Local Delivery" : "Shipping"}</span>
+      <span>${shippingMethod === "local" ? "Local Delivery/Meet to Drop Off Fee" : "Shipping"}</span>
       <span>$${ship.toFixed(2)}</span>
     </div>
     <div class="order-line">
