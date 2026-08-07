@@ -1515,6 +1515,7 @@ async function backfillHistoricalPayments() {
   const btn = document.getElementById("pnlBackfillBtn");
   if (btn) { btn.disabled = true; btn.textContent = "Backfilling…"; }
   try {
+    await livePricingReady;
     for (const o of targets) {
       const { error } = await sb.from("orders").update({
         payment_confirmed_at: o.created_at,
@@ -1925,7 +1926,10 @@ function renderOrdersList() {
           const payload = { status: newStatus };
           if (el.checked) {
             // Snapshot cost at confirm time so a later cost edit never
-            // rewrites this order's historical margin.
+            // rewrites this order's historical margin. Wait for live
+            // product costs to finish loading first, in case this click
+            // happens right after page load before that fetch resolves.
+            await livePricingReady;
             const ord = all.find(o => o.id === id) || {};
             payload.payment_confirmed_at = new Date().toISOString();
             payload.payment_reversed_at = null;
@@ -2223,4 +2227,7 @@ if (ageGate) {
 renderProducts();
 renderFAQ();
 updateCartUI();
-loadLivePricing();
+// Awaited before any COGS snapshot (confirm-payment, backfill) so a
+// payment confirmed right after page load can't compute cost from
+// stale/blank product data while this fetch is still in flight.
+const livePricingReady = loadLivePricing();
