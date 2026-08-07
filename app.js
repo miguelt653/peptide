@@ -285,8 +285,9 @@ const PRODUCTS = loadProducts();
 // from the dashboard without a code change. On load, overlay the live values
 // onto the hardcoded product details; if Supabase is unreachable, the
 // hardcoded defaults above stay in effect so the storefront never breaks.
+let livePricingLoaded = false;
 async function loadLivePricing() {
-  if (!sb) return;
+  if (!sb) { livePricingLoaded = true; return; }
   try {
     const { data, error } = await sb.from("products").select("id, price, pen_price, cost, pen_cost");
     if (error || !data) return;
@@ -301,6 +302,14 @@ async function loadLivePricing() {
     renderProducts();
   } catch (e) {
     console.warn("Live pricing fetch failed, using defaults:", e);
+  } finally {
+    livePricingLoaded = true;
+    // If the admin has the Pricing tab open while this resolves, refresh it —
+    // otherwise it could keep showing stale/default values, and saving from
+    // that stale form would silently overwrite a real live price.
+    if (typeof adminUnlocked !== "undefined" && adminUnlocked && typeof orderFilter !== "undefined" && orderFilter === "pricing") {
+      renderOrdersList();
+    }
   }
 }
 
@@ -648,9 +657,6 @@ function updateLocalShipWarning() {
   localShipWarning.style.display = (shippingMethod === "local" && !isLocalDeliveryEligible(cityInput.value)) ? "block" : "none";
 }
 if (cityInput) cityInput.addEventListener("input", updateLocalShipWarning);
-function activeReferralValid() {
-  return referralInput ? isValidReferral(referralInput.value) : false;
-}
 function getOrderTotal() {
   const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const ship = SHIPPING_RATES[shippingMethod] ?? SHIPPING_RATES.standard;
@@ -1284,12 +1290,23 @@ if (bulkClearBtn) {
 
 if (bulkMarkPaidBtn) {
   bulkMarkPaidBtn.addEventListener("click", async () => {
-    const ids = ordersCache.filter(o => selectedOrderIds.has(o.id) && o.status === "awaiting_payment").map(o => o.id);
-    if (!ids.length || !sb) return;
+    const targets = ordersCache.filter(o => selectedOrderIds.has(o.id) && o.status === "awaiting_payment");
+    if (!targets.length || !sb) return;
     bulkMarkPaidBtn.disabled = true;
     try {
-      const { error } = await sb.from("orders").update({ status: "paid" }).in("id", ids);
-      if (error) throw error;
+      // Same per-order cost snapshot as the individual "Payment received"
+      // checkbox — a shared bulk UPDATE can't set a different cost_amount
+      // per row, so this confirms each order one at a time.
+      await livePricingReady;
+      for (const o of targets) {
+        const { error } = await sb.from("orders").update({
+          status: "paid",
+          payment_confirmed_at: new Date().toISOString(),
+          payment_reversed_at: null,
+          cost_amount: computeOrderCost(o),
+        }).eq("id", o.id);
+        if (error) throw error;
+      }
       selectedOrderIds.clear();
       renderOrders();
     } catch (e) {
@@ -1327,61 +1344,74 @@ if (bulkDeleteBtn) {
   });
 }
 
+// Order data comes from a public, unauthenticated checkout form — and since
+// the anon Supabase key is public too, any field on an order (name, email,
+// tracking, item names, etc.) could in principle be set to arbitrary text
+// via a direct API call, not just through the checkout UI. Escape anything
+// customer-controlled before it goes into innerHTML, so a malicious name or
+// tracking value can't run script in the admin's authenticated session.
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+
 function orderCardHTML(o, selected) {
   const items = Array.isArray(o.items) ? o.items : [];
   const shipped = o.status === "shipped";
   const paid = o.status === "paid" || shipped;
   const statusLabel = shipped ? "Shipped" : (o.status === "paid" ? "Payment Received" : "Awaiting Payment");
+  const id = escapeHtml(o.id);
   return `
-    <div class="order-card order-card--${o.status}${selected ? ' order-card--selected' : ''}" data-order-id="${o.id}">
+    <div class="order-card order-card--${o.status}${selected ? ' order-card--selected' : ''}" data-order-id="${id}">
       <div class="order-card__header">
         <div class="order-card__header-left">
-          <input type="checkbox" class="order-select-check" data-id="${o.id}" aria-label="Select order ${o.id}" ${selected ? 'checked' : ''} />
+          <input type="checkbox" class="order-select-check" data-id="${id}" aria-label="Select order ${id}" ${selected ? 'checked' : ''} />
           <div>
-            <div class="order-card__id">${o.id}</div>
+            <div class="order-card__id">${id}</div>
             <div class="order-card__date">${o.created_at ? new Date(o.created_at).toLocaleString() : ""}</div>
           </div>
         </div>
         <span class="order-status order-status--${o.status}">${statusLabel}</span>
       </div>
       <div class="order-card__body">
-        <div><strong>${o.first_name || ""} ${o.last_name || ""}</strong></div>
-        <div>${o.email || ""} · ${o.phone || "—"}</div>
-        <div>${o.address || ""}, ${o.city || ""}, ${o.state || ""} ${o.zip || ""}</div>
+        <div><strong>${escapeHtml(o.first_name)} ${escapeHtml(o.last_name)}</strong></div>
+        <div>${escapeHtml(o.email)} · ${o.phone ? escapeHtml(o.phone) : "—"}</div>
+        <div>${escapeHtml(o.address)}, ${escapeHtml(o.city)}, ${escapeHtml(o.state)} ${escapeHtml(o.zip)}</div>
         <div class="order-card__items">
-          ${items.map(i => `<span>${i.name}${i.variant === 'pen' ? ' (+Pen)' : ''} × ${i.qty}</span>`).join(" · ")}
+          ${items.map(i => `<span>${escapeHtml(i.name)}${i.variant === 'pen' ? ' (+Pen)' : ''} × ${Number(i.qty) || 0}</span>`).join(" · ")}
         </div>
         ${o.shipping != null ? `<div class="order-card__ship">Shipping: ${shippingLabel(o.shipping_method)} — $${Number(o.shipping).toFixed(2)}</div>` : ""}
         <div class="order-card__total">Total: <strong>$${Number(o.total).toFixed(2)}</strong></div>
         ${o.referral
-          ? `<div class="order-card__referral">Referral: <strong>${o.referral}</strong> ${o.referral_valid ? '<span class="ref-badge ref-badge--ok">valid</span>' : '<span class="ref-badge ref-badge--bad">unrecognized</span>'}</div>`
+          ? `<div class="order-card__referral">Referral: <strong>${escapeHtml(o.referral)}</strong> ${o.referral_valid ? '<span class="ref-badge ref-badge--ok">valid</span>' : '<span class="ref-badge ref-badge--bad">unrecognized</span>'}</div>`
           : ""}
         ${o.referral_valid && o.commission
-          ? `<div class="order-card__commission">⭐ ${o.referral} commission: <strong>$${Number(o.commission).toFixed(2)}</strong></div>`
+          ? `<div class="order-card__commission">⭐ ${escapeHtml(o.referral)} commission: <strong>$${Number(o.commission).toFixed(2)}</strong></div>`
           : ""}
         ${shipped && o.tracking
-          ? `<div class="order-card__tracking">📦 Tracking: ${/^https?:\/\//i.test(o.tracking) ? `<a href="${o.tracking}" target="_blank" rel="noopener">${o.tracking}</a>` : o.tracking}</div>`
+          ? `<div class="order-card__tracking">📦 Tracking: ${/^https?:\/\//i.test(o.tracking) ? `<a href="${escapeHtml(o.tracking)}" target="_blank" rel="noopener">${escapeHtml(o.tracking)}</a>` : escapeHtml(o.tracking)}</div>`
           : ""}
       </div>
       <div class="order-card__actions">
         <label class="pay-check ${paid ? 'pay-check--done' : ''}">
-          <input type="checkbox" data-action="togglepaid" data-id="${o.id}" ${paid ? 'checked' : ''} ${shipped ? 'disabled' : ''} />
+          <input type="checkbox" data-action="togglepaid" data-id="${id}" ${paid ? 'checked' : ''} ${shipped ? 'disabled' : ''} />
           <span>Payment received</span>
         </label>
         ${o.status === "paid" ? `
         <div class="ship-row">
-          <input type="text" class="tracking-input" id="track-${o.id}" placeholder="Tracking # or link (optional)" value="${o.tracking || ''}" />
-          <button class="btn-mini btn-mini--primary" data-action="shipped" data-id="${o.id}">Mark Shipped</button>
+          <input type="text" class="tracking-input" id="track-${id}" placeholder="Tracking # or link (optional)" value="${escapeHtml(o.tracking || '')}" />
+          <button class="btn-mini btn-mini--primary" data-action="shipped" data-id="${id}">Mark Shipped</button>
         </div>` : ""}
         ${shipped ? `<span class="shipped-tag">✓ Shipped</span>` : ""}
         ${o.referral_valid && o.commission ? `
         <label class="pay-check payout-check ${o.commission_paid ? 'pay-check--done' : ''}">
-          <input type="checkbox" data-action="togglecommission" data-id="${o.id}" ${o.commission_paid ? 'checked' : ''} />
-          <span>Paid ${o.referral} $${Number(o.commission).toFixed(2)}</span>
+          <input type="checkbox" data-action="togglecommission" data-id="${id}" ${o.commission_paid ? 'checked' : ''} />
+          <span>Paid ${escapeHtml(o.referral)} $${Number(o.commission).toFixed(2)}</span>
         </label>` : ""}
         ${shipped
-          ? `<button class="btn-mini btn-mini--danger" data-action="delete-shipped" data-id="${o.id}">Delete</button>`
-          : `<button class="btn-mini btn-mini--danger" data-action="delete" data-id="${o.id}">Delete</button>`}
+          ? `<button class="btn-mini btn-mini--danger" data-action="delete-shipped" data-id="${id}">Delete</button>`
+          : `<button class="btn-mini btn-mini--danger" data-action="delete" data-id="${id}">Delete</button>`}
       </div>
     </div>`;
 }
@@ -1524,13 +1554,12 @@ async function backfillHistoricalPayments() {
   if (btn) { btn.disabled = true; btn.textContent = "Backfilling…"; }
   try {
     await livePricingReady;
-    for (const o of targets) {
-      const { error } = await sb.from("orders").update({
-        payment_confirmed_at: o.created_at,
-        cost_amount: computeOrderCost(o),
-      }).eq("id", o.id);
-      if (error) throw error;
-    }
+    const results = await Promise.all(targets.map(o => sb.from("orders").update({
+      payment_confirmed_at: o.created_at,
+      cost_amount: computeOrderCost(o),
+    }).eq("id", o.id)));
+    const failed = results.find(r => r.error);
+    if (failed) throw failed.error;
     renderOrders();
   } catch (e) {
     alert("Backfill failed: " + (e.message || "check your connection."));
@@ -1549,7 +1578,14 @@ function exportPnlCsv(period, monthOffset) {
     .sort((a, b) => new Date(a.payment_confirmed_at) - new Date(b.payment_confirmed_at));
   const pnl = computePnL(ordersCache, period, monthOffset);
 
-  const esc = v => `"${String(v).replace(/"/g, '""')}"`;
+  // Customer name/email/referral cells are untrusted input. Prefixing a
+  // leading =, +, -, or @ with a quote stops Excel/Sheets from treating the
+  // cell as a formula when this tax export gets opened later.
+  const esc = v => {
+    let s = String(v);
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return `"${s.replace(/"/g, '""')}"`;
+  };
   const rows = [
     ["Bella Vita Labs — P&L Report"],
     ["Period", label],
@@ -1695,8 +1731,8 @@ function renderOrdersList() {
           <div class="customer-card">
             <div class="customer-card__header">
               <div>
-                <div class="customer-card__name">${c.name}</div>
-                <div class="customer-card__email">${c.email}</div>
+                <div class="customer-card__name">${escapeHtml(c.name)}</div>
+                <div class="customer-card__email">${escapeHtml(c.email)}</div>
               </div>
               <div class="customer-card__stats">
                 <span class="customer-card__count">${c.orderCount} order${c.orderCount === 1 ? "" : "s"}</span>
@@ -1704,7 +1740,7 @@ function renderOrdersList() {
               </div>
             </div>
             <div class="customer-card__items">
-              ${Object.entries(c.items).map(([name, qty]) => `<span class="spec-tag">${name} × ${qty}</span>`).join("")}
+              ${Object.entries(c.items).map(([name, qty]) => `<span class="spec-tag">${escapeHtml(name)} × ${qty}</span>`).join("")}
             </div>
             <div class="customer-card__last">Last order: ${c.lastOrderAt ? new Date(c.lastOrderAt).toLocaleDateString() : "—"}</div>
           </div>
@@ -1725,13 +1761,18 @@ function renderOrdersList() {
           <div class="product-sales-row">
             <span class="product-sales-rank">#${i + 1}</span>
             <span class="product-sales-icon">${s.icon}</span>
-            <span class="product-sales-name">${s.name} <span class="product-sales-variant">${s.variant === "pen" ? "+ Pen" : "Vial Only"}</span></span>
+            <span class="product-sales-name">${escapeHtml(s.name)} <span class="product-sales-variant">${s.variant === "pen" ? "+ Pen" : "Vial Only"}</span></span>
             <span class="product-sales-qty">${s.qty} sold</span>
             <span class="product-sales-revenue">$${s.revenue.toFixed(2)}</span>
           </div>
         `).join("")}
       </div>`
       : `<div class="empty-state">No confirmed sales${orderSearch ? ` matching "${orderSearch}"` : " yet"}.</div>`;
+  } else if (orderFilter === "pricing" && !livePricingLoaded) {
+    // Don't render editable price/cost fields from possibly-stale hardcoded
+    // defaults — saving from those would silently overwrite real live
+    // prices in Supabase with the old fallback values.
+    body = `<div class="empty-state">Loading live prices…</div>`;
   } else if (orderFilter === "pricing") {
     const shown = orderSearch
       ? PRODUCTS.filter(p => p.name.toLowerCase().includes(orderSearch.toLowerCase()))
@@ -1939,7 +1980,12 @@ function renderOrdersList() {
             // happens right after page load before that fetch resolves.
             await livePricingReady;
             const ord = all.find(o => o.id === id) || {};
-            payload.payment_confirmed_at = new Date().toISOString();
+            // Keep the original confirm date if this order was already
+            // confirmed before (e.g. an accidental uncheck immediately
+            // fixed by rechecking) — only stamp "now" the first time, so a
+            // misclick correction can't shift a sale into the wrong
+            // month's P&L.
+            payload.payment_confirmed_at = ord.payment_confirmed_at || new Date().toISOString();
             payload.payment_reversed_at = null;
             payload.cost_amount = computeOrderCost(ord);
           } else {
@@ -1995,6 +2041,8 @@ async function savePricing(id) {
 
   if (price === null || Number.isNaN(price)) { alert("Vial price is required."); return; }
   if (penPrice !== undefined && (penPrice === null || Number.isNaN(penPrice))) { alert("Pen price is required for this product."); return; }
+  if (cost !== null && Number.isNaN(cost)) { alert("Vial cost isn't a valid number."); return; }
+  if (penCost !== undefined && penCost !== null && Number.isNaN(penCost)) { alert("Pen cost isn't a valid number."); return; }
 
   const btn = row.querySelector(".pricing-save");
   btn.disabled = true;
