@@ -327,7 +327,7 @@
 
   <!-- PRODUCT DETAIL MODAL -->
   <div class="modal-overlay" id="detailOverlay"></div>
-  <div class="modal detail-modal" id="detailModal">
+  <div class="modal detail-modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailName">
     <div class="modal__header detail-modal__header" id="detailHeader">
       <div class="detail-modal__title-row">
         <span class="detail-modal__icon" id="detailIcon"></span>
@@ -355,7 +355,7 @@
 
   <!-- COA LIGHTBOX -->
   <div class="coa-overlay" id="coaOverlay"></div>
-  <div class="coa-lightbox" id="coaLightbox">
+  <div class="coa-lightbox" id="coaLightbox" role="dialog" aria-modal="true" aria-labelledby="coaTitle">
     <div class="coa-lightbox__bar">
       <span class="coa-lightbox__title" id="coaTitle">Certificate of Analysis</span>
       <div class="coa-lightbox__actions">
@@ -375,7 +375,7 @@
 
   <!-- LEGAL MODAL -->
   <div class="modal-overlay" id="legalOverlay"></div>
-  <div class="modal legal-modal" id="legalModal">
+  <div class="modal legal-modal" id="legalModal" role="dialog" aria-modal="true" aria-labelledby="legalTitle">
     <div class="modal__header">
       <h3 id="legalTitle">Terms &amp; Conditions</h3>
       <button class="cart-close" id="legalClose" aria-label="Close">
@@ -387,9 +387,9 @@
 
   <!-- CART DRAWER -->
   <div class="cart-overlay" id="cartOverlay"></div>
-  <div class="cart-drawer" id="cartDrawer">
+  <div class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
     <div class="cart-drawer__header">
-      <h3>Your Cart</h3>
+      <h3 id="cartTitle">Your Cart</h3>
       <button class="cart-close" id="cartClose" aria-label="Close cart">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -413,9 +413,9 @@
 
   <!-- CHECKOUT MODAL -->
   <div class="modal-overlay" id="modalOverlay"></div>
-  <div class="modal" id="checkoutModal">
+  <div class="modal" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
     <div class="modal__header">
-      <h3>Complete Your Order</h3>
+      <h3 id="checkoutTitle">Complete Your Order</h3>
       <button class="cart-close" id="modalClose">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -459,7 +459,7 @@
           </div>
           <div class="form-group">
             <label>ZIP</label>
-            <input type="text" name="zip" required placeholder="10001" />
+            <input type="text" name="zip" required placeholder="10001" pattern="\d{5}(-\d{4})?" inputmode="numeric" title="5-digit ZIP code (e.g. 10001 or 10001-1234)" />
           </div>
         </div>
       </div>
@@ -514,7 +514,7 @@
     <div class="order-success" id="orderSuccess" style="display:none">
       <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 10"/></svg>
       <h3>Order Received!</h3>
-      <p>We'll confirm your Cash App payment and ship within 1–2 business days. Check your email for details.</p>
+      <p>We'll confirm your Cash App payment and ship within 1–2 business days. You'll get a tracking email once your order ships.</p>
       <button class="btn btn--primary" id="successClose">Close</button>
     </div>
     <div class="order-issue" id="orderIssue" style="display:none">
@@ -530,9 +530,9 @@
 
   <!-- ADMIN PANEL -->
   <div class="modal-overlay" id="adminOverlay"></div>
-  <div class="modal admin-modal" id="adminModal">
+  <div class="modal admin-modal" id="adminModal" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
     <div class="modal__header">
-      <h3>Admin Panel</h3>
+      <h3 id="adminTitle">Admin Panel</h3>
       <button class="cart-close" id="adminClose">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -591,6 +591,6 @@
 
   <script src="assets/vendor/supabase.js"></script>
   <script src="assets/vendor/emailjs.js"></script>
-  <script src="app.js?v=20260807a"></script>
+  <script src="app.js?v=20260807b"></script>
 </body>
 </html>

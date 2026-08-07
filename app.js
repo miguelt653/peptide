@@ -28,7 +28,6 @@
 
 /* ---- Config ---- */
 const CASHAPP_HANDLE    = "$BellaVitaLabs"; // change to actual cashtag
-const ADMIN_PASSWORD    = "changeme123"; // change me in production
 // Accepted referral/discount codes (case-insensitive). discountRate applies to
 // the customer's subtotal; commissionRate (if any) is paid to the referrer on
 // the pre-discount subtotal + shipping. Codes with commissionRate 0 are
@@ -107,7 +106,6 @@ const DEFAULT_PRODUCTS = [
     purity: "≥99%",
     desc: "A next-generation triple receptor agonist (GLP-1, GIP, and glucagon) being actively studied for metabolic regulation, body composition, and energy balance.",
     meta: ["20mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
-    stock: 15,
     detail: {
       overview: "Retatrutide is a first-in-class triple receptor agonist targeting GIP, GLP-1, and glucagon receptors simultaneously. It has been the subject of research examining multi-pathway metabolic receptor activation, with studies investigating its broad metabolic signaling interactions.",
       benefits: [
@@ -140,7 +138,6 @@ const DEFAULT_PRODUCTS = [
     purity: "≥99%",
     desc: "A critical coenzyme present in every living cell, studied extensively for cellular energy production, mitochondrial function, DNA repair, and longevity pathways.",
     meta: ["500mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
-    stock: 22,
     detail: {
       overview: "NAD+ delivers pharmaceutical-grade nicotinamide adenine dinucleotide at a 500mg research dose. NAD+ is a master coenzyme involved in every major metabolic pathway and is studied for its role in cellular signaling, declining in availability with age and metabolic stress.",
       benefits: [
@@ -174,7 +171,6 @@ const DEFAULT_PRODUCTS = [
     purity: "≥99%",
     desc: "A naturally occurring copper complex found in human plasma, studied for collagen synthesis stimulation, wound healing, antioxidant activity, and tissue remodeling.",
     meta: ["50mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
-    stock: 30,
     detail: {
       overview: "GHK-Cu (Copper peptide GHK) is a naturally occurring copper-binding peptide found in human plasma, studied for its role as a multi-functional signaling molecule. Research investigates its interactions with over 4,000 human genes involved in tissue remodeling and cellular signaling.",
       benefits: [
@@ -208,7 +204,6 @@ const DEFAULT_PRODUCTS = [
     purity: "≥99%",
     desc: "A complete recovery blend pairing BPC-157 (5mg) with TB-500 (5mg) — two of the most studied healing peptides — for comprehensive soft-tissue, tendon, and ligament recovery research.",
     meta: ["BPC-157 5mg", "TB-500 5mg", "≥99% Purity", "COA Included"],
-    stock: 15,
     detail: {
       overview: "BPC-157 and TB-500 combined in one vial — two peptides studied for their complementary roles in tissue-response and repair signaling pathway research. One vial, two peptides, investigated together for their complementary roles in local and systemic tissue-response signaling pathway research — studied for their distinct but synergistic receptor mechanisms.",
       benefits: [
@@ -239,7 +234,6 @@ const DEFAULT_PRODUCTS = [
     purity: "≥99%",
     desc: "A synthetic analogue of alpha-melanocyte-stimulating hormone (α-MSH), studied for its effect on melanogenesis (skin pigmentation) and the tanning response with reduced UV exposure.",
     meta: ["10mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
-    stock: 20,
     detail: {
       overview: "Melanotan II is a cyclic synthetic analog of alpha-melanocyte-stimulating hormone (α-MSH). Research investigates its activation of melanocortin receptors throughout the body, with studies examining pigmentation pathway signaling, appetite-related signaling, and neuroendocrine receptor interactions.",
       benefits: [
@@ -261,25 +255,7 @@ const DEFAULT_PRODUCTS = [
   },
 ];
 
-/* ---- Load products w/ stock from localStorage ---- */
-function loadProducts() {
-  const saved = localStorage.getItem("bellavita_products") || localStorage.getItem("leanova_products");
-  if (saved) {
-    try {
-      const savedProducts = JSON.parse(saved);
-      // Merge: use saved stock counts but fresh product details
-      return DEFAULT_PRODUCTS.map(p => {
-        const s = savedProducts.find(sp => sp.id === p.id);
-        return { ...p, stock: s ? s.stock : p.stock };
-      });
-    } catch (e) { return [...DEFAULT_PRODUCTS]; }
-  }
-  return [...DEFAULT_PRODUCTS];
-}
-function saveProducts() {
-  localStorage.setItem("bellavita_products", JSON.stringify(PRODUCTS.map(p => ({ id: p.id, stock: p.stock }))));
-}
-const PRODUCTS = loadProducts();
+const PRODUCTS = [...DEFAULT_PRODUCTS];
 
 // Price/cost live in Supabase's `products` table so an admin can update them
 // from the dashboard without a code change. On load, overlay the live values
@@ -386,15 +362,6 @@ const orderIssueClose  = document.getElementById("orderIssueClose");
 const faqList       = document.getElementById("faqList");
 const contactForm   = document.getElementById("contactForm");
 const formSuccess   = document.getElementById("formSuccess");
-
-/* ---- Stock helpers ---- */
-function inCart(id) {
-  // total quantity across all variants of this product
-  return cart.filter(i => i.id === id).reduce((s, i) => s + i.qty, 0);
-}
-function availableStock(p) {
-  return Math.max(0, p.stock - inCart(p.id));
-}
 
 /* ---- Variant ("with Pen") helpers ---- */
 function hasPen(p) {
@@ -891,12 +858,6 @@ checkoutForm.addEventListener("submit", async e => {
   };
   // Referral commission (if the code has one): rate applies to the pre-discount subtotal + shipping
   order.commission = referralConfig ? +((sub + ship) * referralConfig.commissionRate).toFixed(2) : 0;
-  // Decrement stock
-  cart.forEach(item => {
-    const p = PRODUCTS.find(x => x.id === item.id);
-    if (p) p.stock = Math.max(0, p.stock - item.qty);
-  });
-  saveProducts();
   // Save order locally as a backup regardless of cloud outcome
   const orders = loadOrders();
   orders.unshift(order);
@@ -2257,6 +2218,18 @@ document.querySelectorAll(".legal-link").forEach(link => {
     e.preventDefault();
     openLegal(link.dataset.legal);
   });
+});
+
+/* Escape closes whichever modal is currently open, topmost first (the COA
+   lightbox and product detail can stack, everything else is standalone). */
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (coaLightbox.classList.contains("open")) { closeCoa(); return; }
+  if (detailModal.classList.contains("open")) { closeDetail(); return; }
+  if (legalModal.classList.contains("open")) { closeLegal(); return; }
+  if (checkoutModal.classList.contains("open")) { closeCheckout(); return; }
+  if (cartDrawer.classList.contains("open")) { closeCart(); return; }
+  if (adminModal.classList.contains("open")) { closeAdmin(); return; }
 });
 
 /* =========================================================

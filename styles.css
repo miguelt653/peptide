@@ -234,8 +234,6 @@ img { display: block; max-width: 100%; }
   box-shadow: 0 8px 28px rgba(16,38,26,0.1);
   transform: translateY(-3px);
 }
-.product-card--soldout { opacity: 0.6; }
-
 /* "Other Peptides Available" inquiry card */
 .product-card--inquiry {
   border: 1.5px dashed var(--gray-200);
@@ -333,17 +331,6 @@ img { display: block; max-width: 100%; }
   background: var(--gray-200); color: var(--gray-500); cursor: not-allowed;
 }
 .add-to-cart[disabled]:hover { transform: none; box-shadow: none; }
-
-/* Stock indicator */
-.stock-indicator {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 0.75rem; font-weight: 600; padding: 4px 10px;
-  border-radius: 100px;
-}
-.stock-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.stock-indicator--in  { background: var(--green-pale);  color: var(--green); }
-.stock-indicator--low { background: var(--amber-pale);  color: var(--amber); }
-.stock-indicator--out { background: var(--red-pale);    color: var(--red); }
 
 /* ---- Why Us ---- */
 .why {
