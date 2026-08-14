@@ -265,7 +265,7 @@ const DEFAULT_PRODUCTS = [
     unit: "5mg vial",
     purity: "≥99%",
     desc: "A synthetic analog of growth hormone-releasing hormone (GHRH) that stimulates endogenous GH secretion in a physiological, pulsatile pattern, studied extensively in metabolic and body-composition research.",
-    meta: ["5mg / vial", "≥99% Purity", "Lyophilized"],
+    meta: ["5mg / vial (includes two vials)", "≥99% Purity", "Lyophilized"],
     detail: {
       overview: "Tesamorelin is a synthetic peptide analog of growth hormone-releasing hormone (GHRH), studied for its ability to stimulate the pituitary gland's natural, pulsatile release of growth hormone rather than introducing exogenous GH directly. The pen option includes two 5mg vials.",
       benefits: [
