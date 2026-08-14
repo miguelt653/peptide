@@ -254,6 +254,37 @@ const DEFAULT_PRODUCTS = [
       ],
     },
   },
+  {
+    id: 9,
+    name: "Tirzepatide",
+    fullName: "Tirzepatide (Dual GIP/GLP-1 Receptor Agonist)",
+    category: "metabolic",
+    categoryLabel: "Metabolic",
+    icon: "⚖️",
+    price: 155,
+    penPrice: 225,
+    unit: "20mg vial",
+    purity: "≥99%",
+    desc: "A dual glucose-dependent insulinotropic polypeptide (GIP) and glucagon-like peptide-1 (GLP-1) receptor agonist, studied in research settings for its dual-receptor activation properties and associated metabolic signaling interactions.",
+    meta: ["20mg / vial", "≥99% Purity", "Lyophilized"],
+    detail: {
+      overview: "Tirzepatide is a synthetic dual-receptor agonist engineered to activate both GIP and GLP-1 receptors simultaneously. Research has examined its combined-pathway metabolic signaling, with studies investigating how co-activating these two receptor systems compares to single-pathway GLP-1 research models.",
+      benefits: [
+        "Investigated as a dual GIP/GLP-1 receptor agonist",
+        "Studied for glycemic signaling pathway modulation",
+        "Researched for complementary receptor interaction mechanisms",
+        "Explored in cardiometabolic signaling research models",
+      ],
+      mechanism: "Investigated for its co-activation of GIP and GLP-1 receptors, studied for roles in insulin secretion signaling, glucagon pathway suppression, appetite regulatory mechanisms, and gastric emptying modulation — with GIP receptor interactions explored for complementary metabolic signaling.",
+      specs: [
+        { label: "Class", value: "Dual GIP/GLP-1 receptor agonist" },
+        { label: "Molecular Weight", value: "~4,810 Da" },
+        { label: "Form", value: "Lyophilized powder" },
+        { label: "Purity", value: "≥99% (HPLC verified)" },
+        { label: "Storage", value: "Refrigerate at 2–8°C. Do not freeze reconstituted solution." },
+      ],
+    },
+  },
 ];
 
 const PRODUCTS = [...DEFAULT_PRODUCTS];
