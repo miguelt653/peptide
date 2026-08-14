@@ -285,6 +285,38 @@ const DEFAULT_PRODUCTS = [
       ],
     },
   },
+  {
+    id: 10,
+    name: "Tesamorelin",
+    fullName: "Tesamorelin (Synthetic GHRH Analog)",
+    category: "metabolic",
+    categoryLabel: "Metabolic",
+    icon: "📈",
+    price: 80,
+    penPrice: 185,
+    unit: "5mg vial",
+    purity: "≥99%",
+    desc: "A synthetic analog of growth hormone-releasing hormone (GHRH) that stimulates endogenous GH secretion in a physiological, pulsatile pattern, studied extensively in metabolic and body-composition research.",
+    meta: ["5mg / vial", "≥99% Purity", "Lyophilized"],
+    detail: {
+      overview: "Tesamorelin is a synthetic peptide analog of growth hormone-releasing hormone (GHRH), studied for its ability to stimulate the pituitary gland's natural, pulsatile release of growth hormone rather than introducing exogenous GH directly. The pen option includes two 5mg vials.",
+      benefits: [
+        "Investigated for GHRH receptor-mediated GH secretion research",
+        "Studied for physiological, pulsatile GH release pathway modulation",
+        "Researched for body-composition and metabolic signaling interactions",
+        "Explored in IGF-1 axis signaling research models",
+      ],
+      mechanism: "Investigated for its selective agonism of the GHRH receptor on pituitary somatotrophs, studied for stimulating natural pulsatile growth hormone release and downstream IGF-1 signaling, rather than direct exogenous GH pathway activation.",
+      specs: [
+        { label: "Class", value: "Synthetic GHRH analogue" },
+        { label: "Molecular Weight", value: "~5,135 Da" },
+        { label: "Form", value: "Lyophilized powder" },
+        { label: "Purity", value: "≥99% (HPLC verified)" },
+        { label: "Storage", value: "Refrigerate at 2–8°C. Protect from light." },
+        { label: "Pen Kit Contents", value: "2 × 5mg vials + pen" },
+      ],
+    },
+  },
 ];
 
 const PRODUCTS = [...DEFAULT_PRODUCTS];
