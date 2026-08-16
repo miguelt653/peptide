@@ -137,12 +137,13 @@ const DEFAULT_PRODUCTS = [
     category: "metabolic",
     categoryLabel: "Metabolic",
     icon: "⚖️",
+    coa: "assets/coa-tirzepatide.jpg",
     price: 155,
     penPrice: 225,
     unit: "20mg vial",
     purity: "≥99%",
     desc: "A dual glucose-dependent insulinotropic polypeptide (GIP) and glucagon-like peptide-1 (GLP-1) receptor agonist, studied in research settings for its dual-receptor activation properties and associated metabolic signaling interactions.",
-    meta: ["20mg / vial", "≥99% Purity", "Lyophilized"],
+    meta: ["20mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
     detail: {
       overview: "Tirzepatide is a synthetic dual-receptor agonist engineered to activate both GIP and GLP-1 receptors simultaneously. Research has examined its combined-pathway metabolic signaling, with studies investigating how co-activating these two receptor systems compares to single-pathway GLP-1 research models.",
       benefits: [
@@ -264,13 +265,14 @@ const DEFAULT_PRODUCTS = [
     category: "metabolic",
     categoryLabel: "Metabolic",
     icon: "📈",
+    coa: "assets/coa-tesamorelin.jpg",
     price: 80,
     penPrice: 185,
     unit: "5mg vial",
     penUnit: "10mg (2 vials + pen)",
     purity: "≥99%",
     desc: "A synthetic analog of growth hormone-releasing hormone (GHRH) that stimulates endogenous GH secretion in a physiological, pulsatile pattern, studied extensively in metabolic and body-composition research.",
-    meta: ["5mg / vial (10mg with pen)", "≥99% Purity", "Lyophilized"],
+    meta: ["5mg / vial (10mg with pen)", "≥99% Purity", "Lyophilized", "COA Included"],
     detail: {
       overview: "Tesamorelin is a synthetic peptide analog of growth hormone-releasing hormone (GHRH), studied for its ability to stimulate the pituitary gland's natural, pulsatile release of growth hormone rather than introducing exogenous GH directly. The vial option is 5mg; the pen option includes two 5mg vials for 10mg total.",
       benefits: [
