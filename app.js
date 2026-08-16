@@ -267,6 +267,7 @@ const DEFAULT_PRODUCTS = [
     price: 80,
     penPrice: 185,
     unit: "5mg vial",
+    penUnit: "10mg (2 vials + pen)",
     purity: "≥99%",
     desc: "A synthetic analog of growth hormone-releasing hormone (GHRH) that stimulates endogenous GH secretion in a physiological, pulsatile pattern, studied extensively in metabolic and body-composition research.",
     meta: ["5mg / vial (10mg with pen)", "≥99% Purity", "Lyophilized"],
@@ -506,7 +507,7 @@ function renderProducts() {
       <div class="product-card__footer">
         <div>
           <div class="product-card__price">$${curPrice.toFixed(2)}</div>
-          <div class="product-card__price-sub">${variant === 'pen' ? 'vial + injection pen' : `per ${p.unit}`}</div>
+          <div class="product-card__price-sub">${variant === 'pen' ? (p.penUnit ? `per ${p.penUnit}` : 'vial + injection pen') : `per ${p.unit}`}</div>
         </div>
         <div class="product-card__actions">
           <button class="view-details-btn" data-id="${p.id}">Details</button>
@@ -1029,7 +1030,7 @@ let detailProduct = null;
 function refreshDetailPrice(p) {
   const variant = variantOf(p.id);
   document.getElementById("detailPrice").textContent = `$${priceFor(p, variant).toFixed(2)}`;
-  document.getElementById("detailUnit").textContent  = variant === "pen" ? "vial + injection pen" : `per ${p.unit}`;
+  document.getElementById("detailUnit").textContent  = variant === "pen" ? (p.penUnit ? `per ${p.penUnit}` : "vial + injection pen") : `per ${p.unit}`;
   detailBody.querySelectorAll(".variant-opt").forEach(b => {
     b.classList.toggle("variant-opt--active", b.dataset.variant === variant);
   });
