@@ -2163,8 +2163,15 @@ async function savePricing(id) {
     const payload = { price, cost, updated_at: new Date().toISOString() };
     if (penPrice !== undefined) payload.pen_price = penPrice;
     if (penCost !== undefined) payload.pen_cost = penCost;
-    const { error } = await sb.from("products").update(payload).eq("id", Number(id));
+    // .select() so we can tell a real save apart from an UPDATE that matched
+    // zero rows (e.g. this product was never inserted into Supabase) — a
+    // plain .update() reports no error either way, which would otherwise
+    // show "Saved" while silently not persisting anything.
+    const { data, error } = await sb.from("products").update(payload).eq("id", Number(id)).select();
     if (error) throw error;
+    if (!data || data.length === 0) {
+      throw new Error("No matching product row in the database — this product may need to be added to Supabase first.");
+    }
     const p = PRODUCTS.find(x => x.id === Number(id));
     if (p) {
       p.price = price;
