@@ -1037,6 +1037,22 @@ img { display: block; max-width: 100%; }
 }
 .pricing-input:focus { outline: none; border-color: var(--blue); }
 
+/* Referral Codes tab */
+.referral-code-input { text-transform: uppercase; width: 110px; }
+.referral-add-row { background: var(--blue-pale); border-color: #cfe8d8; }
+.referral-row--inactive { opacity: 0.6; }
+.referral-inactive-badge {
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+  color: var(--text-muted); background: var(--gray-100); padding: 2px 8px; border-radius: 100px;
+  margin-left: 6px; vertical-align: middle;
+}
+.referral-active-field {
+  flex-direction: row !important; align-items: center; gap: 6px !important;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: none !important;
+  letter-spacing: normal !important;
+}
+.referral-active-check { width: 15px; height: 15px; accent-color: var(--blue); cursor: pointer; }
+
 /* P&L tab */
 .pnl-backfill-banner {
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;

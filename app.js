@@ -32,13 +32,17 @@ const CASHAPP_HANDLE    = "$BellaVitaLabs"; // change to actual cashtag
 // the customer's subtotal; commissionRate (if any) is paid to the referrer on
 // the pre-discount subtotal + shipping. Codes with commissionRate 0 are
 // plain discount codes with no referrer payout.
-const REFERRAL_CODES = {
-  VAL:   { discountRate: 0.10, commissionRate: 0.30 },
-  VINCE: { discountRate: 0.10, commissionRate: 0.20 },
-  KELLY: { discountRate: 0.10, commissionRate: 0.20 },
-  NEW:   { discountRate: 0.10, commissionRate: 0 },
-  LOYAL: { discountRate: 0.10, commissionRate: 0 },
+// Hardcoded fallback only — the live source of truth is the Supabase
+// referral_codes table (see loadLiveReferralCodes), editable from the admin
+// dashboard's Referral Codes tab. This stays in effect if that fetch fails.
+const DEFAULT_REFERRAL_CODES = {
+  VAL:   { discountRate: 0.10, commissionRate: 0.30, active: true },
+  VINCE: { discountRate: 0.10, commissionRate: 0.20, active: true },
+  KELLY: { discountRate: 0.10, commissionRate: 0.20, active: true },
+  NEW:   { discountRate: 0.10, commissionRate: 0, active: true },
+  LOYAL: { discountRate: 0.10, commissionRate: 0, active: true },
 };
+let REFERRAL_CODES = JSON.parse(JSON.stringify(DEFAULT_REFERRAL_CODES));
 const OWNER_WEBHOOK_URL = "";            // e.g. "https://hooks.zapier.com/hooks/catch/123456/abcdef/"
 const USE_EMAILJS       = true;
 const EMAILJS_CONFIG    = {
@@ -348,6 +352,29 @@ async function loadLivePricing() {
     // otherwise it could keep showing stale/default values, and saving from
     // that stale form would silently overwrite a real live price.
     if (typeof adminUnlocked !== "undefined" && adminUnlocked && typeof orderFilter !== "undefined" && orderFilter === "pricing") {
+      renderOrdersList();
+    }
+  }
+}
+
+let referralCodesLoaded = false;
+async function loadLiveReferralCodes() {
+  if (!sb) { referralCodesLoaded = true; return; }
+  try {
+    const { data, error } = await sb.from("referral_codes").select("code, discount_rate, commission_rate, active");
+    if (error || !data) return;
+    data.forEach(row => {
+      REFERRAL_CODES[row.code] = {
+        discountRate: Number(row.discount_rate),
+        commissionRate: Number(row.commission_rate),
+        active: row.active !== false,
+      };
+    });
+  } catch (e) {
+    console.warn("Live referral codes fetch failed, using defaults:", e);
+  } finally {
+    referralCodesLoaded = true;
+    if (typeof adminUnlocked !== "undefined" && adminUnlocked && typeof orderFilter !== "undefined" && orderFilter === "referrals") {
       renderOrdersList();
     }
   }
@@ -740,7 +767,8 @@ function normalizeReferral(code) {
   return (code || "").trim().toUpperCase();
 }
 function getReferralConfig(code) {
-  return REFERRAL_CODES[normalizeReferral(code)] || null;
+  const config = REFERRAL_CODES[normalizeReferral(code)];
+  return config && config.active !== false ? config : null;
 }
 function isValidReferral(code) {
   return !!getReferralConfig(code);
@@ -1740,7 +1768,7 @@ function renderOrdersList() {
   const commissionOrders = searched.filter(o => o.referral_valid && Number(o.commission) > 0);
 
   const list = orderFilter === "commission" ? commissionOrders
-    : (orderFilter === "products" || orderFilter === "customers" || orderFilter === "pricing" || orderFilter === "pnl") ? []
+    : (orderFilter === "products" || orderFilter === "customers" || orderFilter === "pricing" || orderFilter === "pnl" || orderFilter === "referrals") ? []
     : ({ all: searched, awaiting_payment: pending, paid: received, shipped: shipped }[orderFilter] || searched);
   const emptyMsg = orderSearch ? `No orders match "${orderSearch}".` : "No orders in this view.";
 
@@ -1828,6 +1856,52 @@ function renderOrdersList() {
             <button type="button" class="btn-mini btn-mini--primary pricing-save" data-id="${p.id}">Save</button>
           </div>
         `).join("")}
+      </div>`;
+  } else if (orderFilter === "referrals" && !referralCodesLoaded) {
+    body = `<div class="empty-state">Loading referral codes…</div>`;
+  } else if (orderFilter === "referrals") {
+    const codes = Object.keys(REFERRAL_CODES)
+      .filter(code => !orderSearch || code.toLowerCase().includes(orderSearch.toLowerCase()))
+      .sort();
+    body = `
+      <div class="product-sales-summary">Discount applies to the customer at checkout. Commission is what the referrer earns — set it to 0% for a plain discount code with no payout.</div>
+      <div class="pricing-list">
+        <div class="pricing-row referral-add-row">
+          <div class="pricing-row__name">+ New Code</div>
+          <div class="pricing-row__fields">
+            <label class="pricing-field">Code
+              <input type="text" class="pricing-input referral-code-input" id="newReferralCode" placeholder="e.g. SARAH">
+            </label>
+            <label class="pricing-field">Discount %
+              <input type="number" step="0.1" min="0" max="100" class="pricing-input" id="newReferralDiscount" placeholder="10">
+            </label>
+            <label class="pricing-field pricing-field--cost">Commission %
+              <input type="number" step="0.1" min="0" max="100" class="pricing-input" id="newReferralCommission" placeholder="20">
+            </label>
+          </div>
+          <button type="button" class="btn-mini btn-mini--primary" id="addReferralCodeBtn">Add Code</button>
+        </div>
+        ${codes.map(code => {
+          const cfg = REFERRAL_CODES[code];
+          const inactive = cfg.active === false;
+          return `
+          <div class="pricing-row referral-row ${inactive ? "referral-row--inactive" : ""}" data-code="${escapeHtml(code)}">
+            <div class="pricing-row__name">${escapeHtml(code)}${inactive ? ' <span class="referral-inactive-badge">Inactive</span>' : ""}</div>
+            <div class="pricing-row__fields">
+              <label class="pricing-field">Discount %
+                <input type="number" step="0.1" min="0" max="100" class="pricing-input" data-field="discount" value="${pctVal(cfg.discountRate)}">
+              </label>
+              <label class="pricing-field pricing-field--cost">Commission %
+                <input type="number" step="0.1" min="0" max="100" class="pricing-input" data-field="commission" value="${pctVal(cfg.commissionRate)}">
+              </label>
+              <label class="pricing-field referral-active-field">
+                <input type="checkbox" class="referral-active-check" data-field="active" ${!inactive ? "checked" : ""}>
+                Active
+              </label>
+            </div>
+            <button type="button" class="btn-mini btn-mini--primary referral-save" data-code="${escapeHtml(code)}">Save</button>
+          </div>`;
+        }).join("")}
       </div>`;
   } else if (orderFilter === "pnl") {
     const needsBackfill = all.filter(o => (o.status === "paid" || o.status === "shipped") && !o.payment_confirmed_at);
@@ -1964,6 +2038,18 @@ function renderOrdersList() {
     btn.addEventListener("click", () => savePricing(btn.dataset.id));
   });
 
+  ordersList.querySelectorAll(".referral-save").forEach(btn => {
+    btn.addEventListener("click", () => saveReferralCode(btn.dataset.code));
+  });
+  const addReferralCodeBtn = document.getElementById("addReferralCodeBtn");
+  if (addReferralCodeBtn) addReferralCodeBtn.addEventListener("click", addReferralCode);
+  const newReferralCodeInput = document.getElementById("newReferralCode");
+  if (newReferralCodeInput) {
+    newReferralCodeInput.addEventListener("input", () => {
+      newReferralCodeInput.value = newReferralCodeInput.value.toUpperCase();
+    });
+  }
+
   ordersList.querySelectorAll(".pnl-period-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       plPeriod = btn.dataset.period;
@@ -2093,6 +2179,78 @@ async function savePricing(id) {
     alert("Save failed: " + (e.message || "check your connection."));
     btn.textContent = "Save";
     btn.disabled = false;
+  }
+}
+
+// Rounds a 0–1 rate to a clean percent for display (e.g. 0.10 -> 10, 0.125 -> 12.5).
+function pctVal(rate) {
+  return Math.round(Number(rate) * 1000) / 10;
+}
+
+async function saveReferralCode(code) {
+  const row = ordersList.querySelector(`.referral-row[data-code="${CSS.escape(code)}"]`);
+  if (!row || !sb) return;
+  const discountPct   = Number(row.querySelector('[data-field="discount"]').value);
+  const commissionPct = Number(row.querySelector('[data-field="commission"]').value);
+  const active        = row.querySelector('[data-field="active"]').checked;
+
+  if (Number.isNaN(discountPct) || discountPct < 0 || discountPct > 100) { alert("Discount % must be a number between 0 and 100."); return; }
+  if (Number.isNaN(commissionPct) || commissionPct < 0 || commissionPct > 100) { alert("Commission % must be a number between 0 and 100."); return; }
+
+  const btn = row.querySelector(".referral-save");
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+  try {
+    const discountRate = discountPct / 100;
+    const commissionRate = commissionPct / 100;
+    const { error } = await sb.from("referral_codes").update({
+      discount_rate: discountRate,
+      commission_rate: commissionRate,
+      active,
+    }).eq("code", code);
+    if (error) throw error;
+    REFERRAL_CODES[code] = { discountRate, commissionRate, active };
+    btn.textContent = "Saved ✓";
+    setTimeout(() => { renderOrdersList(); }, 700);
+  } catch (e) {
+    alert("Save failed: " + (e.message || "check your connection."));
+    btn.textContent = "Save";
+    btn.disabled = false;
+  }
+}
+
+// New codes are always created active — deactivating an existing one is a
+// separate, deliberate action from the row's own Active checkbox, so a
+// brand-new code never accidentally launches disabled.
+async function addReferralCode() {
+  const codeInput = document.getElementById("newReferralCode");
+  const discountInput = document.getElementById("newReferralDiscount");
+  const commissionInput = document.getElementById("newReferralCommission");
+  const code = normalizeReferral(codeInput.value);
+  const discountPct = Number(discountInput.value);
+  const commissionPct = commissionInput.value.trim() === "" ? 0 : Number(commissionInput.value);
+
+  if (!code) { alert("Enter a code name."); return; }
+  if (!/^[A-Z0-9]+$/.test(code)) { alert("Codes can only contain letters and numbers."); return; }
+  if (REFERRAL_CODES[code]) { alert(`Code ${code} already exists.`); return; }
+  if (Number.isNaN(discountPct) || discountPct < 0 || discountPct > 100) { alert("Discount % must be a number between 0 and 100."); return; }
+  if (Number.isNaN(commissionPct) || commissionPct < 0 || commissionPct > 100) { alert("Commission % must be a number between 0 and 100."); return; }
+  if (!sb) return;
+
+  const btn = document.getElementById("addReferralCodeBtn");
+  btn.disabled = true;
+  btn.textContent = "Adding…";
+  try {
+    const discountRate = discountPct / 100;
+    const commissionRate = commissionPct / 100;
+    const { error } = await sb.from("referral_codes").insert({ code, discount_rate: discountRate, commission_rate: commissionRate, active: true });
+    if (error) throw error;
+    REFERRAL_CODES[code] = { discountRate, commissionRate, active: true };
+    renderOrdersList();
+  } catch (e) {
+    alert("Add failed: " + (e.message || "check your connection."));
+    btn.disabled = false;
+    btn.textContent = "Add Code";
   }
 }
 
@@ -2325,3 +2483,4 @@ updateCartUI();
 // payment confirmed right after page load can't compute cost from
 // stale/blank product data while this fetch is still in flight.
 const livePricingReady = loadLivePricing();
+loadLiveReferralCodes();
