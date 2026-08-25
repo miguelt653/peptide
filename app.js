@@ -100,6 +100,11 @@ const DEFAULT_PRODUCTS = [
   {
     id: 2,
     name: "GLP-3",
+    // Internal/backend-only name: what gets stored on new orders so Product
+    // Sales, Customer History, and admin order records keep grouping under
+    // the same name as all pre-rename historical orders. Customer-facing
+    // text always uses `name`/`fullName` above, never this field.
+    orderName: "Retatrutide",
     fullName: "GLP-3 (GLP-1/GIP/Glucagon Triple Agonist)",
     category: "metabolic",
     categoryLabel: "Metabolic",
@@ -944,7 +949,10 @@ checkoutForm.addEventListener("submit", async e => {
       state: formData.get("state"),
       zip: formData.get("zip"),
     },
-    items: cart.map(i => ({ id: i.id, name: i.name, variant: i.variant, qty: i.qty, price: i.price })),
+    items: cart.map(i => {
+      const product = PRODUCTS.find(p => p.id === i.id);
+      return { id: i.id, name: (product && product.orderName) || i.name, variant: i.variant, qty: i.qty, price: i.price };
+    }),
     shippingMethod,
     shipping: ship,
     discount,
