@@ -99,7 +99,7 @@ async function saveOrderToCloud(order) {
 const DEFAULT_PRODUCTS = [
   {
     id: 2,
-    name: "GLP-3",
+    name: "GLP-3 (RTA)",
     // Internal/backend-only name: what gets stored on new orders so Product
     // Sales, Customer History, and admin order records keep grouping under
     // the same name as all pre-rename historical orders. Customer-facing
