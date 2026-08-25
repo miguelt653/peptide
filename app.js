@@ -99,8 +99,8 @@ async function saveOrderToCloud(order) {
 const DEFAULT_PRODUCTS = [
   {
     id: 2,
-    name: "Retatrutide",
-    fullName: "Retatrutide (GLP-1/GIP/Glucagon Triple Agonist)",
+    name: "GLP-3",
+    fullName: "GLP-3 (GLP-1/GIP/Glucagon Triple Agonist)",
     category: "metabolic",
     categoryLabel: "Metabolic",
     icon: "🎯",
@@ -112,7 +112,7 @@ const DEFAULT_PRODUCTS = [
     desc: "A next-generation triple receptor agonist (GLP-1, GIP, and glucagon) being actively studied for metabolic regulation, body composition, and energy balance.",
     meta: ["20mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
     detail: {
-      overview: "Retatrutide is a first-in-class triple receptor agonist targeting GIP, GLP-1, and glucagon receptors simultaneously. It has been the subject of research examining multi-pathway metabolic receptor activation, with studies investigating its broad metabolic signaling interactions.",
+      overview: "GLP-3 is a first-in-class triple receptor agonist targeting GIP, GLP-1, and glucagon receptors simultaneously. It has been the subject of research examining multi-pathway metabolic receptor activation, with studies investigating its broad metabolic signaling interactions.",
       benefits: [
         "Studied as a triple-receptor metabolic agonist",
         "Investigated for multi-pathway metabolic receptor activation",
