@@ -137,7 +137,12 @@ const DEFAULT_PRODUCTS = [
   },
   {
     id: 9,
-    name: "Tirzepatide",
+    name: "GLP-2(TIRZ)",
+    // Internal/backend-only name: what gets stored on new orders so Product
+    // Sales, Customer History, and admin order records keep grouping under
+    // the same name as all pre-rename historical orders. Customer-facing
+    // text always uses `name`/`fullName` above, never this field.
+    orderName: "Tirzepatide",
     fullName: "Tirzepatide (Dual GIP/GLP-1 Receptor Agonist)",
     category: "metabolic",
     categoryLabel: "Metabolic",
