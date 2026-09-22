@@ -171,7 +171,7 @@
         return res.json();
       })
       .then(function (token) {
-        return fetch("https://www.wixapis.com/form-submission-service/v4/submissions", {
+        return fetch("https://www.wixapis.com/forms/v4/submissions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
