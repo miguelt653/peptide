@@ -309,6 +309,7 @@ const DEFAULT_PRODUCTS = [
     category: "aesthetic",
     categoryLabel: "Aesthetic",
     icon: "☀️",
+    coa: "assets/coa-melanotan.jpg",
     price: 100,
     penPrice: 125,
     unit: "10mg vial",
