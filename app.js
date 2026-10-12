@@ -150,10 +150,10 @@ const DEFAULT_PRODUCTS = [
     coa: "assets/coa-tirzepatide.jpg",
     price: 155,
     penPrice: 225,
-    unit: "20mg vial",
+    unit: "30mg vial",
     purity: "≥99%",
     desc: "A dual glucose-dependent insulinotropic polypeptide (GIP) and glucagon-like peptide-1 (GLP-1) receptor agonist, studied in research settings for its dual-receptor activation properties and associated metabolic signaling interactions.",
-    meta: ["20mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
+    meta: ["30mg / vial", "≥99% Purity", "Lyophilized", "COA Included"],
     detail: {
       overview: "Tirzepatide is a synthetic dual-receptor agonist engineered to activate both GIP and GLP-1 receptors simultaneously. Research has examined its combined-pathway metabolic signaling, with studies investigating how co-activating these two receptor systems compares to single-pathway GLP-1 research models.",
       benefits: [
