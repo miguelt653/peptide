@@ -344,7 +344,7 @@ const DEFAULT_PRODUCTS = [
     price: 115,
     unit: "1500mg vial",
     purity: "≥99%",
-    desc: "The body's master antioxidant — a tripeptide studied for its role in detoxification, oxidative stress reduction, immune function, and cellular protection.",
+    desc: "Glutathione is the body's primary endogenous antioxidant, synthesized from glutamine, cysteine, and glycine. Injectable glutathione is studied for its systemic bioavailability in research models examining broad antioxidant and detoxification signaling.",
     meta: ["1500mg / vial", "≥99% Purity", "Lyophilized"],
     detail: {
       overview: "Glutathione is a naturally occurring tripeptide (glutamate, cysteine, glycine) produced in nearly every cell of the body. Research has focused on its central role as the body's primary intracellular antioxidant, its involvement in Phase II liver detoxification, and its influence on immune cell function.",
