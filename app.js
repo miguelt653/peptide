@@ -334,6 +334,37 @@ const DEFAULT_PRODUCTS = [
       ],
     },
   },
+  {
+    id: 11,
+    name: "Glutathione",
+    fullName: "Glutathione (Reduced L-Glutathione)",
+    category: "healing",
+    categoryLabel: "Healing & Recovery",
+    icon: "💧",
+    price: 115,
+    unit: "1500mg vial",
+    purity: "≥99%",
+    desc: "The body's master antioxidant — a tripeptide studied for its role in detoxification, oxidative stress reduction, immune function, and cellular protection.",
+    meta: ["1500mg / vial", "≥99% Purity", "Lyophilized"],
+    detail: {
+      overview: "Glutathione is a naturally occurring tripeptide (glutamate, cysteine, glycine) produced in nearly every cell of the body. Research has focused on its central role as the body's primary intracellular antioxidant, its involvement in Phase II liver detoxification, and its influence on immune cell function.",
+      benefits: [
+        "Studied for oxidative stress and free-radical neutralization pathways",
+        "Investigated in Phase II hepatic detoxification research",
+        "Researched for immune cell signaling and support mechanisms",
+        "Explored for cellular protection and mitochondrial health pathways",
+      ],
+      mechanism: "Investigated for its role as a cofactor for glutathione peroxidase and glutathione S-transferase enzymes, studied for neutralizing reactive oxygen species, conjugating and clearing toxins and heavy metals during hepatic detoxification, and regenerating other antioxidants such as vitamins C and E.",
+      specs: [
+        { label: "Sequence", value: "γ-Glu-Cys-Gly" },
+        { label: "Molecular Weight", value: "307.32 Da" },
+        { label: "Form", value: "Lyophilized powder" },
+        { label: "Purity", value: "≥99% (HPLC verified)" },
+        { label: "Storage", value: "Refrigerate at 2–8°C. Protect from light." },
+        { label: "Reconstitution", value: "Bacteriostatic water" },
+      ],
+    },
+  },
 ];
 
 const PRODUCTS = [...DEFAULT_PRODUCTS];
