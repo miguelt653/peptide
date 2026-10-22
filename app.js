@@ -1648,15 +1648,15 @@ function computePnlTrend(orders) {
 // the P&L feature existed have no payment_confirmed_at or cost_amount yet.
 // Backfills both using created_at as an approximate confirm date.
 async function backfillHistoricalPayments() {
-  const targets = ordersCache.filter(o => (o.status === "paid" || o.status === "shipped") && !o.payment_confirmed_at);
+  const targets = ordersCache.filter(o => (o.status === "paid" || o.status === "shipped") && (!o.payment_confirmed_at || o.cost_amount == null));
   if (!targets.length || !sb) return;
-  if (!confirm(`Backfill payment records for ${targets.length} historical order${targets.length === 1 ? "" : "s"}? This uses each order's original date as an approximate confirm time and only needs to run once.`)) return;
+  if (!confirm(`Backfill payment/cost records for ${targets.length} historical order${targets.length === 1 ? "" : "s"}? Orders missing a confirm date use their original order date as an approximate; orders that already have one keep it unchanged and only get their cost re-snapshotted. Safe to run anytime.`)) return;
   const btn = document.getElementById("pnlBackfillBtn");
   if (btn) { btn.disabled = true; btn.textContent = "Backfilling…"; }
   try {
     await livePricingReady;
     const results = await Promise.all(targets.map(o => sb.from("orders").update({
-      payment_confirmed_at: o.created_at,
+      payment_confirmed_at: o.payment_confirmed_at || o.created_at,
       cost_amount: computeOrderCost(o),
     }).eq("id", o.id)));
     const failed = results.find(r => r.error);
@@ -1951,7 +1951,7 @@ function renderOrdersList() {
         }).join("")}
       </div>`;
   } else if (orderFilter === "pnl") {
-    const needsBackfill = all.filter(o => (o.status === "paid" || o.status === "shipped") && !o.payment_confirmed_at);
+    const needsBackfill = all.filter(o => (o.status === "paid" || o.status === "shipped") && (!o.payment_confirmed_at || o.cost_amount == null));
     const shippedUnconfirmed = all.filter(o => o.status === "shipped" && !o.payment_confirmed_at);
     const awaitingFulfillmentCount = all.filter(o => o.status === "paid").length;
     const pnl = computePnL(all, plPeriod, plMonthOffset);
@@ -1962,7 +1962,7 @@ function renderOrdersList() {
     body = `
       ${needsBackfill.length ? `
       <div class="pnl-backfill-banner">
-        <span>${needsBackfill.length} historical order${needsBackfill.length === 1 ? "" : "s"} ${needsBackfill.length === 1 ? "isn't" : "aren't"} counted in P&L yet.</span>
+        <span>${needsBackfill.length} historical order${needsBackfill.length === 1 ? "" : "s"} ${needsBackfill.length === 1 ? "isn't" : "aren't"} fully counted in P&L yet (missing a confirm date and/or cost data).</span>
         <button type="button" class="btn-mini btn-mini--primary" id="pnlBackfillBtn">Backfill Historical Orders</button>
       </div>` : ""}
 
